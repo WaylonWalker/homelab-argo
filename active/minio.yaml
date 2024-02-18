@@ -3,7 +3,7 @@ kind: Service
 metadata:
   annotations:
     kompose.cmd: kompose convert -o deployment.yaml -n minio-homelab
-    kompose.service.expose: aminio.fokais.com, aminio-ui.wayl.one
+    kompose.service.expose: aminio.wayl.one, aminio-ui.wayl.one
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -39,7 +39,7 @@ kind: Deployment
 metadata:
   annotations:
     kompose.cmd: kompose convert -o deployment.yaml -n minio-homelab
-    kompose.service.expose: aminio.fokais.com, aminio-ui.fokais.com
+    kompose.service.expose: aminio.wayl.one, aminio-ui.wayl.one
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -57,11 +57,11 @@ spec:
     metadata:
       annotations:
         kompose.cmd: kompose convert -o deployment.yaml -n minio-homelab
-        kompose.service.expose: aminio.fokais.com, aminio-ui.fokais.com
+        kompose.service.expose: aminio.wayl.one, aminio-ui.wayl.one
         kompose.version: 1.31.2 (a92241f79)
       creationTimestamp: null
       labels:
-        io.kompose.network/miniofokais-default: "true"
+        io.kompose.network/miniohomelab-default: "true"
         io.kompose.service: minio-homelab
     spec:
       containers:
@@ -99,18 +99,6 @@ spec:
             claimName: minio-storage
 status: {}
 
----
-apiVersion: v1
-data:
-  MINIO_ROOT_PASSWORD: outlying.squeak.gullible
-  MINIO_ROOT_USER: fokais
-kind: ConfigMap
-metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: minio-homelab-home-waylon-work-minio-homelab--env
-  name: home-waylon-work-minio-homelab--env
-  namespace: minio-homelab
 
 ---
 apiVersion: networking.k8s.io/v1
