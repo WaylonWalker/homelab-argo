@@ -8,7 +8,7 @@ metadata:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: data
+  name: minecraft-data
   namespace: minecraft
 spec:
   accessModes:
