@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-inspector
+  namespace: minecraft
+spec:
+  containers:
+    - image: docker.io/curlimages/curl
+      name: pvc-inspector
+      command: ["sleep", "3600"]
+      env:
+        - name: FOO
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: foo
+      volumeMounts:
+        - mountPath: /data
+          name: data
+        - name: sealed-secret
+          mountPath: /secret
+          readOnly: true
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: data
+    - name: sealed-secret
+      secret:
+        secretName: mysecret
