@@ -5,25 +5,25 @@ metadata:
   namespace: minecraft
 spec:
   containers:
-    - image: docker.io/curlimages/curl
+    - image: docker.io/waylonwalker/devtainer:slim
       name: pvc-inspector
       command: ["sleep", "3600"]
-      env:
-        - name: FOO
-          valueFrom:
-            secretKeyRef:
-              name: mysecret
-              key: foo
+      # env:
+      #   - name: FOO
+      #     valueFrom:
+      #       secretKeyRef:
+      #         name: mysecret
+      #         key: foo
       volumeMounts:
         - mountPath: /data
-          name: data
-        - name: sealed-secret
-          mountPath: /secret
-          readOnly: true
+          name: minecraft-data
+          # - name: sealed-secret
+          #   mountPath: /secret
+          #   readOnly: true
   volumes:
-    - name: data
+    - name: minecraft-data
       persistentVolumeClaim:
-        claimName: data
-    - name: sealed-secret
-      secret:
-        secretName: mysecret
+        claimName: minecraft-data
+  # - name: sealed-secret
+  #   secret:
+  #     secretName: mysecret

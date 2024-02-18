@@ -1,0 +1,168 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deployment.yaml -n minio-homelab
+    kompose.service.expose: aminio.fokais.com, aminio-ui.wayl.one
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio-homelab
+  name: minio-homelab
+  namespace: minio-homelab
+spec:
+  ports:
+    - name: "9000"
+      port: 9000
+      targetPort: 9000
+    - name: "9001"
+      port: 9001
+      targetPort: 9001
+  selector:
+    io.kompose.service: minio-homelab
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: minio-homelab
+  namespace: minio-homelab
+spec: {}
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deployment.yaml -n minio-homelab
+    kompose.service.expose: aminio.fokais.com, aminio-ui.fokais.com
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio-homelab
+  name: minio-homelab
+  namespace: minio-homelab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: minio-homelab
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -o deployment.yaml -n minio-homelab
+        kompose.service.expose: aminio.fokais.com, aminio-ui.fokais.com
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/miniofokais-default: "true"
+        io.kompose.service: minio-homelab
+    spec:
+      containers:
+        - args:
+            - server
+            - --console-address
+            - :9001
+            - /data
+          env:
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: MINIO_ROOT_PASSWORD
+                  name: home-waylon-work-minio-homelab--env
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: MINIO_ROOT_USER
+                  name: home-waylon-work-minio-homelab--env
+          image: minio/minio
+          name: minio-homelab
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 9001
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: minio-storage
+      restartPolicy: Always
+      volumes:
+        - name: minio-storage
+          persistentVolumeClaim:
+            claimName: minio-storage
+status: {}
+
+---
+apiVersion: v1
+data:
+  MINIO_ROOT_PASSWORD: outlying.squeak.gullible
+  MINIO_ROOT_USER: fokais
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio-homelab-home-waylon-work-minio-homelab--env
+  name: home-waylon-work-minio-homelab--env
+  namespace: minio-homelab
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deployment.yaml -n minio-homelab
+    kompose.service.expose: aminio.fokais.com, aminio-ui.fokais.com
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio-homelab
+  name: minio-homelab
+  namespace: minio-homelab
+spec:
+  rules:
+    - host: aminio.fokais.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: minio-homelab
+                port:
+                  number: 9000
+            path: /
+            pathType: Prefix
+    - host: aminio-ui.fokais.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: minio-homelab
+                port:
+                  number: 9001
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio-storage
+  name: minio-storage
+  namespace: minio-homelab
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
