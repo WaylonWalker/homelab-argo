@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lonecraft
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: lonecraft
+  namespace: lonecraft
+spec:
+  selector:
+    app: lonecraft
+  ports:
+    - name: "35566"
+      port: 35568
+      targetPort: 25565
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lonecraft
+  namespace: lonecraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lonecraft
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: lonecraft
+    spec:
+      containers:
+        - env:
+            - name: SEED
+              value: '5103687417315433447'
+            - name: EULA
+              value: "true"
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                gamerule keepInventory true
+                pregen start 200
+            - name: VERSION
+              value: 1.20.1
+          image: itzg/minecraft-server
+          name: lonecraft
+          ports:
+            - containerPort: 25565
+              hostPort: 35566
+              protocol: TCP
+          resources: {}
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /data
+              name: minecraft-data
+              subPath: lonecraft
+      restartPolicy: Always
+      volumes:
+        - name: minecraft-data
+          persistentVolumeClaim:
+            claimName: minecraft-data
