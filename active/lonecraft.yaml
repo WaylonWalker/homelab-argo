@@ -1,15 +1,8 @@
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: lonecraft
-
----
-
-apiVersion: v1
 kind: Service
 metadata:
   name: lonecraft
-  namespace: lonecraft
+  namespace: minecraft
 spec:
   selector:
     app: lonecraft
@@ -24,7 +17,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lonecraft
-  namespace: lonecraft
+  namespace: minecraft
 spec:
   replicas: 1
   selector:
