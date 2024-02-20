@@ -48,7 +48,7 @@ spec:
           name: lonecraft-creative
           ports:
             - containerPort: 25565
-              hostPort: 35566
+              hostPort: 35567
               protocol: TCP
           resources: {}
           stdin: true
