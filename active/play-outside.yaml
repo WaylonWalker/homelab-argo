@@ -62,7 +62,7 @@ spec:
                   name: tank-git-play-outside--env-prod
             - name: PLAY_OUTSIDE_OPEN_WEATHER_API_KEY
               valueFrom:
-                secreteKeyRef:
+                secretKeyRef:
                   key: PLAY_OUTSIDE_OPEN_WEATHER_API_KEY
                   name: play-outside-open-weather-api-key
           image: registry.wayl.one/play-outside:0.0.28
