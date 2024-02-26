@@ -32,6 +32,24 @@ spec:
     spec:
       containers:
         - env:
+            - name: SERVER_NAME
+              value: Breath of the Walkers
+            - name: MOTD
+              value: "§bBreath§r of the §l§cWalkers§r"
+            - name: SPAWN_ANIMALS
+              value: 'true'
+            - name: SPAWN_MONSTERS
+              value: 'false'
+            - name: SPAWN_PROTECTION
+              value: '0'
+            - name: MODE
+              value: creative
+            - name: GENERATE_STRUCTURES
+              value: 'false'
+            - name: PVP
+              value: 'false'
+            - name: ICON
+              value: https://waylonwalker.com/profile
             - name: EULA
               value: "true"
             - name: LEVEL_TYPE
