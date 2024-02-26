@@ -71,10 +71,10 @@ spec:
           tty: true
           volumeMounts:
             - mountPath: /data
-              name: data
-              subPath: superflat
+              name: minecraft-data
+              subPath: superflat-botw
       restartPolicy: Always
       volumes:
-        - name: data
+        - name: minecraft-data
           persistentVolumeClaim:
-            claimName: data
+            claimName: minecraft-data
