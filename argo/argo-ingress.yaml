@@ -5,13 +5,13 @@ metadata:
   namespace: argocd
 spec:
   rules:
-    - host: argo.wayl.one
+    - host: argocd.wayl.one
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: argocd-server
+                name: argo-argocd-server
                 port:
                   number: 8080
