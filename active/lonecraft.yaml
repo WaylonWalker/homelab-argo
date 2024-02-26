@@ -32,6 +32,12 @@ spec:
     spec:
       containers:
         - env:
+            - name: SERVER_NAME
+              value: LoneCraft
+            - name: MOTD
+              value: §sLone§pCraft
+            - name: ICON
+              value: https://screenshots.waylonwalker.com/lonecraft.png
             - name: SEED
               value: '5103687417315433447'
             - name: EULA
