@@ -1,0 +1,760 @@
+apiVersion: v1
+data:
+  admin.enabled: "true"
+  application.instanceLabelKey: argocd.argoproj.io/instance
+  exec.enabled: "false"
+  server.rbac.log.enforce.enable: "false"
+  timeout.hard.reconciliation: 0s
+  timeout.reconciliation: 180s
+  url: https://argocd.example.com
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: argo
+    meta.helm.sh/release-namespace: argocd
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: argo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: v2.10.1
+    helm.sh/chart: argo-cd-6.1.0
+  name: argocd-cm
+---
+apiVersion: v1
+data:
+  policy.csv: ""
+  policy.default: ""
+  policy.matchMode: glob
+  scopes: '[groups]'
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: argo
+    meta.helm.sh/release-namespace: argocd
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: argo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: v2.10.1
+    helm.sh/chart: argo-cd-6.1.0
+  name: argocd-rbac-cm
+---
+apiVersion: v1
+data:
+  ssh_known_hosts: |
+    [ssh.github.com]:443 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+    [ssh.github.com]:443 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    [ssh.github.com]:443 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+    bitbucket.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPIQmuzMBuKdWeF4+a2sjSSpBK0iqitSQ+5BM9KhpexuGt20JpTVM7u5BDZngncgrqDMbWdxMWWOGtZ9UgbqgZE=
+    bitbucket.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIazEu89wgQZ4bqs3d63QSMzYVa0MuJ2e2gKTKqu+UUO
+    bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDQeJzhupRu0u0cdegZIa8e86EG2qOCsIsD1Xw0xSeiPDlCr7kq97NLmMbpKTX6Esc30NuoqEEHCuc7yWtwp8dI76EEEB1VqY9QJq6vk+aySyboD5QF61I/1WeTwu+deCbgKMGbUijeXhtfbxSxm6JwGrXrhBdofTsbKRUsrN1WoNgUa8uqN1Vx6WAJw1JHPhglEGGHea6QICwJOAr/6mrui/oB7pkaWKHj3z7d1IC4KWLtY47elvjbaTlkN04Kc/5LFEirorGYVbt15kAUlqGM65pk6ZBxtaO3+30LVlORZkxOh+LKL/BvbZ/iRNhItLqNyieoQj/uh/7Iv4uyH/cV/0b4WDSd3DptigWq84lJubb9t/DnZlrJazxyDCulTmKdOR7vs9gMTo+uoIrPSb8ScTtvw65+odKAlBj59dhnVp9zd7QUojOpXlL62Aw56U4oO+FALuevvMjiWeavKhJqlR7i5n9srYcrNV7ttmDw7kf/97P5zauIhxcjX+xHv4M=
+    github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+    github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+    github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+    gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=
+    gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
+    gitlab.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsj2bNKTBSpIYDEGk9KxsGh3mySTRgMtXL583qmBpzeQ+jqCMRgBqB98u3z++J1sKlXHWfM9dyhSevkMwSbhoR8XIq/U0tCNyokEi/ueaBMCvbcTHhO7FcwzY92WK4Yt0aGROY5qX2UKSeOvuP4D6TPqKF1onrSzH9bx9XUf2lEdWT/ia1NEKjunUqu1xOB/StKDHMoX4/OKyIzuS0q/T1zOATthvasJFoPrAjkohTyaDUz2LN5JoH839hViyEG82yB+MjcFV5MU3N1l1QL3cVUCh93xSaua1N85qivl+siMkPGbO5xR/En4iEY6K2XPASUEMaieWVNTRCtJ4S8H+9
+    ssh.dev.azure.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H
+    vs-ssh.visualstudio.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: argo
+    meta.helm.sh/release-namespace: argocd
+  labels:
+    app.kubernetes.io/instance: argo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-ssh-known-hosts-cm
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: v2.10.1
+    helm.sh/chart: argo-cd-6.1.0
+  name: argocd-ssh-known-hosts-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: argo
+    meta.helm.sh/release-namespace: argocd
+  labels:
+    app.kubernetes.io/instance: argo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-tls-certs-cm
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: v2.10.1
+    helm.sh/chart: argo-cd-6.1.0
+  name: argocd-tls-certs-cm
+---
+apiVersion: v1
+data:
+  admin.password: JDJhJDEwJGtlV2c5QjhRd3Vkdi5LNk91SWp6S3VSR2pHZDQwYVhaN1R5TWZkdkQzRWJSQ0wvRVdFL1Z1
+  admin.passwordMtime: MjAyNC0wMi0yNVQxNToxMTozMVo=
+  server.secretkey: emZ4T2l3SzY5ZWE0Y0NjZTMrdG1Td01halJzSy9La1pTbFVmRkNSQlpNOD0=
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURZekNDQWt1Z0F3SUJBZ0lSQUlFZ3dnYVBVUEE3TEl5eC9ocXc0ZWN3RFFZSktvWklodmNOQVFFTEJRQXcKRWpFUU1BNEdBMVVFQ2hNSFFYSm5ieUJEUkRBZUZ3MHlOREF5TVRneE5UTTRNREZhRncweU5UQXlNVGN4TlRNNApNREZhTUJJeEVEQU9CZ05WQkFvVEIwRnlaMjhnUTBRd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3CmdnRUtBb0lCQVFDNFFOZGFyNG5zK2lVcWNvVXQwVW5rWG5NaXN4N3dlU3FCdTZ1UDFtRCtpdnJQRGFjekk4S3YKRTZlRTFGRUM3Uk0zMXJSUUd3WEVXV1BKUXg3WEsvU2pmbmlNU2JIRlNYd3VLZ0RTdVEwMVZwUEp4enYwbXluTApPWGUrWk1QMFh2K1BpR1FyYnIrRlI5b2tNVklGUDlSckR2QXN6b1BILzBHTXptOHh3dHpBSFIzQ1lxeXJuZ2lzClJaMUdTQktKeUV1dVNuNnZuaW5CKzdPZFU3akZzdTBjUndTRmgyejc2SUhoVjZFYkFLL3dmaEw5TndrYTNXTzIKcFdCRi9pY3ZybE9MMWpWcWlZZlBZVjBaaTFPOXp5RG8zMnYwMUs3RnRmQlNvL1NMaFRDTlJZbjBPTVpUclMzUgpTS3NtUk1Oc1E2VUtrM1oxN0VuNkhGRjJKMEFFZy8vRkFnTUJBQUdqZ2JNd2diQXdEZ1lEVlIwUEFRSC9CQVFECkFnV2dNQk1HQTFVZEpRUU1NQW9HQ0NzR0FRVUZCd01CTUF3R0ExVWRFd0VCL3dRQ01BQXdld1lEVlIwUkJIUXcKY29JSmJHOWpZV3hvYjNOMGdnMWhjbWR2WTJRdGMyVnlkbVZ5Z2hSaGNtZHZZMlF0YzJWeWRtVnlMbUZ5WjI5agpaSUlZWVhKbmIyTmtMWE5sY25abGNpNWhjbWR2WTJRdWMzWmpnaVpoY21kdlkyUXRjMlZ5ZG1WeUxtRnlaMjlqClpDNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFOVDV6RS84R3FKakkKcUIzejZFL0FNNjZNODRQWlJSRHhWZjg0NXk3enJTNm55MHZtUGhTeTNvaDJjZGZGSUR3aktVK0NJcXpYSGl3YwpBdTd6R0hsSkxhU0s1eWplbkZzTStkcGh1K3lFajVsNVVmWC80YnJGMERQcmtyTTZSSDVYdEppbGJhcE1NNmZkCk1iRGREUjc0MFdYUXFVdmtITXhsSEdtbUhmQnRqMHRkSDVzbzUzV2Z4WUs1V3l4bWMyQTd0UEdxSHpuNUVxVUsKWWw4T3NUeTYraWRVai9icm0zV1Fob09GM2E2eTJDS2Naa21HR05GTDJoWWhienRTelRyWjBIR2E2cFNCRXp0cApYL1BDTmhuL3NqWjdYajFVWElqMWM1M1JoTTVkRitTUWJwMUZNaVByaDdlbkl0RXVMWXZRMTgxdjN6aVFOeHFFCklndTVpSHhSVEE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBdUVEWFdxK0o3UG9sS25LRkxkRko1RjV6SXJNZThIa3FnYnVyajlaZy9vcjZ6dzJuCk15UENyeE9uaE5SUkF1MFROOWEwVUJzRnhGbGp5VU1lMXl2MG8zNTRqRW14eFVsOExpb0EwcmtOTlZhVHljYzcKOUpzcHl6bDN2bVREOUY3L2o0aGtLMjYvaFVmYUpERlNCVC9VYXc3d0xNNkR4LzlCak01dk1jTGN3QjBkd21LcwpxNTRJckVXZFJrZ1NpY2hMcmtwK3I1NHB3ZnV6blZPNHhiTHRIRWNFaFlkcysraUI0VmVoR3dDdjhINFMvVGNKCkd0MWp0cVZnUmY0bkw2NVRpOVkxYW9tSHoyRmRHWXRUdmM4ZzZOOXI5TlN1eGJYd1VxUDBpNFV3alVXSjlEakcKVTYwdDBVaXJKa1REYkVPbENwTjJkZXhKK2h4UmRpZEFCSVAveFFJREFRQUJBb0lCQVFDT0ZPbzhNd3J2NDhGUApKenBOcDRzTWdFeldvRHVtZ2pqbUM3cnpVd1ErcFJ0ZEdSRXEzVk9lUUZDNG5DVFFWZEt4QjI3S0t0eGFtZmZaCjFsbHM0YWRuZi9vamJCeWFudDBVbUMxRVVaQys1Y0ZYSXJ5NEZnSzNoTnd5eEc5YS9QcWpTekM3VVU1OHozaUcKMmtWK2FNYzd1eXczMFJSTDRDbERGRmtvalRRL0s2V3ovdXpjanNMb044emR3TjRSTnlxTVQ4VDFjb2xac2tzSQpRZnQ0Q3BWYlNCSFR4UE9vQTRWejFIdWZsU1RFNmhlbDEycko0cTZOdTJUNUF6WmFJazd0ZVVadUc1Kzc3NjY2CmQxanZhWUJTV3crUU1mWHE5eFBkbXRNV0tkYWRBU3hJejNnM0d2cE9TTkhBZCszakFlWXNHNUlvQ1NWUU5lTGUKeWpQV1pQbU5Bb0dCQU5jNFRBOHpZTHBOTWtadEVma3F3cmQrOTdPTXJwMDNoWHpBV3BjM1ZpRVpZR1E4b1JCNgozTnFXeGtVMzlOd2lxWERwdWVjT2w2N010RG11MWxPOEo0QlpkS2Y1VC9TTDlJV3Nad3ZJNWpVU2t6Z3JNdVp6Cm9iQ0VsMGJ0ZWxKaWxmcHZsV1VUaXFFYThyaUJuZm8vb0dFZkpraTNPZGl3QzB1QklvRkRXa1MzQW9HQkFOc3EKY1EvaVE2aytReGptQkx4Y2doRXFkc0lESWFUSW03bjJpMUlMT3FtMU1wTHo4M0JGTEtJYU1sOGt6SDdaUDhobAp6emtNblVkSzBST3UvNWFPVmVRYUQyT1g3UC9iVmM5WWtKeWpzM201bzhCYlNsNjVQVzd5YVhURmRBS3VLMkh3Ckh3cUR0WUs0dUpNbEphTDlmNWVzbFlFcXlRSU1DdFo0QW1nZXBQdGpBb0dBZVI1VG41SlljMEFTZFJQWXM1TGUKOWdsY09RMkpEeTA1MEZVb0prV2NFUkNJOEtBMlBHSUlmSE94clM2cWZHQjlYdkFLRVFCaldKb1hLd2M3MHUvbQpneExVMWRzMnBmZEZheHowK09yY3N5MTY4SGRQTStZTExwM1B6TGpFeUN4M0h2TkE3aHNyUHpNOU9aeW9YVGNGCmVPTGcxcmRXdEoyT0hiWFV4MDR5Tk0wQ2dZQWozcEJlanlPUHdYYnR6a2VjSkcvTksyd0FXTTdhejFKZFh6SnkKSFJCZTBoOFMyZ1pQcTZLZ2JUVXRTVEtHMkR1T0tzdDloTWtBOEFmRDl2SXh5OTNXMVVVTGdjUHlKQTJwUDg5NwpNM2VlUm5tOGM3UjZTRXI3cTRVQzdZWU5Ja0JMYVNkTGF6Nzd4QXZCV1dVTmhmdXA4VDhPd3RmZkUrVjZNRzRFCmFHK01EUUtCZ1FDaE9QU2l2MEJCQ1FNU2IvZ2FLS3RKWGVjalFoMFZ0Z3hzZGJsdkIwQzNqRUlNenZKS2FrOWgKaUMvWlRWYSs4dld3Sk5nSkxqU2tCY01GOGIyTk52UVJKTjNYQkdXcE9sRGNSOWpiUjFWSHRUZDlicEx2QWRpKwpuSkhMeXdKVVRtamtKaWlQTGV4TzN3S0diam9SQi9kelZHYnVPOUdNK1RscWwwaG1lNzk0MHc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+kind: Secret
+metadata:
+  annotations:
+    meta.helm.sh/release-name: argo
+    meta.helm.sh/release-namespace: argocd
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: argo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-secret
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: v2.10.1
+    helm.sh/chart: argo-cd-6.1.0
+  name: argocd-secret
+type: Opaque
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
+  sourceRepos:
+  - '*'
+status: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: installer
+spec:
+  destination:
+    namespace: installer
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: installer
+    repoURL: https://github.com/waylonwalker/homelab-argo
+status:
+  controllerNamespace: argocd
+  health:
+    status: Healthy
+  history:
+  - deployStartedAt: "2024-02-25T20:10:07Z"
+    deployedAt: "2024-02-25T20:10:07Z"
+    id: 0
+    revision: 0476d4c2d0d243ecf641cdb3a182e8c1023843c7
+    source:
+      path: installer
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:12:23Z"
+    deployedAt: "2024-02-25T20:12:24Z"
+    id: 1
+    revision: eb7faf833845c634412809c75b4cae3ce9252234
+    source:
+      path: installer
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  operationState:
+    finishedAt: "2024-02-25T20:12:24Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        revision: eb7faf833845c634412809c75b4cae3ce9252234
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2024-02-25T20:12:23Z"
+    syncResult:
+      resources:
+      - group: ""
+        hookPhase: Running
+        kind: Namespace
+        message: namespace/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: networking.k8s.io
+        hookPhase: Running
+        kind: Ingress
+        message: ingress.networking.k8s.io/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: bitnami.com
+        hookPhase: Running
+        kind: SealedSecret
+        message: sealedsecret.bitnami.com/regcred created
+        name: regcred
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1alpha1
+      revision: eb7faf833845c634412809c75b4cae3ce9252234
+      source:
+        path: installer
+        repoURL: https://github.com/waylonwalker/homelab-argo
+  reconciledAt: "2024-02-25T20:23:03Z"
+  resources:
+  - kind: Namespace
+    name: installer
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: installer
+    namespace: installer
+    status: Synced
+    version: v1
+  - group: apps
+    health:
+      status: Healthy
+    kind: Deployment
+    name: installer
+    namespace: installer
+    status: Synced
+    version: v1
+  - group: bitnami.com
+    health:
+      status: Healthy
+    kind: SealedSecret
+    name: regcred
+    namespace: installer
+    status: Synced
+    version: v1alpha1
+  - group: networking.k8s.io
+    health:
+      status: Healthy
+    kind: Ingress
+    name: installer
+    namespace: installer
+    status: Synced
+    version: v1
+  sourceType: Directory
+  summary:
+    externalURLs:
+    - http://i.k.waylonwalker.com/
+    - http://i.wayl.one/
+    - http://installer.k.waylonwalker.com/
+    - http://installer.wayl.one/
+    images:
+    - registry.wayl.one/installer
+  sync:
+    comparedTo:
+      destination:
+        namespace: installer
+        server: https://kubernetes.default.svc
+      source:
+        path: installer
+        repoURL: https://github.com/waylonwalker/homelab-argo
+    revision: bac8224ce726424914268b84a48833854bd7b309
+    status: Synced
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: play-outside
+spec:
+  destination:
+    namespace: play-outside
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: play-outside
+    repoURL: https://github.com/waylonwalker/homelab-argo
+status:
+  controllerNamespace: argocd
+  health:
+    status: Healthy
+  history:
+  - deployStartedAt: "2024-02-25T20:15:23Z"
+    deployedAt: "2024-02-25T20:15:23Z"
+    id: 0
+    revision: bac8224ce726424914268b84a48833854bd7b309
+    source:
+      path: play-outside
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:16:42Z"
+    deployedAt: "2024-02-25T20:16:42Z"
+    id: 1
+    revision: bac8224ce726424914268b84a48833854bd7b309
+    source:
+      path: play-outside
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  operationState:
+    finishedAt: "2024-02-25T20:16:42Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        prune: true
+        revision: bac8224ce726424914268b84a48833854bd7b309
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2024-02-25T20:16:42Z"
+    syncResult:
+      resources:
+      - group: ""
+        hookPhase: Running
+        kind: Namespace
+        message: namespace/play-outside created
+        name: play-outside
+        namespace: play-outside
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/tank-git-play-outside--env-prod created
+        name: tank-git-play-outside--env-prod
+        namespace: play-outside
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/play-outside-wayl-one created
+        name: play-outside-wayl-one
+        namespace: play-outside
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/play-outside-wayl-one created
+        name: play-outside-wayl-one
+        namespace: play-outside
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: networking.k8s.io
+        hookPhase: Running
+        kind: Ingress
+        message: ingress.networking.k8s.io/play-outside-wayl-one created
+        name: play-outside-wayl-one
+        namespace: play-outside
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: bitnami.com
+        hookPhase: Running
+        kind: SealedSecret
+        message: sealedsecret.bitnami.com/regcred created
+        name: regcred
+        namespace: play-outside
+        status: Synced
+        syncPhase: Sync
+        version: v1alpha1
+      - group: bitnami.com
+        hookPhase: Running
+        kind: SealedSecret
+        message: sealedsecret.bitnami.com/play-outside-open-weather-api-key created
+        name: play-outside-open-weather-api-key
+        namespace: play-outside
+        status: Synced
+        syncPhase: Sync
+        version: v1alpha1
+      revision: bac8224ce726424914268b84a48833854bd7b309
+      source:
+        path: play-outside
+        repoURL: https://github.com/waylonwalker/homelab-argo
+  reconciledAt: "2024-02-25T20:23:03Z"
+  resources:
+  - kind: ConfigMap
+    name: tank-git-play-outside--env-prod
+    namespace: play-outside
+    status: Synced
+    version: v1
+  - kind: Namespace
+    name: play-outside
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: play-outside-wayl-one
+    namespace: play-outside
+    status: Synced
+    version: v1
+  - group: apps
+    health:
+      status: Healthy
+    kind: Deployment
+    name: play-outside-wayl-one
+    namespace: play-outside
+    status: Synced
+    version: v1
+  - group: bitnami.com
+    health:
+      status: Healthy
+    kind: SealedSecret
+    name: play-outside-open-weather-api-key
+    namespace: play-outside
+    status: Synced
+    version: v1alpha1
+  - group: bitnami.com
+    health:
+      status: Healthy
+    kind: SealedSecret
+    name: regcred
+    namespace: play-outside
+    status: Synced
+    version: v1alpha1
+  - group: networking.k8s.io
+    health:
+      status: Healthy
+    kind: Ingress
+    name: play-outside-wayl-one
+    namespace: play-outside
+    status: Synced
+    version: v1
+  sourceType: Directory
+  summary:
+    externalURLs:
+    - http://play-outside.wayl.one/
+    images:
+    - registry.wayl.one/play-outside:0.0.28
+  sync:
+    comparedTo:
+      destination:
+        namespace: play-outside
+        server: https://kubernetes.default.svc
+      source:
+        path: play-outside
+        repoURL: https://github.com/waylonwalker/homelab-argo
+    revision: bac8224ce726424914268b84a48833854bd7b309
+    status: Synced
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homelab
+spec:
+  destination:
+    namespace: homelab
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: active
+    repoURL: https://github.com/waylonwalker/homelab-argo
+  syncPolicy:
+    automated:
+      prune: true
+status:
+  controllerNamespace: argocd
+  health:
+    status: Healthy
+  history:
+  - deployStartedAt: "2024-02-25T15:34:17Z"
+    deployedAt: "2024-02-25T15:34:18Z"
+    id: 31
+    revision: b9f9076d7b66fadc31c7d4f4a3cb069615cf2db3
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T18:23:06Z"
+    deployedAt: "2024-02-25T18:23:06Z"
+    id: 32
+    revision: c9651c42c79b5d69247b3afed20f878939a443fa
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T18:23:34Z"
+    deployedAt: "2024-02-25T18:23:34Z"
+    id: 33
+    revision: c9651c42c79b5d69247b3afed20f878939a443fa
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T18:24:45Z"
+    deployedAt: "2024-02-25T18:24:45Z"
+    id: 34
+    revision: c9651c42c79b5d69247b3afed20f878939a443fa
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:11:36Z"
+    deployedAt: "2024-02-25T20:11:37Z"
+    id: 35
+    revision: eb7faf833845c634412809c75b4cae3ce9252234
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:11:37Z"
+    deployedAt: "2024-02-25T20:11:47Z"
+    id: 36
+    revision: 0476d4c2d0d243ecf641cdb3a182e8c1023843c7
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:11:49Z"
+    deployedAt: "2024-02-25T20:11:50Z"
+    id: 37
+    revision: eb7faf833845c634412809c75b4cae3ce9252234
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:15:24Z"
+    deployedAt: "2024-02-25T20:15:25Z"
+    id: 38
+    revision: 35265ee875c4a7f9912fcd5586ed892decfdf2ee
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:15:25Z"
+    deployedAt: "2024-02-25T20:15:26Z"
+    id: 39
+    revision: bac8224ce726424914268b84a48833854bd7b309
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:15:55Z"
+    deployedAt: "2024-02-25T20:15:55Z"
+    id: 40
+    revision: bac8224ce726424914268b84a48833854bd7b309
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  operationState:
+    finishedAt: "2024-02-25T20:15:55Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        prune: true
+        revision: bac8224ce726424914268b84a48833854bd7b309
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2024-02-25T20:15:55Z"
+    syncResult:
+      resources:
+      - group: ""
+        hookPhase: Succeeded
+        kind: Namespace
+        message: pruned
+        name: play-outside
+        namespace: ""
+        status: Pruned
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Namespace
+        message: namespace/minecraft unchanged
+        name: minecraft
+        namespace: homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Namespace
+        message: namespace/minio-homelab configured
+        name: minio-homelab
+        namespace: homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: PersistentVolumeClaim
+        message: persistentvolumeclaim/minecraft-data unchanged
+        name: minecraft-data
+        namespace: minecraft
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: PersistentVolumeClaim
+        message: persistentvolumeclaim/minio-storage configured
+        name: minio-storage
+        namespace: minio-homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/lonecraft unchanged
+        name: lonecraft
+        namespace: minecraft
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/minio-homelab configured
+        name: minio-homelab
+        namespace: minio-homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/lonecraft unchanged
+        name: lonecraft
+        namespace: minecraft
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/minio-homelab configured
+        name: minio-homelab
+        namespace: minio-homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: networking.k8s.io
+        hookPhase: Running
+        kind: Ingress
+        message: ingress.networking.k8s.io/minio-homelab configured
+        name: minio-homelab
+        namespace: minio-homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: bitnami.com
+        hookPhase: Running
+        kind: SealedSecret
+        message: sealedsecret.bitnami.com/minio-secret unchanged
+        name: minio-secret
+        namespace: minio-homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1alpha1
+      revision: bac8224ce726424914268b84a48833854bd7b309
+      source:
+        path: active
+        repoURL: https://github.com/waylonwalker/homelab-argo
+  reconciledAt: "2024-02-25T20:23:03Z"
+  resources:
+  - kind: Namespace
+    name: minecraft
+    status: Synced
+    version: v1
+  - kind: Namespace
+    name: minio-homelab
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: PersistentVolumeClaim
+    name: minecraft-data
+    namespace: minecraft
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: PersistentVolumeClaim
+    name: minio-storage
+    namespace: minio-homelab
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: lonecraft
+    namespace: minecraft
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: minio-homelab
+    namespace: minio-homelab
+    status: Synced
+    version: v1
+  - group: apps
+    health:
+      status: Healthy
+    kind: Deployment
+    name: lonecraft
+    namespace: minecraft
+    status: Synced
+    version: v1
+  - group: apps
+    health:
+      status: Healthy
+    kind: Deployment
+    name: minio-homelab
+    namespace: minio-homelab
+    status: Synced
+    version: v1
+  - group: bitnami.com
+    health:
+      status: Healthy
+    kind: SealedSecret
+    name: minio-secret
+    namespace: minio-homelab
+    status: Synced
+    version: v1alpha1
+  - group: networking.k8s.io
+    health:
+      status: Healthy
+    kind: Ingress
+    name: minio-homelab
+    namespace: minio-homelab
+    status: Synced
+    version: v1
+  sourceType: Directory
+  summary:
+    externalURLs:
+    - http://aminio-ui.fokais.com/
+    - http://aminio.fokais.com/
+    images:
+    - itzg/minecraft-server
+    - minio/minio
+  sync:
+    comparedTo:
+      destination:
+        namespace: homelab
+        server: https://kubernetes.default.svc
+      source:
+        path: active
+        repoURL: https://github.com/waylonwalker/homelab-argo
+    revision: bac8224ce726424914268b84a48833854bd7b309
+    status: Synced
+---
