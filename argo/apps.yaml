@@ -1,0 +1,7 @@
+project: default
+source:
+  repoURL: 'https://github.com/waylonwalker/homelab-argo'
+  path: installer
+destination:
+  server: 'https://kubernetes.default.svc'
+  namespace: installer
