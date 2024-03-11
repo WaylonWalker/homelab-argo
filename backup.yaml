@@ -130,154 +130,235 @@ status: {}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: installer
+  name: librespeed
 spec:
   destination:
-    namespace: installer
+    namespace: librespeed
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: installer
+    path: librespeed
     repoURL: https://github.com/waylonwalker/homelab-argo
 status:
+  conditions:
+  - lastTransitionTime: "2024-03-11T15:14:07Z"
+    message: 'Failed to load target state: failed to generate manifest for source
+      1 of 1: rpc error: code = Unknown desc = failed to initialize repository resources:
+      rpc error: code = Internal desc = Failed to initialize git repo: stat <path
+      to cached source> permission denied'
+    type: ComparisonError
   controllerNamespace: argocd
   health:
     status: Healthy
   history:
-  - deployStartedAt: "2024-02-25T20:10:07Z"
-    deployedAt: "2024-02-25T20:10:07Z"
+  - deployStartedAt: "2024-02-26T01:08:18Z"
+    deployedAt: "2024-02-26T01:08:19Z"
     id: 0
-    revision: 0476d4c2d0d243ecf641cdb3a182e8c1023843c7
+    revision: 6bf95bf8233b502a095a8c649b4fdd169307f754
     source:
-      path: installer
-      repoURL: https://github.com/waylonwalker/homelab-argo
-  - deployStartedAt: "2024-02-25T20:12:23Z"
-    deployedAt: "2024-02-25T20:12:24Z"
-    id: 1
-    revision: eb7faf833845c634412809c75b4cae3ce9252234
-    source:
-      path: installer
+      path: librespeed
       repoURL: https://github.com/waylonwalker/homelab-argo
   operationState:
-    finishedAt: "2024-02-25T20:12:24Z"
+    finishedAt: "2024-02-26T01:08:19Z"
     message: successfully synced (all tasks run)
     operation:
       initiatedBy:
         username: admin
       retry: {}
       sync:
-        revision: eb7faf833845c634412809c75b4cae3ce9252234
+        prune: true
+        revision: 6bf95bf8233b502a095a8c649b4fdd169307f754
         syncStrategy:
           hook: {}
     phase: Succeeded
-    startedAt: "2024-02-25T20:12:23Z"
+    startedAt: "2024-02-26T01:08:18Z"
     syncResult:
       resources:
       - group: ""
         hookPhase: Running
         kind: Namespace
-        message: namespace/installer created
-        name: installer
-        namespace: installer
+        message: namespace/librespeed configured
+        name: librespeed
+        namespace: librespeed
         status: Synced
         syncPhase: Sync
         version: v1
       - group: ""
         hookPhase: Running
         kind: Service
-        message: service/installer created
-        name: installer
-        namespace: installer
+        message: service/librespeed configured
+        name: librespeed
+        namespace: librespeed
         status: Synced
         syncPhase: Sync
         version: v1
       - group: apps
         hookPhase: Running
         kind: Deployment
-        message: deployment.apps/installer created
-        name: installer
-        namespace: installer
+        message: deployment.apps/librespeed configured
+        name: librespeed
+        namespace: librespeed
         status: Synced
         syncPhase: Sync
         version: v1
       - group: networking.k8s.io
         hookPhase: Running
         kind: Ingress
-        message: ingress.networking.k8s.io/installer created
-        name: installer
-        namespace: installer
+        message: ingress.networking.k8s.io/librespeed configured
+        name: librespeed
+        namespace: librespeed
         status: Synced
         syncPhase: Sync
         version: v1
-      - group: bitnami.com
-        hookPhase: Running
-        kind: SealedSecret
-        message: sealedsecret.bitnami.com/regcred created
-        name: regcred
-        namespace: installer
-        status: Synced
-        syncPhase: Sync
-        version: v1alpha1
-      revision: eb7faf833845c634412809c75b4cae3ce9252234
+      revision: 6bf95bf8233b502a095a8c649b4fdd169307f754
       source:
-        path: installer
+        path: librespeed
         repoURL: https://github.com/waylonwalker/homelab-argo
-  reconciledAt: "2024-02-25T20:23:03Z"
+  reconciledAt: "2024-03-11T19:47:07Z"
   resources:
   - kind: Namespace
-    name: installer
-    status: Synced
+    name: librespeed
+    requiresPruning: true
+    status: Unknown
     version: v1
   - health:
       status: Healthy
     kind: Service
-    name: installer
-    namespace: installer
-    status: Synced
+    name: librespeed
+    namespace: librespeed
+    requiresPruning: true
+    status: Unknown
     version: v1
   - group: apps
     health:
       status: Healthy
     kind: Deployment
-    name: installer
-    namespace: installer
-    status: Synced
+    name: librespeed
+    namespace: librespeed
+    requiresPruning: true
+    status: Unknown
     version: v1
-  - group: bitnami.com
-    health:
-      status: Healthy
-    kind: SealedSecret
-    name: regcred
-    namespace: installer
-    status: Synced
-    version: v1alpha1
   - group: networking.k8s.io
     health:
       status: Healthy
     kind: Ingress
-    name: installer
-    namespace: installer
-    status: Synced
+    name: librespeed
+    namespace: librespeed
+    requiresPruning: true
+    status: Unknown
     version: v1
-  sourceType: Directory
   summary:
     externalURLs:
-    - http://i.k.waylonwalker.com/
-    - http://i.wayl.one/
-    - http://installer.k.waylonwalker.com/
-    - http://installer.wayl.one/
+    - http://librespeed.wayl.one/
     images:
-    - registry.wayl.one/installer
+    - lscr.io/linuxserver/librespeed
   sync:
     comparedTo:
       destination:
-        namespace: installer
+        namespace: librespeed
         server: https://kubernetes.default.svc
       source:
-        path: installer
+        path: librespeed
         repoURL: https://github.com/waylonwalker/homelab-argo
-    revision: bac8224ce726424914268b84a48833854bd7b309
-    status: Synced
+    status: Unknown
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo
+spec:
+  destination:
+    namespace: argo
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: argo
+    repoURL: https://github.com/waylonwalker/homelab-argo
+status:
+  conditions:
+  - lastTransitionTime: "2024-03-11T15:14:07Z"
+    message: 'Failed to load target state: failed to generate manifest for source
+      1 of 1: rpc error: code = Unknown desc = failed to initialize repository resources:
+      rpc error: code = Internal desc = Failed to initialize git repo: stat <path
+      to cached source> permission denied'
+    type: ComparisonError
+  controllerNamespace: argocd
+  health:
+    status: Healthy
+  history:
+  - deployStartedAt: "2024-02-26T00:45:37Z"
+    deployedAt: "2024-02-26T00:45:38Z"
+    id: 0
+    revision: bf27586f0f1b3626edc4d1c7620ac019a3c0d821
+    source:
+      path: argo
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T00:46:53Z"
+    deployedAt: "2024-02-26T00:46:53Z"
+    id: 1
+    revision: 127f1d5ce96c7d3bac9f6e388e6a27cab9ea1ce4
+    source:
+      path: argo
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T00:48:30Z"
+    deployedAt: "2024-02-26T00:48:30Z"
+    id: 2
+    revision: a651bf1b237e5a9d2a2d7de7d99d39110209be1b
+    source:
+      path: argo
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  operationState:
+    finishedAt: "2024-02-26T00:48:30Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        prune: true
+        revision: a651bf1b237e5a9d2a2d7de7d99d39110209be1b
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2024-02-26T00:48:30Z"
+    syncResult:
+      resources:
+      - group: networking.k8s.io
+        hookPhase: Running
+        kind: Ingress
+        message: ingress.networking.k8s.io/argocd-ingress configured
+        name: argocd-ingress
+        namespace: argocd
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      revision: a651bf1b237e5a9d2a2d7de7d99d39110209be1b
+      source:
+        path: argo
+        repoURL: https://github.com/waylonwalker/homelab-argo
+  reconciledAt: "2024-03-11T19:47:07Z"
+  resources:
+  - group: networking.k8s.io
+    health:
+      status: Healthy
+    kind: Ingress
+    name: argocd-ingress
+    namespace: argocd
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  summary:
+    externalURLs:
+    - http://argocd.wayl.one/
+  sync:
+    comparedTo:
+      destination:
+        namespace: argo
+        server: https://kubernetes.default.svc
+      source:
+        path: argo
+        repoURL: https://github.com/waylonwalker/homelab-argo
+    status: Unknown
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -292,6 +373,13 @@ spec:
     path: play-outside
     repoURL: https://github.com/waylonwalker/homelab-argo
 status:
+  conditions:
+  - lastTransitionTime: "2024-03-11T15:14:07Z"
+    message: 'Failed to load target state: failed to generate manifest for source
+      1 of 1: rpc error: code = Unknown desc = failed to initialize repository resources:
+      rpc error: code = Internal desc = Failed to initialize git repo: stat <path
+      to cached source> permission denied'
+    type: ComparisonError
   controllerNamespace: argocd
   health:
     status: Healthy
@@ -393,23 +481,26 @@ status:
       source:
         path: play-outside
         repoURL: https://github.com/waylonwalker/homelab-argo
-  reconciledAt: "2024-02-25T20:23:03Z"
+  reconciledAt: "2024-03-11T19:47:07Z"
   resources:
   - kind: ConfigMap
     name: tank-git-play-outside--env-prod
     namespace: play-outside
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - kind: Namespace
     name: play-outside
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - health:
       status: Healthy
     kind: Service
     name: play-outside-wayl-one
     namespace: play-outside
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - group: apps
     health:
@@ -417,7 +508,8 @@ status:
     kind: Deployment
     name: play-outside-wayl-one
     namespace: play-outside
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - group: bitnami.com
     health:
@@ -425,7 +517,8 @@ status:
     kind: SealedSecret
     name: play-outside-open-weather-api-key
     namespace: play-outside
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1alpha1
   - group: bitnami.com
     health:
@@ -433,7 +526,8 @@ status:
     kind: SealedSecret
     name: regcred
     namespace: play-outside
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1alpha1
   - group: networking.k8s.io
     health:
@@ -441,9 +535,9 @@ status:
     kind: Ingress
     name: play-outside-wayl-one
     namespace: play-outside
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
-  sourceType: Directory
   summary:
     externalURLs:
     - http://play-outside.wayl.one/
@@ -457,8 +551,169 @@ status:
       source:
         path: play-outside
         repoURL: https://github.com/waylonwalker/homelab-argo
-    revision: bac8224ce726424914268b84a48833854bd7b309
-    status: Synced
+    status: Unknown
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: installer
+spec:
+  destination:
+    namespace: installer
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: installer
+    repoURL: https://github.com/waylonwalker/homelab-argo
+status:
+  conditions:
+  - lastTransitionTime: "2024-03-11T15:14:07Z"
+    message: 'Failed to load target state: failed to generate manifest for source
+      1 of 1: rpc error: code = Unknown desc = failed to initialize repository resources:
+      rpc error: code = Internal desc = Failed to initialize git repo: stat <path
+      to cached source> permission denied'
+    type: ComparisonError
+  controllerNamespace: argocd
+  health:
+    status: Healthy
+  history:
+  - deployStartedAt: "2024-02-25T20:10:07Z"
+    deployedAt: "2024-02-25T20:10:07Z"
+    id: 0
+    revision: 0476d4c2d0d243ecf641cdb3a182e8c1023843c7
+    source:
+      path: installer
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-25T20:12:23Z"
+    deployedAt: "2024-02-25T20:12:24Z"
+    id: 1
+    revision: eb7faf833845c634412809c75b4cae3ce9252234
+    source:
+      path: installer
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  operationState:
+    finishedAt: "2024-02-25T20:12:24Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        revision: eb7faf833845c634412809c75b4cae3ce9252234
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2024-02-25T20:12:23Z"
+    syncResult:
+      resources:
+      - group: ""
+        hookPhase: Running
+        kind: Namespace
+        message: namespace/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: networking.k8s.io
+        hookPhase: Running
+        kind: Ingress
+        message: ingress.networking.k8s.io/installer created
+        name: installer
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: bitnami.com
+        hookPhase: Running
+        kind: SealedSecret
+        message: sealedsecret.bitnami.com/regcred created
+        name: regcred
+        namespace: installer
+        status: Synced
+        syncPhase: Sync
+        version: v1alpha1
+      revision: eb7faf833845c634412809c75b4cae3ce9252234
+      source:
+        path: installer
+        repoURL: https://github.com/waylonwalker/homelab-argo
+  reconciledAt: "2024-03-11T19:47:07Z"
+  resources:
+  - kind: Namespace
+    name: installer
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: installer
+    namespace: installer
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    health:
+      status: Healthy
+    kind: Deployment
+    name: installer
+    namespace: installer
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: bitnami.com
+    health:
+      status: Healthy
+    kind: SealedSecret
+    name: regcred
+    namespace: installer
+    requiresPruning: true
+    status: Unknown
+    version: v1alpha1
+  - group: networking.k8s.io
+    health:
+      status: Healthy
+    kind: Ingress
+    name: installer
+    namespace: installer
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  summary:
+    externalURLs:
+    - http://i.k.waylonwalker.com/
+    - http://i.wayl.one/
+    - http://installer.k.waylonwalker.com/
+    - http://installer.wayl.one/
+    images:
+    - registry.wayl.one/installer
+  sync:
+    comparedTo:
+      destination:
+        namespace: installer
+        server: https://kubernetes.default.svc
+      source:
+        path: installer
+        repoURL: https://github.com/waylonwalker/homelab-argo
+    status: Unknown
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -476,59 +731,17 @@ spec:
     automated:
       prune: true
 status:
+  conditions:
+  - lastTransitionTime: "2024-03-11T15:14:07Z"
+    message: 'Failed to load target state: failed to generate manifest for source
+      1 of 1: rpc error: code = Unknown desc = failed to initialize repository resources:
+      rpc error: code = Internal desc = Failed to initialize git repo: stat <path
+      to cached source> permission denied'
+    type: ComparisonError
   controllerNamespace: argocd
   health:
     status: Healthy
   history:
-  - deployStartedAt: "2024-02-25T15:34:17Z"
-    deployedAt: "2024-02-25T15:34:18Z"
-    id: 31
-    revision: b9f9076d7b66fadc31c7d4f4a3cb069615cf2db3
-    source:
-      path: active
-      repoURL: https://github.com/waylonwalker/homelab-argo
-  - deployStartedAt: "2024-02-25T18:23:06Z"
-    deployedAt: "2024-02-25T18:23:06Z"
-    id: 32
-    revision: c9651c42c79b5d69247b3afed20f878939a443fa
-    source:
-      path: active
-      repoURL: https://github.com/waylonwalker/homelab-argo
-  - deployStartedAt: "2024-02-25T18:23:34Z"
-    deployedAt: "2024-02-25T18:23:34Z"
-    id: 33
-    revision: c9651c42c79b5d69247b3afed20f878939a443fa
-    source:
-      path: active
-      repoURL: https://github.com/waylonwalker/homelab-argo
-  - deployStartedAt: "2024-02-25T18:24:45Z"
-    deployedAt: "2024-02-25T18:24:45Z"
-    id: 34
-    revision: c9651c42c79b5d69247b3afed20f878939a443fa
-    source:
-      path: active
-      repoURL: https://github.com/waylonwalker/homelab-argo
-  - deployStartedAt: "2024-02-25T20:11:36Z"
-    deployedAt: "2024-02-25T20:11:37Z"
-    id: 35
-    revision: eb7faf833845c634412809c75b4cae3ce9252234
-    source:
-      path: active
-      repoURL: https://github.com/waylonwalker/homelab-argo
-  - deployStartedAt: "2024-02-25T20:11:37Z"
-    deployedAt: "2024-02-25T20:11:47Z"
-    id: 36
-    revision: 0476d4c2d0d243ecf641cdb3a182e8c1023843c7
-    source:
-      path: active
-      repoURL: https://github.com/waylonwalker/homelab-argo
-  - deployStartedAt: "2024-02-25T20:11:49Z"
-    deployedAt: "2024-02-25T20:11:50Z"
-    id: 37
-    revision: eb7faf833845c634412809c75b4cae3ce9252234
-    source:
-      path: active
-      repoURL: https://github.com/waylonwalker/homelab-argo
   - deployStartedAt: "2024-02-25T20:15:24Z"
     deployedAt: "2024-02-25T20:15:25Z"
     id: 38
@@ -550,31 +763,70 @@ status:
     source:
       path: active
       repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T13:54:27Z"
+    deployedAt: "2024-02-26T13:54:28Z"
+    id: 41
+    revision: 3773c1e955a38f2047eb203be2379a96ff92cfb2
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T13:54:28Z"
+    deployedAt: "2024-02-26T13:54:29Z"
+    id: 42
+    revision: 6bf95bf8233b502a095a8c649b4fdd169307f754
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T13:54:30Z"
+    deployedAt: "2024-02-26T13:54:30Z"
+    id: 43
+    revision: 3773c1e955a38f2047eb203be2379a96ff92cfb2
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T13:59:07Z"
+    deployedAt: "2024-02-26T13:59:07Z"
+    id: 44
+    revision: 2d544851b46529a93b1d78d700a4b253ae22c948
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T14:31:37Z"
+    deployedAt: "2024-02-26T14:31:38Z"
+    id: 45
+    revision: 22681c8d9c267728220809356d99e06a64eb9732
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T14:31:38Z"
+    deployedAt: "2024-02-26T14:31:39Z"
+    id: 46
+    revision: 2d544851b46529a93b1d78d700a4b253ae22c948
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
+  - deployStartedAt: "2024-02-26T14:35:04Z"
+    deployedAt: "2024-02-26T14:35:04Z"
+    id: 47
+    revision: 22681c8d9c267728220809356d99e06a64eb9732
+    source:
+      path: active
+      repoURL: https://github.com/waylonwalker/homelab-argo
   operationState:
-    finishedAt: "2024-02-25T20:15:55Z"
+    finishedAt: "2024-02-26T14:35:04Z"
     message: successfully synced (all tasks run)
     operation:
       initiatedBy:
-        username: admin
-      retry: {}
+        automated: true
+      retry:
+        limit: 5
       sync:
         prune: true
-        revision: bac8224ce726424914268b84a48833854bd7b309
-        syncStrategy:
-          hook: {}
+        revision: 22681c8d9c267728220809356d99e06a64eb9732
     phase: Succeeded
-    startedAt: "2024-02-25T20:15:55Z"
+    startedAt: "2024-02-26T14:35:04Z"
     syncResult:
       resources:
-      - group: ""
-        hookPhase: Succeeded
-        kind: Namespace
-        message: pruned
-        name: play-outside
-        namespace: ""
-        status: Pruned
-        syncPhase: Sync
-        version: v1
       - group: ""
         hookPhase: Running
         kind: Namespace
@@ -623,6 +875,15 @@ status:
       - group: ""
         hookPhase: Running
         kind: Service
+        message: service/superflat unchanged
+        name: superflat
+        namespace: minecraft
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
         message: service/minio-homelab configured
         name: minio-homelab
         namespace: minio-homelab
@@ -632,8 +893,8 @@ status:
       - group: apps
         hookPhase: Running
         kind: Deployment
-        message: deployment.apps/lonecraft unchanged
-        name: lonecraft
+        message: deployment.apps/superflat unchanged
+        name: superflat
         namespace: minecraft
         status: Synced
         syncPhase: Sync
@@ -644,6 +905,15 @@ status:
         message: deployment.apps/minio-homelab configured
         name: minio-homelab
         namespace: minio-homelab
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/lonecraft configured
+        name: lonecraft
+        namespace: minecraft
         status: Synced
         syncPhase: Sync
         version: v1
@@ -665,47 +935,61 @@ status:
         status: Synced
         syncPhase: Sync
         version: v1alpha1
-      revision: bac8224ce726424914268b84a48833854bd7b309
+      revision: 22681c8d9c267728220809356d99e06a64eb9732
       source:
         path: active
         repoURL: https://github.com/waylonwalker/homelab-argo
-  reconciledAt: "2024-02-25T20:23:03Z"
+  reconciledAt: "2024-03-11T19:47:07Z"
   resources:
   - kind: Namespace
     name: minecraft
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - kind: Namespace
     name: minio-homelab
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - health:
       status: Healthy
     kind: PersistentVolumeClaim
     name: minecraft-data
     namespace: minecraft
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - health:
       status: Healthy
     kind: PersistentVolumeClaim
     name: minio-storage
     namespace: minio-homelab
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - health:
       status: Healthy
     kind: Service
     name: lonecraft
     namespace: minecraft
-    status: Synced
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: superflat
+    namespace: minecraft
+    requiresPruning: true
+    status: Unknown
     version: v1
   - health:
       status: Healthy
     kind: Service
     name: minio-homelab
     namespace: minio-homelab
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - group: apps
     health:
@@ -713,7 +997,17 @@ status:
     kind: Deployment
     name: lonecraft
     namespace: minecraft
-    status: Synced
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    health:
+      status: Healthy
+    kind: Deployment
+    name: superflat
+    namespace: minecraft
+    requiresPruning: true
+    status: Unknown
     version: v1
   - group: apps
     health:
@@ -721,7 +1015,8 @@ status:
     kind: Deployment
     name: minio-homelab
     namespace: minio-homelab
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
   - group: bitnami.com
     health:
@@ -729,7 +1024,8 @@ status:
     kind: SealedSecret
     name: minio-secret
     namespace: minio-homelab
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1alpha1
   - group: networking.k8s.io
     health:
@@ -737,9 +1033,9 @@ status:
     kind: Ingress
     name: minio-homelab
     namespace: minio-homelab
-    status: Synced
+    requiresPruning: true
+    status: Unknown
     version: v1
-  sourceType: Directory
   summary:
     externalURLs:
     - http://aminio-ui.fokais.com/
@@ -755,6 +1051,5 @@ status:
       source:
         path: active
         repoURL: https://github.com/waylonwalker/homelab-argo
-    revision: bac8224ce726424914268b84a48833854bd7b309
-    status: Synced
+    status: Unknown
 ---
