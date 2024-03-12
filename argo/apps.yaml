@@ -13,9 +13,9 @@ spec:
     path: argo
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
-# syncPolicy:
-#   automated:
-#     prune: true
+syncPolicy:
+  automated:
+    prune: true
 
 ---
 
