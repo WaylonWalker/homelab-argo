@@ -1,4 +1,22 @@
+
 apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argo
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argo
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+apiVersion: argoproj.io/v1alpha1
+
+---
+
 kind: Application
 metadata:
   name: installer
@@ -15,17 +33,16 @@ spec:
 
 ---
 
-apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: apps
+  name: librespeed
   namespace: argocd
 spec:
   project: default
   destination:
-    namespace: argo
+    namespace: librespeed
     server: 'https://kubernetes.default.svc'
   source:
-    path: argo
+    path: librespeed
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
