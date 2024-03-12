@@ -9,7 +9,7 @@ spec:
   project: default
   destination:
     namespace: installer
-    name: in-cluster
+    server: 'https://kubernetes.default.svc'
   source:
     path: installer
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
