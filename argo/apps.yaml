@@ -1,7 +1,17 @@
-project: default
-source:
-  repoURL: 'https://github.com/waylonwalker/homelab-argo'
-  path: installer
-destination:
-  server: 'https://kubernetes.default.svc'
-  namespace: installer
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-app
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: installer
+    namespace: default
+    name: in-cluster
+  project: default
+  source:
+    path: installer
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
