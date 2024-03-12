@@ -13,10 +13,13 @@ spec:
     path: argo
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
-apiVersion: argoproj.io/v1alpha1
+syncPolicy:
+  automated:
+    prune: true
 
 ---
 
+apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: installer
@@ -33,6 +36,7 @@ spec:
 
 ---
 
+apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: librespeed
