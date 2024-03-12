@@ -50,3 +50,20 @@ spec:
     path: librespeed
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: play-outside
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: play-outside
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: play-outside
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
