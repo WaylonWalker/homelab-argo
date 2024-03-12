@@ -6,11 +6,10 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
+  project: default
   destination:
     namespace: installer
-    namespace: default
     name: in-cluster
-  project: default
   source:
     path: installer
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
