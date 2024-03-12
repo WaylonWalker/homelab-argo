@@ -12,3 +12,20 @@ spec:
     path: installer
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo
+  namespace: argo
+spec:
+  project: default
+  destination:
+    namespace: installer
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argo
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
