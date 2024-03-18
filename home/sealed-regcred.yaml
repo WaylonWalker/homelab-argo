@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: wayl-one
+spec:
+  encryptedData:
+    .dockerconfigjson: AgA3mFCRjo3kWL16ZsKn64v53jLyQYSIlXQ23uhLiAPuKd46ISJORUlScj0WDc24BZEL/qN4aLmqBX98FQG7oIYOeICDVr1eCeNV/TV7xb0lLZmGAxVZKpHNZYoG4p5r2jJbFW8VJ7nto/MYPKM8cbnV2rHRMijrJgUvy6uQQptCIPLLTXjPpQfDdbbuSefbT3mMpkgVjxZgxoPTp0ER+Kz/Cx07TCTWyXl7wxjJ3JO0za7rgmGalXmRL/xM4Mj2thbXxopOsuSzSCRLhqnL4YyUKeEfm1n74PwhZetHS8rlZD9gr6zzo5RBFEzTtPm6P5veQd3PVG6PJjLl5rvBudl88ld+T2nXH/NIappv8IxChQtwEunlek3R2IPGeW88HcMiYyS3xI21ZhMiQZEXa16n0A5APSl//gM9kBziIB/pjHG6TMpxwd2+IOnQLnufkxWQ7wImKFhyXVR2h2+JIJWrFbag86e9w0tEwFHMQL1S42i1tqk8IuLsDUdCcWlMczdSePRDWFRO9caYoGMqOsK060tY0TUeUG/EiwoKXhTJbBsuqyXzRMfZ086USbwo3mYt2HVS9LLLWzNu2NkLI3ABynlqCHCLI3lAgf/5QMYVhf5NpsmaLT2Hk+rA8IoDdYUEEpblOVCb4GThM6s6zQaGH0LmibKWMUsHrXnPi/PchCciton3/Qy2kEGHDQDHwxSLnO0++lYjGSpUp/Z3GhtxbHxdagxrItixrb4VCZd6Qd+WKE2Qj2MgrRnkaKBmnWZhGTuJD/pwgcV7ICF7meXl/r6qX10TGZXDF0r6TsS3v0bnQHXsWHetGjDfkTaSfm4hLOzM538QBQ==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: regcred
+      namespace: wayl-one
+    type: kubernetes.io/dockerconfigjson
