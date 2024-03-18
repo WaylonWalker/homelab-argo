@@ -140,10 +140,30 @@ metadata:
 spec:
   project: default
   destination:
-    namespace: wayl-one
     server: 'https://kubernetes.default.svc'
+    namespace: code-server
   source:
     path: code-server
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jupyter
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: jupyter
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: jupyter
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
