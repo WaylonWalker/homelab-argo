@@ -129,3 +129,23 @@ spec:
   syncPolicy:
     automated:
       prune: true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: code-server
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: wayl-one
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: code-server
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
