@@ -127,9 +127,12 @@ spec:
         - name: registry-auth
           persistentVolumeClaim:
             claimName: registry-auth
-        - name: registry-config
+        - name: registry-config-og-remove-later
           persistentVolumeClaim:
             claimName: registry-config
+        - name: registry-config
+          configMap:
+            name: registry-config
         - name: registry-password
           secret:
             secretName: registry-password
