@@ -117,7 +117,7 @@ spec:
             - mountPath: /etc/docker/registry
               name: registry-config
             - name: registry-password
-              mountPath: /auth/registry.password
+              mountPath: /auth
               readOnly: true
       restartPolicy: Always
       volumes:
