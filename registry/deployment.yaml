@@ -103,6 +103,8 @@ spec:
               value: Waylon Walker's Docker Registry
             - name: REGISTRY_URL
               value: https://registry.wayl.one
+            - name: REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin
+              value: "*"
           image: registry:2.8.2
           name: registry-server
           ports:
