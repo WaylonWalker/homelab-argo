@@ -8,5 +8,5 @@ seal:
     kubeseal -f private/home-regcred.yaml -w home/sealed-regcred.yaml
     kubeseal -f private/regcred.yaml -w registry/sealed-regcred.yaml --namespace registry --name regcred
     cat private/registry.password | kubeseal create secret --namespace registry --name registry.password
-    cat private/registry.password | kubectl create secret generic mysecret --dry-run=client --from-file=foo=/dev/stdin -o yaml > private/registry-password.yaml
-    kubeseal -f private/registry-password.yaml -w registry/sealed-registry-password.yaml
+    cat private/registry.password | kubectl create secret generic registry-password --dry-run=client --from-file=foo=/dev/stdin -o yaml > private/registry-password.yaml
+    kubeseal -f private/registry-password.yaml -w registry/sealed-registry-password.yaml --namespace registry --name registry-password
