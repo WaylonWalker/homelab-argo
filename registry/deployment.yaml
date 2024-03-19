@@ -117,8 +117,8 @@ spec:
             - mountPath: /etc/docker/registry
               name: registry-config
             - name: registry-password
-              secret:
-                secretName: my-registry-secret
+              mountPath: /auth/registry.password
+              readOnly: true
       restartPolicy: Always
       volumes:
         - name: registry
@@ -131,8 +131,8 @@ spec:
           persistentVolumeClaim:
             claimName: registry-config
         - name: registry-password
-          mountPath: /auth/registry.password
-          readOnly: true
+          secret:
+            secretName: my-registry-secret
 status: {}
 
 ---
