@@ -132,7 +132,7 @@ spec:
             claimName: registry-config
         - name: registry-password
           secret:
-            secretName: my-registry-secret
+            secretName: registry-password
 status: {}
 
 ---
