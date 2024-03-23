@@ -79,8 +79,6 @@ spec:
               value: RTSP1
             - name: TZ
               value: America/Chicago
-            - name: WYZE_EMAIL
-            - name: WYZE_PASSWORD
             - valueFrom:
               secretKeyRef:
                 key: WYZE_EMAIL
