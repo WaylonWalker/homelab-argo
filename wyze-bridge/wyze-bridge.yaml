@@ -81,8 +81,13 @@ spec:
               value: America/Chicago
             - name: WYZE_EMAIL
             - name: WYZE_PASSWORD
-          envFrom:
-            - secretRef:
+            - valueFrom:
+              secretKeyRef:
+                key: WYZE_EMAIL
+                name: wyze-bridge-secret
+            - valueFrom:
+              secretKeyRef:
+                key: WYZE_PASSWORD
                 name: wyze-bridge-secret
           image: mrlt8/wyze-bridge:latest
           name: wyze-bridge
