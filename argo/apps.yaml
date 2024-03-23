@@ -269,3 +269,23 @@ spec:
   syncPolicy:
     automated:
       prune: true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wyze-bridge
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: wyze-bridge
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: wyze-bridge
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
