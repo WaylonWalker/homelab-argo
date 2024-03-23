@@ -14,13 +14,13 @@ spec:
   ports:
     - name: "5000"
       port: 5000
-      targetPort: 5000
+      # targetPort: 5000
     - name: "8554"
       port: 8554
-      targetPort: 8554
+      # targetPort: 8554
     - name: "8888"
       port: 8888
-      targetPort: 8888
+      # targetPort: 8888
   selector:
     io.kompose.service: wyze-bridge
 status:
