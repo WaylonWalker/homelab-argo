@@ -68,6 +68,9 @@ spec:
         io.kompose.service: wyze-bridge
     spec:
       containers:
+        - envFrom:
+            - secretRef:
+                name: wyze-bridge-secret
         - env:
             - name: IMG_DIR
               value: /img/
@@ -79,14 +82,6 @@ spec:
               value: RTSP1
             - name: TZ
               value: America/Chicago
-            - valueFrom:
-              secretKeyRef:
-                key: WYZE_EMAIL
-                name: wyze-bridge-secret
-            - valueFrom:
-              secretKeyRef:
-                key: WYZE_PASSWORD
-                name: wyze-bridge-secret
           image: mrlt8/wyze-bridge:latest
           name: wyze-bridge
           ports:
