@@ -1,0 +1,164 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace frigate -o frigate.yaml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: frigate
+  name: frigate
+  namespace: frigate
+spec:
+  ports:
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+    - name: "8554"
+      port: 8554
+      targetPort: 8554
+    - name: "8555"
+      port: 8555
+      targetPort: 8555
+    - name: 8555-udp
+      port: 8555
+      protocol: UDP
+      targetPort: 8555
+  selector:
+    io.kompose.service: frigate
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: frigate
+  namespace: frigate
+spec: {}
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace frigate -o frigate.yaml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: frigate
+  name: frigate
+  namespace: frigate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: frigate
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --namespace frigate -o frigate.yaml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/frigate-default: "true"
+        io.kompose.service: frigate
+    spec:
+      containers:
+        - env:
+            - name: FRIGATE_RTSP_PASSWORD
+              value: '"password"'
+            - name: TZ
+              value: America/Chicago
+          image: ghcr.io/blakeblackshear/frigate:stable
+          name: frigate
+          ports:
+            - containerPort: 5000
+              # hostPort: 5000
+              protocol: TCP
+            - containerPort: 8554
+              # hostPort: 8554
+              protocol: TCP
+            - containerPort: 8555
+              # hostPort: 8555
+              protocol: TCP
+            - containerPort: 8555
+              # hostPort: 8555
+              protocol: UDP
+          resources: {}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /media/frigate
+              name: storage
+            - mountPath: /tmp/cache
+              name: frigate-claim2
+      restartPolicy: Always
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+        - name: frigate-claim2
+          persistentVolumeClaim:
+            claimName: frigate-claim2
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: config
+  name: config
+  namespace: frigate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: storage
+  name: storage
+  namespace: frigate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: frigate-claim2
+  name: frigate-claim2
+  namespace: frigate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
