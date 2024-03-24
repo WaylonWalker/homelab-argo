@@ -24,6 +24,7 @@ spec:
       port: 8888
       targetPort: 8888
       nodePort: 30003
+  type: NodePort
   selector:
     io.kompose.service: wyze-bridge
 status:
