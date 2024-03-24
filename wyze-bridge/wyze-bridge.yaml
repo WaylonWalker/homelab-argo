@@ -71,7 +71,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: wyze-bridge
-        - env:
+          env:
             - name: IMG_DIR
               value: /img/
             - name: QUALITY
@@ -83,6 +83,7 @@ spec:
             - name: TZ
               value: America/Chicago
           image: mrlt8/wyze-bridge:latest
+          name: wyze-bridge
           ports:
             - containerPort: 5000
               # hostPort: 5000
