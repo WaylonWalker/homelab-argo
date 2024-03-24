@@ -14,6 +14,7 @@ spec:
     - name: "5000"
       port: 5000
       targetPort: 5000
+      nodePort: 31000
     - name: "8554"
       port: 8554
       targetPort: 8554
@@ -24,6 +25,7 @@ spec:
       port: 8555
       protocol: UDP
       targetPort: 8555
+  type: NodePort
   selector:
     io.kompose.service: frigate
 status:
@@ -89,6 +91,7 @@ spec:
             - containerPort: 8555
               # hostPort: 8555
               protocol: UDP
+
           resources: {}
           securityContext:
             privileged: true
