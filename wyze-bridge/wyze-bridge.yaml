@@ -19,9 +19,11 @@ spec:
     - name: "8554"
       port: 8554
       targetPort: 8554
+      nodePort: 30002
     - name: "8888"
       port: 8888
       targetPort: 8888
+      nodePort: 30003
   type: NodePort
 
   ports:
