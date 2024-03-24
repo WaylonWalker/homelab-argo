@@ -70,7 +70,7 @@ spec:
       containers:
         - envFrom:
             - secretRef:
-                name: wyze-bridge-secret
+                name: wyze-bridge
         - env:
             - name: IMG_DIR
               value: /img/
