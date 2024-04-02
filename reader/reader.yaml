@@ -12,7 +12,7 @@ metadata:
   name: reader-cronjob
   namespace: reader
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "0 * * * *"
   jobTemplate:
     spec:
       template:
