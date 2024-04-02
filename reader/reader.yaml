@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: namespace
+metadata:
+  creationTimestamp: null
+  name: reader
+  namespace: reader
+
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
