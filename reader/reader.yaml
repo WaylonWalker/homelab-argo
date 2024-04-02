@@ -25,5 +25,5 @@ spec:
                   valueFrom:
                     secretKeyRef:
                       name: cloudflare-secret
-                      key: api-token
+                      key: cloudflare-secret
           restartPolicy: OnFailure
