@@ -329,3 +329,23 @@ spec:
   syncPolicy:
     automated:
       prune: true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: htmx-patterns
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: htmx-patterns
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: htmx-patterns
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
