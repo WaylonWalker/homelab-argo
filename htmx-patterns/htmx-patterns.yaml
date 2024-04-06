@@ -61,7 +61,7 @@ spec:
         io.kompose.service: htmx-patterns
     spec:
       containers:
-        - image: docker.io/waylonwalker/htmx-patterns-waylonwalker-com:0.1.2
+        - image: docker.io/waylonwalker/htmx-patterns-waylonwalker-com:0.1.3
           name: htmx-patterns
           ports:
             - containerPort: 5000
