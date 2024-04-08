@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: creeperconqueror
+  namespace: minecraft
+spec:
+  selector:
+    app: creeperconqueror
+  ports:
+    - name: "35566"
+      port: 35568
+      targetPort: 25565
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: creeperconqueror
+  namespace: minecraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: creeperconqueror
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: creeperconqueror
+    spec:
+      containers:
+        - env:
+            - name: SERVER_NAME
+              value: creeperconqueror
+            - name: MOTD
+              value: §sCreeper§pConqueror
+            - name: ICON
+              value: https://screenshots.waylonwalker.com/lonecraft.png
+            # - name: SEED
+            #   value: '5103687417315433447'
+            - name: EULA
+              value: "true"
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                gamerule keepInventory true
+                pregen start 200
+            - name: VERSION
+              value: 1.20.4
+          image: itzg/minecraft-server
+          name: creeperconqueror
+          ports:
+            - containerPort: 25565
+              hostPort: 35566
+              protocol: TCP
+          resources: {}
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /data
+              name: minecraft-data
+              subPath: creeperconqueror
+      restartPolicy: Always
+      volumes:
+        - name: minecraft-data
+          persistentVolumeClaim:
+            claimName: minecraft-data
