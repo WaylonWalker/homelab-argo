@@ -1,0 +1,32 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: play-outside
+spec:
+  encryptedData:
+    .dockerconfigjson: AgCBfLtRYtll2QNqwc6joSxtPj8vae6ESdySo7Wjs9ABQHi1Dcd5gQL/VC19YewL5k/tdUWfAFnRAdKAb9nrOY3w/y4n4rp464VAonZNMa8vF+tJRAqtu9IzCmeXUT1ls33ZZMQsfQuVHpcsGrEges1i+SIZ4ZAprJzSphOvx965lY3f48lj1z5C/haDgWwFK6qu/lQdTFxXbC3LLrrwJycJ5ALnXgRuMDPal0hFMZwGViWydkZaI45J9D+OP8LzphNQF3iZmN8/SG6FhCGPEP8alQyO1+E3klyI9awMDX/Z7u7RZRhvkZKAtUc/A+6AK/kzNVIwimcv/ne/LliDV9XnRYTadCwCl5BniD3UhcL9B1vLaBv3pMQtt3+FYJYj1FCRS0IuyP4MXb3AkUz33QBtDkWsvTtgfRUQF6xf9s7nEhgLp+ELgdTmNrk/IUoZ1GoLVUItMotTRxqxNWnvvdQnEBwGh0sh0b2DST8mUFObwgVRspLVunkvkRZm0iCHhzx19VoAP6xXCwwzgm8bnDwRTxW81B1O4BJzXGLWkT+UyK+ReFkuz4464WooyJUGY5m0YA0CY1NmPaxwuzcLH7oIVOO6q4mtPzww4LtTY0h5/tzaSgtGhGJ04qm5Hd8pKKZLZ5F4HRFxzfHFfM63cUvvmpR47IjGC0unxSSqsGDFXgyQ82pApJHQPUpDn9HRYV537DsdYrvz5mvzAHgM8srXYjO/1vbQR8DQUqiW1AfcgFYqGpCeMk9/COkAXhOYx+ddokojbMmQ8dXM21nDLHJL8M3DbqE/8WtqoInS9wJxyjdHpzBm+kzStYyL17hjDzn39DGoBmYR7g==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: regcred
+      namespace: play-outside
+    type: kubernetes.io/dockerconfigjson
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: wayl-one
+spec:
+  encryptedData:
+    .dockerconfigjson: AgCIr900wer3t3jAYcWbnxBZg3+dy/xJqn3ZMg4BscujXVwn32zUzTMn5CfQww+lW+xoCp6bOX8s2/XG23gMWT/cQK6Ysif7YqblIPBxRJJ7Mh05T+KO0isallh+GcYHFj1mwtT5ruUlXuXbNdIJpvcu2JFS1jfk/h47IRcZqf88Q9ThiZfwrXzKJDhftVhK4hf1ZTDB27R/2dErXlV1W0MtcwWDxRRMcsRL6O/7KtJbG8RHXAy/E26LJunEd2dsNVP9PzkOwQKinIN2sUQEkr40aig4yrUk5OK2p3Eov23nr3KpVepeTlZlvzD3FvdcDssjsrAnlRh8gldvISTIug6LYp4q0CGivAkbgdrHpOt7nkRa6qy29yg2BqmmK8xi/i21o7FH+63D44yS3Xf250vyrWfhiKua7+X8xDbsQSHqCVGhEuC0H3o/mfxFjNSIVNaTuuGXIZhkH782D3juBQWTes+dOmRS421TZ23ocJS46BnfxeOZtheo/F3/1vhLaPz9AvNukvLwUXoQ6rx8patBG04l7IA4Tyn4iRDxBDY1rU5jT3QQTNWQ0MBC/1rMJZG/ovyBBpoHcfoHnAZ3Yqbiw8Xbchw0yDM9wDyiswmEk7pViBgCXMpKrINwYkT3BJnUrwg4KUNrDyOQLRRzdGm9XIxEikraHB66BMPKzV03c7BvLwG8ip4lqf9zlvWpuFqV0ea0HWzQ6fQnweHV0cNfI/KFF4uwgAY5F6nVcznlJDk8OL/iJy70f/UacqcqQNDlfAJEl08O2tYYeW/NKE0C9S8S0++JcBB6HNWP3ng4ZO8NLpsHaOfAFKPV/2yOf+NHqW01ZgBgxw==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: regcred
+      namespace: wayl-one
+    type: kubernetes.io/dockerconfigjson
