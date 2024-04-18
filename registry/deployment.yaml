@@ -71,7 +71,7 @@ metadata:
   name: registry-server
   namespace: registry
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: registry-server
@@ -296,4 +296,3 @@ spec:
             pathType: Prefix
 status:
   loadBalancer: {}
-
