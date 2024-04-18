@@ -94,7 +94,7 @@ spec:
             - name: REGISTRY_AUTH
               value: htpasswd
             - name: REGISTRY_AUTH_HTPASSWD_PATH
-              value: /auth/registry.password
+              value: /auth/htpasswd
             - name: REGISTRY_AUTH_HTPASSWD_REALM
               value: Registry
             - name: REGISTRY_STORAGE_DELETE_ENABLED
