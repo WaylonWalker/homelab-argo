@@ -284,5 +284,16 @@ spec:
                   number: 80
             path: /
             pathType: Prefix
+    - host: registry.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: registry
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix
 status:
   loadBalancer: {}
+
