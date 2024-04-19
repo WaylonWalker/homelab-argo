@@ -369,3 +369,23 @@ spec:
   syncPolicy:
     automated:
       prune: true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shots
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: shots
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: shots
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
