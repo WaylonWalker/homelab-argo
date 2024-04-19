@@ -55,14 +55,14 @@ spec:
               value: "3003"
             - name: USER
               value: waylonwalker
-          image: registry.wayl.one/installer
+          image: waylonwalker/installer
           name: installer
           ports:
             - containerPort: 3003
               protocol: TCP
           resources: {}
-      imagePullSecrets:
-        - name: regcred
+      # imagePullSecrets:
+      #   - name: regcred
       restartPolicy: Always
 status: {}
 
