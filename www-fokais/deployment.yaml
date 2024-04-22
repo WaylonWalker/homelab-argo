@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    service: www-fokais
+  name: www-fokais
+  namespace: www-fokais
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+  selector:
+    service: www-fokais
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: www-fokais
+  namespace: www-fokais
+spec: {}
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: www-fokais
+  name: www-fokais
+  namespace: www-fokais
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: www-fokais
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: www-fokais
+    spec:
+      containers:
+        - image: docker.io/fokais/fokais/www-fokais:0.1.0
+          name: www-fokais
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources: {}
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  labels:
+    service: www-fokais
+  name: www-fokais
+  namespace: www-fokais
+spec:
+  rules:
+    - host: www.fokais.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: www-fokais
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: fokais.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: www-fokais
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}
+
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: default
+spec:
+  encryptedData:
+    .dockerconfigjson: AgBa1/wfDoCifNP5OFATqKGiG2fyyPLYN8qYGwPZuuBx3gdrhGfN/tSrPQMGkPtykvJ6xYeo5NugLnUXIAocAKoH1Pdz4J293iUlhSJnAOQsWzG+kaqSQH3teNdLa6B9U0hRlEItDwOPZfCgeWrRSLGnbMMcQDKCKKRhSxWCTCxELI4VVyBAEU2pCyjqc/QPOA7fW3PVbzlWBDzjkTQdIJxbzhLFWIA1Slc9KF2hTRGnGX8BQ9mGYuLBn0wzvV5ZKNiW9cw1vJWgNAJgJWd/OxtAAtaw7O4t83TQtxhmIiScF02zsSLO/pWLF9JPH7MWFIVyMyqqKUOVtTZ5dTNxAjEfRneoOa6TrX7YXFtib2GUEkg2jSOo/C2OcRdQzE8m/6Eiq8jsjsiVeOMrSFxZRerW8utNPLMRjNn8efIjRUclKZKlMOwDbEAHo6IvlJjN1aS/Y5EQiF1gEfPZoDWCUOehVHgkrvCzbwSJo0BaGywijFl2jcQ8sBJIge+91W4DrXcWl97efv68q/HVGQtpBRv/1lenz89GFx1qNUbTbw31Eafdirv/uxLmQnJRZWp7CV0u2/sIwp3ygig9TSE/zCebvSLrBn3KOJuozPlv3M/Qq+rqS4FQvgCHnMKMAdv8KvNYEiFvCbj++4STOXZ8rphz/lhPMgaLMapjcp+9KGDVttSo42jYLZKEwKStiz4uwveSrRtBbvW0u7+k/g8dE/k7tqEyb8gzVuhA+ubt6pLhtKnpgwbYpekHkP6XteFT18R3mUG661ALejPwh3Prz/iujklFAPGScNpHBMRrTewUSpgWauJUQ2ldQDcK7O38b9InpvNYFRDSjlfKL0I25GuxxwoS2H5FMrrnfB9xWQQI
+  template:
+    metadata:
+      creationTimestamp: null
+      name: regcred
+      namespace: default
+    type: kubernetes.io/dockerconfigjson
