@@ -300,7 +300,7 @@ metadata:
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
-    io.kompose.service: registry
+    io.kompose.service: registry-server
   name: registry
   namespace: registry
 spec:
@@ -310,7 +310,7 @@ spec:
         paths:
           - backend:
               service:
-                name: registry
+                name: registry-server
                 port:
                   number: 5000
             path: /
