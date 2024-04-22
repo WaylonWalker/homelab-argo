@@ -389,6 +389,25 @@ spec:
   syncPolicy:
     automated:
       prune: true
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: registry
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: registry
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: registry
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
 
 ---
 
