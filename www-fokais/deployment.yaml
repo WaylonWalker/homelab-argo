@@ -99,7 +99,7 @@ kind: SealedSecret
 metadata:
   creationTimestamp: null
   name: regcred
-  namespace: default
+  namespace: www-fokais
 spec:
   encryptedData:
     .dockerconfigjson: AgBa1/wfDoCifNP5OFATqKGiG2fyyPLYN8qYGwPZuuBx3gdrhGfN/tSrPQMGkPtykvJ6xYeo5NugLnUXIAocAKoH1Pdz4J293iUlhSJnAOQsWzG+kaqSQH3teNdLa6B9U0hRlEItDwOPZfCgeWrRSLGnbMMcQDKCKKRhSxWCTCxELI4VVyBAEU2pCyjqc/QPOA7fW3PVbzlWBDzjkTQdIJxbzhLFWIA1Slc9KF2hTRGnGX8BQ9mGYuLBn0wzvV5ZKNiW9cw1vJWgNAJgJWd/OxtAAtaw7O4t83TQtxhmIiScF02zsSLO/pWLF9JPH7MWFIVyMyqqKUOVtTZ5dTNxAjEfRneoOa6TrX7YXFtib2GUEkg2jSOo/C2OcRdQzE8m/6Eiq8jsjsiVeOMrSFxZRerW8utNPLMRjNn8efIjRUclKZKlMOwDbEAHo6IvlJjN1aS/Y5EQiF1gEfPZoDWCUOehVHgkrvCzbwSJo0BaGywijFl2jcQ8sBJIge+91W4DrXcWl97efv68q/HVGQtpBRv/1lenz89GFx1qNUbTbw31Eafdirv/uxLmQnJRZWp7CV0u2/sIwp3ygig9TSE/zCebvSLrBn3KOJuozPlv3M/Qq+rqS4FQvgCHnMKMAdv8KvNYEiFvCbj++4STOXZ8rphz/lhPMgaLMapjcp+9KGDVttSo42jYLZKEwKStiz4uwveSrRtBbvW0u7+k/g8dE/k7tqEyb8gzVuhA+ubt6pLhtKnpgwbYpekHkP6XteFT18R3mUG661ALejPwh3Prz/iujklFAPGScNpHBMRrTewUSpgWauJUQ2ldQDcK7O38b9InpvNYFRDSjlfKL0I25GuxxwoS2H5FMrrnfB9xWQQI
@@ -107,5 +107,5 @@ spec:
     metadata:
       creationTimestamp: null
       name: regcred
-      namespace: default
+      namespace: www-fokais
     type: kubernetes.io/dockerconfigjson
