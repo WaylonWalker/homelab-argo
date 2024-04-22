@@ -8,8 +8,8 @@ metadata:
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
-    io.kompose.service: registry-server-tcp
-  name: registry-server-tcp
+    io.kompose.service: registry-server
+  name: registry-server
   namespace: registry
 spec:
   ports:
