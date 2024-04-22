@@ -15,9 +15,6 @@ spec:
   ports:
     - name: "5000"
       port: 5000
-      targetPort: 5000
-      nodePort: 5000
-  type: NodePort
   selector:
     io.kompose.service: registry-server
   type: LoadBalancer
@@ -286,6 +283,35 @@ spec:
                 name: registry-ui
                 port:
                   number: 80
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deployment.yaml -n registry --replicas 4
+    kompose.image-pull-secret: regcred
+    kompose.service.expose: registry.wayl.one
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: registry
+  name: registry
+  namespace: registry
+spec:
+  rules:
+    - host: registry.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: registry
+                port:
+                  number: 5000
             path: /
             pathType: Prefix
 status:
