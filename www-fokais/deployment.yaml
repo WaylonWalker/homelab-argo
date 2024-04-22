@@ -48,7 +48,7 @@ spec:
         service: www-fokais
     spec:
       containers:
-        - image: docker.io/fokais/fokais/www-fokais:0.1.0
+        - image: docker.io/fokais/fokais:www-fokais-0.1.0
           name: www-fokais
           ports:
             - containerPort: 80
