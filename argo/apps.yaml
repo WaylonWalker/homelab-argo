@@ -436,7 +436,7 @@ metadata:
   name: www-fokais
   namespace: argocd
 spec:
-  project: default
+  project: fokais
   destination:
     namespace: www-fokais
     server: 'https://kubernetes.default.svc'
