@@ -447,3 +447,23 @@ spec:
   syncPolicy:
     automated:
       prune: true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fokais-apps
+  namespace: argocd
+spec:
+  project: fokais
+  destination:
+    namespace: fokais-apps
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argo
+    repoURL: 'https://github.com/fokais-com/deployments.fokais'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
