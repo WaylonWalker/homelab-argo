@@ -101,5 +101,15 @@ spec:
                   number: 80
             path: /
             pathType: Prefix
+    - host: my.home
+      http:
+        paths:
+          - backend:
+              service:
+                name: wayl-one
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
 status:
   loadBalancer: {}
