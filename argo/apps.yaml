@@ -430,6 +430,16 @@ spec:
       prune: true
 
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: fokais-apps
+  namespace: excalidraw
+spec: {}
+status: {}
+
+---
 
 apiVersion: argoproj.io/v1alpha1
 kind: Application
