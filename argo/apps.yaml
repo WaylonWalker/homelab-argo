@@ -443,7 +443,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: argo
-    repoURL: 'https://github.com/fokais-com/deployments.fokais'
+    repoURL: 'git@github.com:fokais-com/deployments.fokais.git'
     targetRevision: HEAD
   syncPolicy:
     automated:
