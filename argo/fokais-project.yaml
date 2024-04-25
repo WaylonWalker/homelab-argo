@@ -13,7 +13,9 @@ spec:
     - '*'
   # Only permit applications to deploy to the guestbook namespace in the same cluster
   destinations:
-    - namespace: guestbook
+    - namespace: fokais-apps
+      server: https://kubernetes.default.svc
+    - namespace: fokais
       server: https://kubernetes.default.svc
   # Deny all cluster-scoped resources from being created, except for Namespace
   clusterResourceWhitelist:
@@ -33,6 +35,18 @@ spec:
       kind: Deployment
     - group: 'apps'
       kind: StatefulSet
+    - group: 'apps'
+      kind: Ingress
+    - group: 'apps'
+      kind: Service
+    - group: 'apps'
+      kind: Application
+    - group: 'apps'
+      kind: Namespace
+    - group: 'apps'
+      kind: ConfigMap
+    - group: 'apps'
+      kind: PersistentVolumeClaim
   roles:
     # A role which provides read-only access to all applications in the project
     - name: read-only
