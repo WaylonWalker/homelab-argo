@@ -64,7 +64,7 @@ spec:
         io.kompose.service: wayl-one
     spec:
       containers:
-        - image: docker.io/waylonwalker/wayl-one:v1
+        - image: docker.io/waylonwalker/wayl-one:v2
           name: wayl-one
           ports:
             - containerPort: 80
