@@ -93,10 +93,13 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: config
+              subPath: "pv/frigate/frigate-config"
             - mountPath: /media/frigate
               name: storage
+              subPath: "pv/frigate/frigate-storage"
             - mountPath: /tmp/cache
-              name: frigate-claim2
+              name: frigate-temp
+              subPath: "pv/frigate/frigate-temp"
       restartPolicy: Always
       volumes:
         - name: config
@@ -105,9 +108,9 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: storage
-        - name: frigate-claim2
+        - name: frigate-temp
           persistentVolumeClaim:
-            claimName: frigate-claim2
+            claimName: frigate-temp
 status: {}
 
 ---
@@ -125,6 +128,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
+  volumeName: pv-nfs-general-config
   storageClassName: falcon-nfs
 status: {}
 
@@ -143,6 +147,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
+  volumeName: pv-nfs-general-storage
   storageClassName: falcon-nfs
 status: {}
 
@@ -152,8 +157,8 @@ kind: PersistentVolumeClaim
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: frigate-claim2
-  name: frigate-claim2
+    io.kompose.service: frigate-temp
+  name: frigate-temp
   namespace: frigate
 spec:
   accessModes:
@@ -161,6 +166,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
+  volumeName: pv-nfs-general-temp
   storageClassName: falcon-nfs
 status: {}
 
@@ -196,7 +202,7 @@ status:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-general-nfs
+  name: pv-nfs-general-config
 spec:
   capacity:
     storage: 100Mi
@@ -212,7 +218,44 @@ spec:
     server: falcon # Your NFS server hostname or IP
 
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-general-storage
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany # NFS generally supports ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
+  storageClassName: falcon-nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/vault/nfs/general/
+    server: falcon # Your NFS server hostname or IP
 
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-general-temp
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany # NFS generally supports ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
+  storageClassName: falcon-nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/vault/nfs/general/
+    server: falcon # Your NFS server hostname or IP
+
+---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
