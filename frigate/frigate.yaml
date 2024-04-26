@@ -185,7 +185,7 @@ metadata:
   namespace: frigate
 spec:
   rules:
-    - host: frigate.wayl.one
+    - host: frigate.localdomain
       http:
         paths:
           - backend:
