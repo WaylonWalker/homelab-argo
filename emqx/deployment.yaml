@@ -1,10 +1,9 @@
----
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
     kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
-    kompose.service.expose: eqmx.wayl.one
+    kompose.service.expose: emqx.wayl.one
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -49,7 +48,7 @@ kind: Deployment
 metadata:
   annotations:
     kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
-    kompose.service.expose: eqmx.wayl.one
+    kompose.service.expose: emqx.wayl.one
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -67,7 +66,7 @@ spec:
     metadata:
       annotations:
         kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
-        kompose.service.expose: eqmx.wayl.one
+        kompose.service.expose: emqx.wayl.one
         kompose.version: 1.31.2 (a92241f79)
       creationTimestamp: null
       labels:
@@ -105,7 +104,7 @@ kind: Ingress
 metadata:
   annotations:
     kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
-    kompose.service.expose: eqmx.wayl.one
+    kompose.service.expose: emqx.wayl.one
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -114,7 +113,7 @@ metadata:
   namespace: emqx
 spec:
   rules:
-    - host: eqmx.wayl.one
+    - host: emqx.wayl.one
       http:
         paths:
           - backend:
@@ -143,4 +142,3 @@ spec:
     requests:
       storage: 100Mi
 status: {}
-

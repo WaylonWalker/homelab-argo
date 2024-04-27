@@ -12,6 +12,6 @@ services:
       - 8084
       - 8883
     labels:
-      kompose.service.expose: eqmx.wayl.one
+      kompose.service.expose: emqx.wayl.one
 volumes:
   emqx_data:
