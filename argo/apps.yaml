@@ -423,7 +423,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     path: argo
-    repoURL: 'git@github.com:fokais-com/deployments.fokais.git'
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
     automated:
