@@ -129,7 +129,7 @@ spec:
     requests:
       storage: 100Mi
   volumeName: pv-nfs-general-config
-  storageClassName: falcon-nfs-2
+  storageClassName: falcon-nfs
 status: {}
 
 ---
@@ -148,7 +148,7 @@ spec:
     requests:
       storage: 100Mi
   volumeName: pv-nfs-general-storage
-  storageClassName: falcon-nfs-2
+  storageClassName: falcon-nfs
 status: {}
 
 ---
@@ -167,7 +167,7 @@ spec:
     requests:
       storage: 100Mi
   volumeName: pv-nfs-general-temp
-  storageClassName: falcon-nfs-2
+  storageClassName: falcon-nfs
 status: {}
 
 ---
@@ -210,7 +210,7 @@ spec:
   accessModes:
     - ReadWriteMany # NFS generally supports ReadWriteMany
   persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs-2
+  storageClassName: falcon-nfs
   mountOptions:
     - hard
     - nfsvers=4.1
@@ -229,7 +229,7 @@ spec:
   accessModes:
     - ReadWriteMany # NFS generally supports ReadWriteMany
   persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs-2
+  storageClassName: falcon-nfs
   mountOptions:
     - hard
     - nfsvers=4.1
@@ -248,7 +248,7 @@ spec:
   accessModes:
     - ReadWriteMany # NFS generally supports ReadWriteMany
   persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs-2
+  storageClassName: falcon-nfs
   mountOptions:
     - hard
     - nfsvers=4.1
@@ -260,7 +260,7 @@ spec:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: falcon-nfs-2
+  name: falcon-nfs
 provisioner: example.com/external-nfs
 parameters:
   path: /mnt/vault/nfs/general/
