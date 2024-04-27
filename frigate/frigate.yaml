@@ -216,7 +216,7 @@ spec:
     - nfsvers=4.1
   nfs:
     path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
+    server: falcon # Your NFS server hostname or IP
 
 ---
 apiVersion: v1
@@ -235,7 +235,7 @@ spec:
     - nfsvers=4.1
   nfs:
     path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
+    server: falcon # Your NFS server hostname or IP
 
 ---
 apiVersion: v1
@@ -254,7 +254,7 @@ spec:
     - nfsvers=4.1
   nfs:
     path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
+    server: falcon # Your NFS server hostname or IP
 
 ---
 apiVersion: storage.k8s.io/v1
