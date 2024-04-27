@@ -422,7 +422,7 @@ spec:
     namespace: emqx
     server: 'https://kubernetes.default.svc'
   source:
-    path: argo
+    path: emqx
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
