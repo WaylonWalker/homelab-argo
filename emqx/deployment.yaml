@@ -1,0 +1,151 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
+    kompose.service.expose: eqmx.wayl.one
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: emqx
+  name: emqx
+  namespace: emqx
+spec:
+  ports:
+    - name: "18083"
+      port: 18083
+      targetPort: 18083
+    - name: "1883"
+      port: 1883
+      targetPort: 1883
+    - name: "8083"
+      port: 8083
+      targetPort: 8083
+    - name: "8084"
+      port: 8084
+      targetPort: 8084
+    - name: "8883"
+      port: 8883
+      targetPort: 8883
+  selector:
+    io.kompose.service: emqx
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: emqx
+  namespace: emqx
+spec: {}
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
+    kompose.service.expose: eqmx.wayl.one
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: emqx
+  name: emqx
+  namespace: emqx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: emqx
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
+        kompose.service.expose: eqmx.wayl.one
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/emqx-default: "true"
+        io.kompose.service: emqx
+    spec:
+      containers:
+        - image: emqx:latest
+          name: emqx
+          ports:
+            - containerPort: 18083
+              hostPort: 18083
+              protocol: TCP
+            - containerPort: 1883
+              hostPort: 1883
+              protocol: TCP
+            - containerPort: 8083
+              hostPort: 8083
+              protocol: TCP
+            - containerPort: 8084
+              hostPort: 8084
+              protocol: TCP
+            - containerPort: 8883
+              hostPort: 8883
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /opt/emqx/data
+              name: emqx-data
+      restartPolicy: Always
+      volumes:
+        - name: emqx-data
+          persistentVolumeClaim:
+            claimName: emqx-data
+status: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
+    kompose.service.expose: eqmx.wayl.one
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: emqx
+  name: emqx
+  namespace: emqx
+spec:
+  rules:
+    - host: eqmx.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: emqx
+                port:
+                  number: 18083
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: emqx-data
+  name: emqx-data
+  namespace: emqx
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
