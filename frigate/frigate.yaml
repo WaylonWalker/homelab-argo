@@ -129,7 +129,7 @@ spec:
     requests:
       storage: 100Mi
   volumeName: pv-nfs-general-config
-  storageClassName: falcon-nfs
+  storageClassName: falcon-nfs-2
 status: {}
 
 ---
@@ -148,7 +148,7 @@ spec:
     requests:
       storage: 100Mi
   volumeName: pv-nfs-general-storage
-  storageClassName: falcon-nfs
+  storageClassName: falcon-nfs-2
 status: {}
 
 ---
@@ -167,7 +167,7 @@ spec:
     requests:
       storage: 100Mi
   volumeName: pv-nfs-general-temp
-  storageClassName: falcon-nfs
+  storageClassName: falcon-nfs-2
 status: {}
 
 ---
@@ -210,13 +210,13 @@ spec:
   accessModes:
     - ReadWriteMany # NFS generally supports ReadWriteMany
   persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
+  storageClassName: falcon-nfs-2
   mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
     path: /mnt/vault/nfs/general/
-    server: falcon # Your NFS server hostname or IP
+    server: 192.168.1.106 # Your NFS server hostname or IP
 
 ---
 apiVersion: v1
@@ -229,13 +229,13 @@ spec:
   accessModes:
     - ReadWriteMany # NFS generally supports ReadWriteMany
   persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
+  storageClassName: falcon-nfs-2
   mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
     path: /mnt/vault/nfs/general/
-    server: falcon # Your NFS server hostname or IP
+    server: 192.168.1.106 # Your NFS server hostname or IP
 
 ---
 apiVersion: v1
@@ -248,23 +248,23 @@ spec:
   accessModes:
     - ReadWriteMany # NFS generally supports ReadWriteMany
   persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
+  storageClassName: falcon-nfs-2
   mountOptions:
     - hard
     - nfsvers=4.1
   nfs:
     path: /mnt/vault/nfs/general/
-    server: falcon # Your NFS server hostname or IP
+    server: 192.168.1.106 # Your NFS server hostname or IP
 
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: falcon-nfs
+  name: falcon-nfs-2
 provisioner: example.com/external-nfs
 parameters:
   path: /mnt/vault/nfs/general/
-  server: falcon # Your NFS server hostname or IP
+  server: 192.168.1.106 # Your NFS server hostname or IP
   # server: nfs-server.example.com
   # path: /share
   readOnly: "false"
