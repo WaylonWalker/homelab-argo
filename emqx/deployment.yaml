@@ -79,19 +79,14 @@ spec:
           name: emqx
           ports:
             - containerPort: 18083
-              hostPort: 18083
               protocol: TCP
             - containerPort: 1883
-              hostPort: 1883
               protocol: TCP
             - containerPort: 8083
-              hostPort: 8083
               protocol: TCP
             - containerPort: 8084
-              hostPort: 8084
               protocol: TCP
             - containerPort: 8883
-              hostPort: 8883
               protocol: TCP
           resources: {}
           volumeMounts:

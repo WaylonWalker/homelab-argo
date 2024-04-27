@@ -6,11 +6,11 @@ services:
     volumes:
       - emqx_data:/opt/emqx/data
     ports:
-      - 18083:18083
-      - 1883:1883
-      - 8083:8083
-      - 8084:8084
-      - 8883:8883
+      - 18083
+      - 1883
+      - 8083
+      - 8084
+      - 8883
     labels:
       kompose.service.expose: eqmx.wayl.one
 volumes:
