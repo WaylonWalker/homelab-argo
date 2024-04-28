@@ -178,9 +178,6 @@ metadata:
     kompose.cmd: kompose convert -o deployment.yaml -n frigate
     kompose.service.expose: frigate.wayl.one
     kompose.version: 1.31.2 (a92241f79)
-    traefik.ingress.kubernetes.io/auth-type: "basic"
-    traefik.ingress.kubernetes.io/auth-secret: "frigate-basic-auth"
-    traefik.ingress.kubernetes.io/auth-header-field: "Authorization"
   creationTimestamp: null
   labels:
     io.kompose.service: frigate
@@ -201,24 +198,6 @@ spec:
 status:
   loadBalancer: {}
 
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: frigate
-#   namespace: frigate
-# spec:
-#   entryPoints:
-#     - web
-#   routes:
-#     - match: "Host(`frigate.wayl.one`)"
-#       kind: Rule
-#       services:
-#         - name: frigate
-#           port: 5000
-#       middlewares:
-#         - name: basic-auth
-# ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -291,13 +270,3 @@ parameters:
   # server: nfs-server.example.com
   # path: /share
   readOnly: "false"
-
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: basic-auth
-  namespace: frigate
-spec:
-  basicAuth:
-    secret: frigate-basic-auth
