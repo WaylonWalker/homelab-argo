@@ -301,19 +301,3 @@ metadata:
 spec:
   basicAuth:
     secret: frigate-basic-auth
-
----
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
-metadata:
-  creationTimestamp: null
-  name: frigate-basic-auth
-  namespace: frigate
-spec:
-  encryptedData:
-    users: AgBoo5fu0cOQjRg5ov4pq4EMubwUlV3Fl89QgJA5BEZCzxz+lkRuAJqWoj38t6utMxqoUOrEJclozAJttwIIpNvN94BQ0FiuxvQ62GylTGSF61O30Yq7yQOH9rECpnCV3P080vflHgV84hRU9ZzGBqFq6IKDl/bBl8LSXUtuQSgdBUeLa47TSApgt17gYh/MVHhoZsuVd/10EbJ/VJ30xgram3Nh37SbygYpZnHd5FcM+TOo5Goeoc3dYya3w49lfBjhy4KQ6fcxPDEpnvJpZ5pp2nMPa3QA4afWCzgMbZ0WQkrNQ/B5IDIXYUHAfds5S5Wvz/kf1JHTLApbmtR3/CbqNqAhZNc7JWJO9IueG5/OzD0kWotMZ90vpebLulGb5zs/npd1rpQu2Q184GgbVWfzDLIGkroYS0xuCVzo4ZvPA3k5cq8kwomI6BliMWXlE15sHpxvF7QFknyzV+SvZIJ5IGK9Jv9o3KjmdfwHkBvwLw8IHAl71JWjkoXjITAZ9Sizu9pd6fXqFOHV5wJpbt9pH4QXsVBp0KtD/SXNuu8bOfamWljQc2FGkOaKihlQlGDfFLRsyTodRw6qBwFIErXnyWEarZxHqc3jwqytwjKtYAXKL1qmp3K1MjkKtt9TNKlWMRLlmxFjkkd2Awn+MsPUjydxjqF5zv2BHbeB+ZkLAVRbE7+pZv2ng+HBcYJ1L3RbU+8OWVCjJq0W+yMm8+1Iyd4aLFiy7U3QJ9VkXzCeVBeoGZcvG2RQc8Truho=
-  template:
-    metadata:
-      creationTimestamp: null
-      name: frigate-basic-auth
-      namespace: frigate
