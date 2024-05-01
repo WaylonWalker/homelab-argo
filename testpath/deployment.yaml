@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace testpath -o deployment.yaml
+    kompose.image-pull-secret: regcred
+    kompose.service.expose: test.wayl.one/testme
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: wayl-one
+  name: wayl-one
+  namespace: testpath
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+  selector:
+    io.kompose.service: wayl-one
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: testpath
+  namespace: testpath
+spec: {}
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace testpath -o deployment.yaml
+    kompose.image-pull-secret: regcred
+    kompose.service.expose: test.wayl.one/testme
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: wayl-one
+  name: wayl-one
+  namespace: testpath
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: wayl-one
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --namespace testpath -o deployment.yaml
+        kompose.image-pull-secret: regcred
+        kompose.service.expose: test.wayl.one/testme
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/testpath-default: "true"
+        io.kompose.service: wayl-one
+    spec:
+      containers:
+        - image: docker.io/waylonwalker/wayl-one:v1
+          name: wayl-one
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources: {}
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace testpath -o deployment.yaml
+    kompose.image-pull-secret: regcred
+    kompose.service.expose: test.wayl.one/testme
+    kompose.version: 1.31.2 (a92241f79)
+    traefik.ingress.kubernetes.io/router.middlewares: testpath-mw-admin@kubernetescrd
+  creationTimestamp: null
+  labels:
+    io.kompose.service: wayl-one
+  name: wayl-one
+  namespace: testpath
+spec:
+  rules:
+    - host: test.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: wayl-one
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: test.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: wayl-one
+                port:
+                  number: 80
+            path: /testme
+            pathType: Prefix
+status:
+  loadBalancer: {}
+
+---
+# Middleware
+# Strip prefix /overview
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: mw-admin
+  namespace: testpath
+spec:
+  stripPrefix:
+    forceSlash: false
+    prefixes:
+      - /testme

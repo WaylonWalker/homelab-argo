@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  wayl-one:
+    image: docker.io/waylonwalker/wayl-one:v1
+    ports:
+      - 80
+    labels:
+      kompose.service.expose: test.wayl.one/testme
+      kompose.image-pull-secret: regcred
