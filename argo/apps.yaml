@@ -434,6 +434,26 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: terraria
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: terraria
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: terraria
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: www-fokais
   namespace: argocd
 spec:
