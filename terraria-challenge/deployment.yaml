@@ -8,7 +8,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: terraria
-  name: terraria
+  name: terraria-challenge
   namespace: terraria-challenge
 spec:
   type: NodePort
@@ -27,7 +27,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   creationTimestamp: null
-  name: terraria
+  name: terraria-challenge
   namespace: terraria-challenge
 spec: {}
 status: {}
@@ -42,7 +42,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: terraria
-  name: terraria
+  name: terraria-challenge
   namespace: terraria-challenge
 spec:
   replicas: 1
@@ -73,7 +73,7 @@ spec:
           # mono TerrariaServer.exe -config "$CONFIGPATH/$CONFIG_FILENAME" -logpath "$LOGPATH" -world "$WORLD_PATH" "$@"
           command: ["./TShock.Server", "-config", "/config/serverconfig.txt", "-logpath", "/config", "-world", "/worlds/world.wld", "-autocreate"]
 
-          name: terraria
+          name: terraria-challenge
           ports:
             - containerPort: 7777
               hostPort: 7777
