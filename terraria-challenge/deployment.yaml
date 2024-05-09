@@ -1,0 +1,192 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace terraria -o deployment.yaml
+    kompose.service.expose: terraria.wayl.one
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: terraria
+  name: terraria
+  namespace: terraria-challenge
+spec:
+  type: NodePort
+  ports:
+    - name: "7777"
+      port: 7777
+      targetPort: 7777
+      nodePort: 7777
+  selector:
+    io.kompose.service: terraria
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: terraria
+  namespace: terraria-challenge
+spec: {}
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --namespace terraria -o deployment.yaml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: terraria
+  name: terraria
+  namespace: terraria-challenge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: terraria
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --namespace terraria -o deployment.yaml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/terraria-default: "true"
+        io.kompose.service: terraria
+    spec:
+      containers:
+        - env:
+            - name: CONFIGPATH
+              value: /config
+            - name: CONFIG_FILENAME
+              value: '"serverconfig.txt"'
+            - name: WORLD_FILENAME
+              value: world.wld
+          image: ryshe/terraria:latest
+          # mono TerrariaServer.exe -config "$CONFIGPATH/$CONFIG_FILENAME" -logpath "$LOGPATH" -world "$WORLD_PATH" "$@"
+          command: ["./TShock.Server", "-config", "/config/serverconfig.txt", "-logpath", "/config", "-world", "/worlds/world.wld", "-autocreate"]
+
+          name: terraria
+          ports:
+            - containerPort: 7777
+              hostPort: 7777
+              protocol: TCP
+          resources: {}
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /worlds
+              name: world
+              subPath: "pv/terraria-challenge/worlds"
+            - mountPath: /config
+              name: config
+              subPath: "pv/terraria-challenge/config"
+      restartPolicy: Always
+      volumes:
+        - name: world
+          persistentVolumeClaim:
+            claimName: world
+        - name: config
+          persistentVolumeClaim:
+            claimName: config
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: world
+  name: world
+  namespace: terraria-challenge
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+  volumeName: pv-nfs-general-terraria-world
+  storageClassName: falcon-nfs
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: config
+  name: config
+  namespace: terraria-challenge
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+  volumeName: pv-nfs-general-terraria-config
+  storageClassName: falcon-nfs
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-general-terraria-world
+  namespace: terraria-challenge
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany # NFS generally supports ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
+  storageClassName: falcon-nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/vault/nfs/general/
+    server: 192.168.1.106 # Your NFS server hostname or IP
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-general-terraria-config
+  namespace: terraria-challenge
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany # NFS generally supports ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
+  storageClassName: falcon-nfs
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/vault/nfs/general/
+    server: 192.168.1.106 # Your NFS server hostname or IP
+
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: falcon-nfs
+  namespace: terraria-challenge
+provisioner: example.com/external-nfs
+parameters:
+  path: /mnt/vault/nfs/general/
+  server: 192.168.1.106 # Your NFS server hostname or IP
+  # server: nfs-server.example.com
+  # path: /share
+  readOnly: "false"
