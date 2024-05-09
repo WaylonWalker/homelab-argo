@@ -113,7 +113,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-nfs-general-terraria-world
+  volumeName: pv-nfs-general-terraria-challenge-world
   storageClassName: falcon-nfs
 status: {}
 
@@ -132,7 +132,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-nfs-general-terraria-config
+  volumeName: pv-nfs-general-terraria-challenge-config
   storageClassName: falcon-nfs
 status: {}
 
@@ -140,7 +140,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-nfs-general-terraria-world
+  name: pv-nfs-general-terraria-challenge-world
   namespace: terraria-challenge
 spec:
   capacity:
@@ -160,7 +160,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-nfs-general-terraria-config
+  name: pv-nfs-general-terraria-challenge-config
   namespace: terraria-challenge
 spec:
   capacity:
