@@ -16,7 +16,7 @@ spec:
     - name: "7777"
       port: 7777
       targetPort: 7777
-      nodePort: 7778
+      nodePort: 30777
   selector:
     io.kompose.service: terraria
 status:
