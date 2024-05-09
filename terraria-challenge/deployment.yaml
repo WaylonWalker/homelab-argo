@@ -1,28 +1,27 @@
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    kompose.cmd: kompose convert --namespace terraria -o deployment.yaml
-    kompose.service.expose: terraria.wayl.one
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: terraria
-  name: terraria-challenge
-  namespace: terraria-challenge
-spec:
-  type: NodePort
-  ports:
-    - name: "7777"
-      port: 7777
-      targetPort: 7778
-      nodePort: 30777
-  selector:
-    io.kompose.service: terraria
-status:
-  loadBalancer: {}
-
----
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   annotations:
+#     kompose.cmd: kompose convert --namespace terraria -o deployment.yaml
+#     kompose.service.expose: terraria.wayl.one
+#     kompose.version: 1.31.2 (a92241f79)
+#   creationTimestamp: null
+#   labels:
+#     io.kompose.service: terraria
+#   name: terraria-challenge
+#   namespace: terraria-challenge
+# spec:
+#   type: NodePort
+#   ports:
+#     - name: "7777"
+#       port: 7777
+#       targetPort: 7777
+#   selector:
+#     io.kompose.service: terraria
+# status:
+#   loadBalancer: {}
+#
+# ---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -76,7 +75,7 @@ spec:
           name: terraria-challenge
           ports:
             - containerPort: 7777
-              hostPort: 7777
+              hostPort: 7778
               protocol: TCP
           resources: {}
           stdin: true
