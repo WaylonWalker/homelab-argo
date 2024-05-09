@@ -65,7 +65,7 @@ spec:
                 secretKeyRef:
                   key: PLAY_OUTSIDE_OPEN_WEATHER_API_KEY
                   name: play-outside-open-weather-api-key
-          image: docker.io/waylonwalker/play-outside:0.0.28
+          image: docker.io/waylonwalker/play-outside:0.0.29
           name: play-outside-wayl-one
           ports:
             - containerPort: 8200
