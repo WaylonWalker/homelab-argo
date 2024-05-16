@@ -19,7 +19,8 @@ services:
       - 69:69/udp
       - 8080:80 #optional
       # restart: unless-stopped
-
+    labels:
+      kompose.service.expose: netboot.wayl.one
 volumes:
   config:
   assets:
