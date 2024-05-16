@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -89,10 +90,8 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: config
-              subPath: "pv/netboot/config"
             - mountPath: /assets
               name: assets
-              subPath: "pv/netboot/assets"
       restartPolicy: Always
       volumes:
         - name: config
@@ -114,12 +113,10 @@ metadata:
   namespace: netboot
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-nfs-general-netboot-config
-  storageClassName: falcon-nfs
 status: {}
 
 ---
@@ -133,64 +130,9 @@ metadata:
   namespace: netboot
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-nfs-general-netboot-assets
-  storageClassName: falcon-nfs
 status: {}
 
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-nfs-general-netboot-config
-  namespace: netboot
-spec:
-  capacity:
-    storage: 100Mi
-  accessModes:
-    - ReadWriteMany # NFS generally supports ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
-  mountOptions:
-    - hard
-    - nfsvers=4.1
-  nfs:
-    path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
-
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-nfs-general-netboot-assets
-  namespace: netboot
-spec:
-  capacity:
-    storage: 100Mi
-  accessModes:
-    - ReadWriteMany # NFS generally supports ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
-  mountOptions:
-    - hard
-    - nfsvers=4.1
-  nfs:
-    path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
-
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: falcon-nfs
-  namespace: netboot
-provisioner: example.com/external-nfs
-parameters:
-  path: /mnt/vault/nfs/general/
-  server: 192.168.1.106 # Your NFS server hostname or IP
-  # server: nfs-server.example.com
-  # path: /share
-  readOnly: "false"
