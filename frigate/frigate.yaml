@@ -74,13 +74,13 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: config
-              subPath: "pv/frigate/frigate-config"
+              # subPath: "pv/frigate/frigate-config"
             - mountPath: /media/frigate
               name: storage
-              subPath: "pv/frigate/frigate-storage"
+              # subPath: "pv/frigate/frigate-storage"
             - mountPath: /tmp/cache
               name: frigate-temp
-              subPath: "pv/frigate/frigate-temp"
+              # subPath: "pv/frigate/frigate-temp"
       restartPolicy: Always
       volumes:
         - name: config
