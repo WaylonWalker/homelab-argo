@@ -1,12 +1,6 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert --namespace frigate -o frigate.yaml
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: frigate
   name: frigate
   namespace: frigate
 spec:
@@ -22,48 +16,36 @@ spec:
       protocol: UDP
   type: ClusterIP
   selector:
-    io.kompose.service: frigate
+    service: frigate
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  creationTimestamp: null
   name: frigate
   namespace: frigate
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert --namespace frigate -o frigate.yaml
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
   labels:
-    io.kompose.service: frigate
+    service: frigate
   name: frigate
   namespace: frigate
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: frigate
+      service: frigate
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert --namespace frigate -o frigate.yaml
-        kompose.version: 1.31.2 (a92241f79)
-      creationTimestamp: null
       labels:
-        io.kompose.network/frigate-default: "true"
-        io.kompose.service: frigate
+        service: frigate
     spec:
       containers:
         - env:
@@ -86,7 +68,6 @@ spec:
             - containerPort: 8555
               # hostPort: 8555
               protocol: UDP
-
           resources: {}
           securityContext:
             privileged: true
@@ -112,14 +93,10 @@ spec:
           persistentVolumeClaim:
             claimName: frigate-temp
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: config
   name: config
   namespace: frigate
 spec:
@@ -131,14 +108,10 @@ spec:
   volumeName: pv-nfs-general-config
   storageClassName: falcon-nfs
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: storage
   name: storage
   namespace: frigate
 spec:
@@ -150,14 +123,10 @@ spec:
   volumeName: pv-nfs-general-storage
   storageClassName: falcon-nfs
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: frigate-temp
   name: frigate-temp
   namespace: frigate
 spec:
@@ -169,18 +138,12 @@ spec:
   volumeName: pv-nfs-general-temp
   storageClassName: falcon-nfs
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -o deployment.yaml -n frigate
-    kompose.service.expose: frigate.wayl.one
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
   labels:
-    io.kompose.service: frigate
+    service: frigate
   name: frigate
   namespace: frigate
 spec:
@@ -197,77 +160,51 @@ spec:
             pathType: Prefix
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-nfs-general-config
+  name: pv-hostpath-general-config
   namespace: frigate
 spec:
   capacity:
     storage: 100Mi
   accessModes:
-    - ReadWriteMany # NFS generally supports ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
-  mountOptions:
-    - hard
-    - nfsvers=4.1
-  nfs:
+    - ReadWriteMany # Ensure your use case allows this, as hostPath is node-specific
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
     path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
-
+    type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-nfs-general-storage
+  name: pv-hostpath-general-storage
   namespace: frigate
 spec:
   capacity:
     storage: 100Mi
   accessModes:
-    - ReadWriteMany # NFS generally supports ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
-  mountOptions:
-    - hard
-    - nfsvers=4.1
-  nfs:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
     path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
-
+    type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-nfs-general-temp
+  name: pv-hostpath-general-temp
   namespace: frigate
 spec:
   capacity:
     storage: 100Mi
   accessModes:
-    - ReadWriteMany # NFS generally supports ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain # Change to 'Delete' if you want it to be deleted with the PVC
-  storageClassName: falcon-nfs
-  mountOptions:
-    - hard
-    - nfsvers=4.1
-  nfs:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
     path: /mnt/vault/nfs/general/
-    server: 192.168.1.106 # Your NFS server hostname or IP
-
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: falcon-nfs
-  namespace: frigate
-provisioner: example.com/external-nfs
-parameters:
-  path: /mnt/vault/nfs/general/
-  server: 192.168.1.106 # Your NFS server hostname or IP
-  # server: nfs-server.example.com
-  # path: /share
-  readOnly: "false"
+    type: DirectoryOrCreate
