@@ -83,6 +83,8 @@ spec:
             - mountPath: /tmp/cache
               name: frigate-temp
               # subPath: "pv/frigate/frigate-temp"
+            - mountPath: /dev/shm
+              name: cache-volume
       restartPolicy: Always
       volumes:
         - name: config
@@ -94,6 +96,10 @@ spec:
         - name: frigate-temp
           persistentVolumeClaim:
             claimName: frigate-temp
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 256Mi
+          name: cache-volume
 status: {}
 ---
 apiVersion: v1
@@ -184,7 +190,7 @@ metadata:
   name: pv-hostpath-general-storage
 spec:
   capacity:
-    storage: 100Mi
+    storage: 10000Mi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
@@ -200,7 +206,7 @@ metadata:
   namespace: frigate
 spec:
   capacity:
-    storage: 100Mi
+    storage: 1000Mi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
