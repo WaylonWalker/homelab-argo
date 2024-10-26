@@ -15,7 +15,6 @@ spec:
     service: installer
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -25,7 +24,6 @@ metadata:
   namespace: installer
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -65,7 +63,6 @@ spec:
       #   - name: regcred
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -87,7 +84,7 @@ spec:
                   number: 3003
             path: /
             pathType: Prefix
-    - host: installer.k.waylonwalker.com
+    - host: installer.waylonwalker.com
       http:
         paths:
           - backend:
@@ -107,7 +104,7 @@ spec:
                   number: 3003
             path: /
             pathType: Prefix
-    - host: i.k.waylonwalker.com
+    - host: i.waylonwalker.com
       http:
         paths:
           - backend:
