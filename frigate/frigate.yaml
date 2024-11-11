@@ -181,16 +181,16 @@ spec:
                   number: 5000
             path: /
             pathType: Prefix
-    - host: localfrigate.wayl.one
-      http:
-        paths:
-          - backend:
-              service:
-                name: frigate
-                port:
-                  number: 5000
-            path: /
-            pathType: Prefix
+            # - host: localfrigate.wayl.one
+            #   http:
+            #     paths:
+            #       - backend:
+            #           service:
+            #             name: frigate
+            #             port:
+            #               number: 5000
+            #         path: /
+            #         pathType: Prefix
 status:
   loadBalancer: {}
 ---
