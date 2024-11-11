@@ -158,6 +158,9 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    traefik.ingress.kubernetes.io/auth-type: "basic"
+    traefik.ingress.kubernetes.io/auth-secret: "localfrigate-auth-secret"
+    traefik.ingress.kubernetes.io/auth-realm: "Authentication Required"
 spec:
   ingressClassName: traefik
   tls:
