@@ -147,6 +147,15 @@ spec:
   storageClassName: hostpath
 status: {}
 ---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: localfrigate-auth
+  namespace: frigate
+spec:
+  basicAuth:
+    secret: localfrigate-htpasswd
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -156,20 +165,9 @@ metadata:
   namespace: frigate
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
-    traefik.ingress.kubernetes.io/auth-type: "basic"
-    traefik.ingress.kubernetes.io/auth-secret: "localfrigate-auth-secret"
-    traefik.ingress.kubernetes.io/auth-realm: "Authentication Required"
+    traefik.ingress.kubernetes.io/router.middlewares: frigate-localfrigate-auth@kubernetescrd
 spec:
   ingressClassName: traefik
-  tls:
-    - hosts:
-        - frigate.wayl.one
-      secretName: frigate-cert-tls
-    - hosts:
-        - localfrigate.wayl.one
-      secretName: localfrigate-cert-tls
   rules:
     - host: frigate.wayl.one
       http:
@@ -181,16 +179,53 @@ spec:
                   number: 5000
             path: /
             pathType: Prefix
-            # - host: localfrigate.wayl.one
-            #   http:
-            #     paths:
-            #       - backend:
-            #           service:
-            #             name: frigate
-            #             port:
-            #               number: 5000
-            #         path: /
-            #         pathType: Prefix
+    - host: localfrigate.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: frigate
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - frigate.wayl.one
+      secretName: frigate-cert-tls
+    - hosts:
+        - localfrigate.wayl.one
+      secretName: localfrigate-cert-tls
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    service: frigate
+  name: ffrigate
+  namespace: frigate
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: frigate-localfrigate-auth@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: f.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: frigate
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - f.wayl.one
+      secretName: ffrigate-cert-tls
 status:
   loadBalancer: {}
 ---
