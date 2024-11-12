@@ -179,23 +179,10 @@ spec:
                   number: 5000
             path: /
             pathType: Prefix
-    - host: localfrigate.wayl.one
-      http:
-        paths:
-          - backend:
-              service:
-                name: frigate
-                port:
-                  number: 5000
-            path: /
-            pathType: Prefix
   tls:
     - hosts:
         - frigate.wayl.one
       secretName: frigate-cert-tls
-    - hosts:
-        - localfrigate.wayl.one
-      secretName: localfrigate-cert-tls
 status:
   loadBalancer: {}
 ---
