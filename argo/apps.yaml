@@ -30,6 +30,9 @@ spec:
     path: installer
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -45,6 +48,9 @@ spec:
     path: librespeed
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -507,6 +513,9 @@ spec:
     path: traefik-dashboard
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -522,3 +531,6 @@ spec:
     path: basic-auth
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
