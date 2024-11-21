@@ -3,3 +3,12 @@ kind: Namespace
 metadata:
   name: basic-auth
   namespace: basic-auth
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: basic-auth
+  namespace: basic-auth
+spec:
+  basicAuth:
+    secret: basic-auth
