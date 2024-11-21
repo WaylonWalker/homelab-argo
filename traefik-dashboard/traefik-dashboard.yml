@@ -17,25 +17,15 @@ spec:
     app.kubernetes.io/instance: traefik-kube-system
     app.kubernetes.io/name: traefik
 ---
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: redirect-root-to-dashboard
-  namespace: traefik
-spec:
-  redirectRegex:
-    regex: ^/$
-    replacement: /dashboard/
-    permanent: true
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: traefik-ingress
   namespace: kube-system
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     spec.ingressClassName: traefik
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-redirect-root-to-dashboard@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: basic-authbasic-auth@kubernetescrd
 spec:
   rules:
     - host: traefik.wayl.one
@@ -48,3 +38,7 @@ spec:
                 name: traefik-dashboard
                 port:
                   number: 9000
+  tls:
+    - secretName: traefik-tls
+      hosts:
+        - traefik.wayl.one
