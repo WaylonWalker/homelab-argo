@@ -562,8 +562,8 @@ spec:
   project: default
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: HEAD
-    chart: prometheus-community
+    targetRevision: 66.2.1
+    chart: kube-prometheus-stack
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
