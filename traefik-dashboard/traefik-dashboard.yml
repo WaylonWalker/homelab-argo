@@ -23,9 +23,9 @@ metadata:
   name: traefik-ingress
   namespace: kube-system
   annotations:
+    kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    spec.ingressClassName: traefik
-    traefik.ingress.kubernetes.io/router.middlewares: basic-authbasic-auth@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: basic-auth-basic-auth@kubernetescrd
 spec:
   rules:
     - host: traefik.wayl.one
@@ -39,6 +39,6 @@ spec:
                 port:
                   number: 9000
   tls:
-    - secretName: traefik-tls
+    - secretName: traefik-cert-tls
       hosts:
         - traefik.wayl.one
