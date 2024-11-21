@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  namespace: argocd
+data:
+  server.insecure: "true"
+
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: argocd-ingress
+#   namespace: argocd
+#   annotations:
+#     spec.ingressClassName: traefik
+#     cert-manager.io/cluster-issuer: letsencrypt-prod
+# spec:
+#   rules:
+#     - host: argocd.wayl.one
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: argocd-server
+#                 port:
+#                   number: 80
+#   tls:
+#     - secretName: argocd-tls
+#       hosts:
+#         - argocd.wayl.one
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argocd-server
+  namespace: argocd
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`argocd.wayl.one`)
+      priority: 10
+      services:
+        - name: argocd-server
+          port: 80
+    - kind: Rule
+      match: Host(`argocd.wayl.one`) && Headers(`Content-Type`, `application/grpc`)
+      priority: 11
+      services:
+        - name: argocd-server
+          port: 80
+          scheme: h2c
+  tls:
+    secretName: argocd-tls
+---
