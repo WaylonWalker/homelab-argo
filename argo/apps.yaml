@@ -507,3 +507,18 @@ spec:
     path: traefik-dashboard
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: basic-auth
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: basic-auth
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: basic-auth
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
