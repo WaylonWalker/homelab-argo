@@ -15,9 +15,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -32,9 +30,7 @@ spec:
     path: installer
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -49,9 +45,7 @@ spec:
     path: librespeed
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -69,9 +63,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -89,9 +81,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -109,9 +99,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -129,9 +117,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -149,9 +135,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -169,9 +153,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -189,9 +171,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -209,9 +189,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -251,7 +229,6 @@ spec:
 #       prune: true
 #
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -269,9 +246,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -289,9 +264,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -309,9 +282,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -329,9 +300,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -349,9 +318,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -369,9 +336,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -390,7 +355,6 @@ spec:
     automated:
       prune: true
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -408,9 +372,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -428,9 +390,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
-
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
 # metadata:
@@ -470,7 +430,6 @@ spec:
 #       prune: true
 #
 # ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -488,10 +447,7 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -509,7 +465,6 @@ spec:
   syncPolicy:
     automated:
       prune: true
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -519,9 +474,7 @@ metadata:
   namespace: excalidraw
 spec: {}
 status: {}
-
 ---
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -539,3 +492,18 @@ spec:
   syncPolicy:
     automated:
       prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik-dashboard
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: traefik-dashboard
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: installer
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
