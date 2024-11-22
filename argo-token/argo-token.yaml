@@ -5,11 +5,8 @@ metadata:
   namespace: argo
 rules:
   - apiGroups: ["argoproj.io"]
-    resources: ["workflows"]
-    verbs: ["list", "update"]
-  - apiGroups: ["argoproj.io"]
-    resources: ["workflowtemplates"]
-    verbs: ["list"]
+    resources: ["workflows", "workflowtemplates", "workflow-events"]
+    verbs: ["list", "get", "watch"]
 ---
 apiVersion: v1
 kind: ServiceAccount
