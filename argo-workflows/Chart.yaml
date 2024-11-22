@@ -1,0 +1,10 @@
+apiVersion: v2
+name: argo-workflows
+description: A Helm chart for installing Argo Workflows via Argo CD
+type: application
+version: 0.1.0
+appVersion: "3.6.0"
+dependencies:
+  - name: argo-workflows
+    version: "0.44.0"
+    repository: "https://argoproj.github.io/argo-helm"

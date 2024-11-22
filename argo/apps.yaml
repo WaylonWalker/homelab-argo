@@ -591,3 +591,25 @@ spec:
   syncPolicy:
     automated:
       prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-workflows
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+    path: argo-workflows
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

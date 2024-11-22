@@ -1,0 +1,56 @@
+# Argo Workflows Helm Chart Values
+
+# Namespace where Argo Workflows will be deployed
+namespace: argo
+# Configuration for the Argo Workflows server
+server:
+  # Enable authentication
+  authMode: server # Options: 'server', 'client', 'sso', 'hybrid'
+  # Server configuration settings
+  config:
+    # External URL of the Argo Workflows UI
+    url: https://argo-workflows.wayl.one # Replace with your domain
+  # Ingress configuration to expose the UI
+  ingress:
+    enabled: true
+    ingressClassName: traefik # Adjust based on your ingress controller
+    annotations:
+      # Cert-manager annotation to request a certificate from the ClusterIssuer
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      # Optional: Adjust based on your ingress controller
+      kubernetes.io/ingress.class: traefik
+    hosts:
+      - argo-workflows.wayl.one # Replace with your domain
+    tls:
+      - hosts:
+          - argo-workflows.wayl.one # Replace with your domain
+        secretName: argo-workflows-tls # Name of the secret where cert-manager will store the certificate
+# Additional settings for the workflow controller
+workflow:
+  serviceAccount:
+    create: true
+    name: argo-workflows # Service account name used by workflows
+# (Optional) Persistence configuration if you want to use a database
+persistence:
+  enabled: false # Enable if you want to use PostgreSQL or MySQL
+# (Optional) Artifact repository configuration if needed
+# artifactRepository:
+#   archiveLogs: true
+#   s3:
+#     bucket: my-argo-bucket
+#     endpoint: minio.argo.svc.cluster.local:9000
+#     insecure: true
+#     accessKeySecret:
+#       name: argo-minio
+#       key: accesskey
+#     secretKeySecret:
+#       name: argo-minio
+#       key: secretkey
+
+# (Optional) Security context and resource limits
+securityContext:
+  runAsNonRoot: true
+  fsGroup: 65534 # Adjust based on your needs
+# (Optional) Additional configurations
+workflowController:
+  replicas: 1
