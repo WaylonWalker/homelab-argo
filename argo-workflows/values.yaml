@@ -9,9 +9,9 @@ server:
   # Ingress configuration to expose the UI
   ingress:
     enabled: true
-    ingressClassName: nginx # Adjust based on your Ingress controller
+    ingressClassName: treafik # Adjust based on your Ingress controller
     annotations:
-      kubernetes.io/ingress.class: nginx
+      kubernetes.io/ingress.class: treafik
       cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
       - argo-workflows.wayl.one # Replace with your domain
