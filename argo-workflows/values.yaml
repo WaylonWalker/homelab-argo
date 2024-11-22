@@ -13,12 +13,12 @@ server:
   # Ingress configuration to expose the UI
   ingress:
     enabled: true
-    ingressClassName: traefik # Adjust based on your ingress controller
+    # ingressClassName: traefik # Adjust based on your ingress controller
     annotations:
       # Cert-manager annotation to request a certificate from the ClusterIssuer
       cert-manager.io/cluster-issuer: letsencrypt-prod
       # Optional: Adjust based on your ingress controller
-      kubernetes.io/ingress.class: traefik
+      # kubernetes.io/ingress.class: traefik
     hosts:
       - argo-workflows.wayl.one # Replace with your domain
     tls:
