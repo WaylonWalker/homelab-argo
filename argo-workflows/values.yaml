@@ -11,7 +11,7 @@ argo-workflows: # name of the dependency in Chart.yaml
     # Ingress configuration to expose the UI
     ingress:
       enabled: true
-      ingressClassName: treafik # Adjust based on your Ingress controller
+      ingressClassName: traefik # Adjust based on your Ingress controller
       annotations:
         kubernetes.io/ingress.class: treafik
         cert-manager.io/cluster-issuer: letsencrypt-prod
