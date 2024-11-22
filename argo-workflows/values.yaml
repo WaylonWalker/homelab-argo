@@ -2,7 +2,7 @@ argo-workflows: # name of the dependency in Chart.yaml
   # Namespace where Argo Workflows will be deployed
   namespace: argo-workflows
   server:
-    serviceType: LoadBalancer # Expose the UI via a LoadBalancer
+    # serviceType: LoadBalancer # Expose the UI via a LoadBalancer
     # Enable authentication
     authMode: server # Options: 'server', 'client', 'sso', 'hybrid'
     # Server configuration settings
