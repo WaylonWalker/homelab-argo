@@ -645,7 +645,7 @@ metadata:
 spec:
   project: default
   destination:
-    namespace: workflow-templates
+    namespace: argo
     server: 'https://kubernetes.default.svc'
   source:
     path: workflow-templates
