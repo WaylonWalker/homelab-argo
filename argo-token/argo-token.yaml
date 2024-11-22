@@ -5,7 +5,7 @@ metadata:
   namespace: argo
 rules:
   - apiGroups: ["argoproj.io"]
-    resources: ["workflows", "workflowtemplates", "workflow-events", "clusterworkflowtemplates", "cronworkflows", "eventsources", "sensors", "workfloweventbindings", "workflowtemplates"]
+    resources: ["workflows", "workflowtemplates", "workflow-events", "clusterworkflowtemplates", "cronworkflows", "eventsources", "sensors", "workfloweventbindings"]
     verbs: ["list", "get", "watch", "create", "update", "delete"]
 ---
 apiVersion: v1
