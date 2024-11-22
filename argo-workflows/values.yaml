@@ -4,7 +4,7 @@ argo-workflows: # name of the dependency in Chart.yaml
   server:
     # serviceType: LoadBalancer # Expose the UI via a LoadBalancer
     # Enable authentication
-    authMode: server # Options: 'server', 'client', 'sso', 'hybrid'
+    authMode: sso # Options: 'server', 'client', 'sso', 'hybrid'
     # Server configuration settings
     config:
       url: https://argo-workflows.wayl.one # Replace with your domain
