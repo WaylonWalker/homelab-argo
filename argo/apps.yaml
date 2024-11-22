@@ -636,3 +636,24 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: workflow-templates
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: workflow-templates
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: workflow-templates
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
