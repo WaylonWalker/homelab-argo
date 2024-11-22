@@ -1,5 +1,5 @@
 # Namespace where Argo Workflows will be deployed
-namespace: argo
+namespace: argo-workflows
 server:
   # Enable authentication
   authMode: server # Options: 'server', 'client', 'sso', 'hybrid'
