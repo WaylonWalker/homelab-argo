@@ -1,27 +1,28 @@
-# Namespace where Argo Workflows will be deployed
-namespace: argo-workflows
-server:
-  # Enable authentication
-  authMode: server # Options: 'server', 'client', 'sso', 'hybrid'
-  # Server configuration settings
-  config:
-    url: https://argo-workflows.wayl.one # Replace with your domain
-  # Ingress configuration to expose the UI
-  ingress:
-    enabled: true
-    ingressClassName: treafik # Adjust based on your Ingress controller
-    annotations:
-      kubernetes.io/ingress.class: treafik
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-    hosts:
-      - argo-workflows.wayl.one # Replace with your domain
-    tls:
-      - secretName: argo-workflows-tls # Name of the secret where cert-manager will store the certificate
-        hosts:
-          - argo-workflows.wayl.one
-workflow:
-  serviceAccount:
-    create: true
-    name: argo-workflows # Service account name used by workflows
+argo-workflows: # name of the dependency in Chart.yaml
+  # Namespace where Argo Workflows will be deployed
+  namespace: argo-workflows
+  server:
+    # Enable authentication
+    authMode: server # Options: 'server', 'client', 'sso', 'hybrid'
+    # Server configuration settings
+    config:
+      url: https://argo-workflows.wayl.one # Replace with your domain
+    # Ingress configuration to expose the UI
+    ingress:
+      enabled: true
+      ingressClassName: treafik # Adjust based on your Ingress controller
+      annotations:
+        kubernetes.io/ingress.class: treafik
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - argo-workflows.wayl.one # Replace with your domain
+      tls:
+        - secretName: argo-workflows-tls # Name of the secret where cert-manager will store the certificate
+          hosts:
+            - argo-workflows.wayl.one
+  workflow:
+    serviceAccount:
+      create: true
+      name: argo-workflows # Service account name used by workflows
 
 # Additional settings (if needed)
