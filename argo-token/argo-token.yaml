@@ -7,6 +7,9 @@ rules:
   - apiGroups: ["argoproj.io"]
     resources: ["workflows"]
     verbs: ["list", "update"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["workflowtemplates"]
+    verbs: ["list"]
 ---
 apiVersion: v1
 kind: ServiceAccount
