@@ -23,9 +23,13 @@ argo-workflows: # name of the dependency in Chart.yaml
             - argo-workflows.wayl.one
   workflow:
     serviceAccount:
-      create: true
+      create: true # Specifies whether a service account should be created
       name: argo-workflows # Service account name used by workflows
+      # annotations: # Annotations applied to created service account
   controller:
+    # Specify all namespaces where this workflow controller instance will
+    # manage workflows. This controls where the service account and RBAC
+    # resources will be created. Only valid when singleNamespace is false.
     workflowNamespaces:
       - argo
 
