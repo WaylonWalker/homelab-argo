@@ -25,5 +25,8 @@ argo-workflows: # name of the dependency in Chart.yaml
     serviceAccount:
       create: true
       name: argo-workflows # Service account name used by workflows
+  controller:
+    workflowNamespaces:
+      - argo
 
 # Additional settings (if needed)
