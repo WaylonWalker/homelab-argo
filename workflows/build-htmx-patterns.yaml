@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: build-htmx-patterns-
+spec:
+  entrypoint: build-htmx-patterns
+  serviceAccountName: waylon
+  templates:
+    - name: build-htmx-patterns
+      inputs:
+        artifacts:
+          # Check out the main branch of the argo repo and place it at /src
+          # revision can be anything that git checkout accepts: branch, commit, tag, etc.
+          - name: devtainer-source
+            path: /src
+            git:
+              repo: https://github.com/waylonwalker/htmx-patterns.git
+              revision: "main"
+      container:
+        # image: quay.io/podman/stable
+        image: quay.io/buildah/stable
+        securityContext:
+          runAsUser: 0
+          privileged: true
+        env:
+          - name: STORAGE_DRIVER
+            value: vfs
+          - name: STORAGE_ROOT
+            value: /tmp/containers-storage
+        command: [sh, -c]
+        args:
+          - |
+            mkdir -p $STORAGE_ROOT
+            buildah --storage-driver=$STORAGE_DRIVER --root=$STORAGE_ROOT bud -f /src/Dockerfile -t waylonwalker/htmx-patterns /src

@@ -1,0 +1,91 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: devtainer-build-run-
+spec:
+  entrypoint: main
+  serviceAccountName: waylon
+  templates:
+    - name: main
+      dag:
+        tasks:
+          - name: clone-repo
+            template: clone-repo
+          - name: ls-repo
+            template: ls-repo
+            dependencies: [clone-repo]
+          - name: build-image
+            template: build-image
+            dependencies: [clone-repo]
+          - name: run-container
+            template: run-container
+            dependencies: [build-image]
+    # Step 1: Clone the repository
+    - name: clone-repo
+      container:
+        image: alpine/git
+        command: [sh, -c]
+        args:
+          - |
+            echo "Cloning devtainer repository"
+            git clone https://github.com/waylonwalker/devtainer.git /workspace/devtainer
+            echo "Listing contents of /workspace/devtainer"
+            ls -la /workspace/devtainer
+        workingDir: /workspace
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+    # Step 1b: show the repository
+    - name: ls-repo
+      container:
+        image: alpine/git
+        command: [sh, -c]
+        args:
+          - |
+            echo "Contents of root"
+            ls -la /
+            echo "Contents of workspace"
+            ls -la /workspace
+            echo "Contents of the repo"
+            ls -la /workspace/devtainer
+        workingDir: /workspace
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+    # Step 2: Build the Podman image
+    - name: build-image
+      container:
+        image: quay.io/podman/stable
+        command: [sh, -c]
+        args:
+          - |
+            export STORAGE_DRIVER=overlay
+            export STORAGE_DRIVER=vfs
+            export STORAGE_ROOT=/tmp/containers-storage
+            mkdir -p $STORAGE_ROOT
+            podman --storage-driver=$STORAGE_DRIVER --root=$STORAGE_ROOT build -f /workspace/docker/Dockerfile -t waylonwalker/devtainer /workspace/devtainer
+        workingDir: /workspace
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+          - name: podman-storage
+            mountPath: /tmp/containers-storage
+    # Step 3: Run something using the Podman container
+    - name: run-container
+      container:
+        image: quay.io/podman/stable
+        command: [sh, -c]
+        args:
+          - |
+            export STORAGE_DRIVER=overlay
+            export STORAGE_ROOT=/tmp/containers-storage
+            podman --storage-driver=$STORAGE_DRIVER --root=$STORAGE_ROOT run --rm waylonwalker/devtainer echo "Hello from the Podman container!"
+        workingDir: /workspace
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+    volumes:
+      - name: workspace
+        emptyDir: {}
+      - name: podman-storage
+        emptyDir: {}
