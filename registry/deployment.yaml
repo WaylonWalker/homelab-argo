@@ -21,7 +21,6 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Service
@@ -45,7 +44,6 @@ spec:
     io.kompose.service: registry-ui
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -55,7 +53,6 @@ metadata:
   namespace: registry
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -139,7 +136,6 @@ spec:
           secret:
             secretName: registry-password
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -156,7 +152,6 @@ spec:
     requests:
       storage: 100Mi
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -173,7 +168,6 @@ spec:
     requests:
       storage: 100Mi
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -190,7 +184,6 @@ spec:
     requests:
       storage: 100Mi
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -259,12 +252,12 @@ spec:
         - name: regcred
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     kompose.cmd: kompose convert -o deployment.yaml -n registry --replicas 4
     kompose.image-pull-secret: regcred
     kompose.service.expose: registry-ui.wayl.one
@@ -288,12 +281,12 @@ spec:
             pathType: Prefix
 status:
   loadBalancer: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     kompose.cmd: kompose convert -o deployment.yaml -n registry --replicas 4
     kompose.image-pull-secret: regcred
     kompose.service.expose: registry.wayl.one
