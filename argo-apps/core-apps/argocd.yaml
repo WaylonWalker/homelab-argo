@@ -1,0 +1,23 @@
+apiVersion: argproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argocd
+    server: 'https://kubernetes.default.svc'
+  sources:
+    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
+      chart: argocd
+      helm:
+        valueFules:
+          - $values/values/argocd/prod-values.yaml
+      targetRevision: HEAD
+    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
+      ref: values
+      targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
