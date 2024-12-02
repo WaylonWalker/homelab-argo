@@ -12,7 +12,7 @@ spec:
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
       chart: argocd
       helm:
-        valueFules:
+        valueFiles:
           - $values/values/argocd/prod-values.yaml
       targetRevision: HEAD
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
