@@ -15,3 +15,24 @@ seal:
     kubeseal -f private/registry-password.yaml -w registry/sealed-registry-password.yaml --namespace registry --name registry-password
     kubectl create configmap registry-config --dry-run=client --from-file=registry/config.yml -o yaml > registry/registry-config.yaml
     kubeseal < private/wyze-bridge-htpasswd-secret.yaml > wyze-bridge/htpasswd-sealed.yaml -o yaml
+    kubeseal -f private/shots-secret.yaml -w shots/sealed-shots-secret.yaml --namespace shot --name minio-shots
+    kubeseal -f private/basic-auth.yaml -w basic-auth/basic-auth-secret.yaml --namespace basic-auth --name basic-auth
+
+argo-patch-insecure:
+    kubectl patch configmap argocd-cmd-params-cm -n argocd --type merge -p '{"data":{"server.insecure":"true"}}'
+
+forward: argo-echo-password argo-copy-password argo-forward
+
+argo-forward:
+    kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+argo-echo-password:
+    #!/bin/bash
+    echo -n 'admin password: '
+    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+argo-copy-password:
+    #!/bin/bash
+    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d | xclip -selection clipboard
+    echo 'password copied to clipboard'
+
+
