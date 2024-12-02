@@ -14,10 +14,10 @@ spec:
       helm:
         valueFiles:
           - $values/values/argocd/prod-values.yaml
-      targetRevision: HEAD
+      targetRevision: "main"
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
       ref: values
-      targetRevision: HEAD
+      targetRevision: "main"
   syncPolicy:
     automated:
       prune: true
