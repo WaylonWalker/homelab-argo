@@ -10,14 +10,14 @@ spec:
     server: 'https://kubernetes.default.svc'
   sources:
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
-      chart: argocd
+      targetRevision: "main"
+      path: argocd
       helm:
         valueFiles:
           - $values/values/argocd/prod-values.yaml
-      targetRevision: "main"
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
-      ref: values
       targetRevision: "main"
+      ref: values
   syncPolicy:
     automated:
       prune: true
