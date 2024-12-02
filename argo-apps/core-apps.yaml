@@ -1,0 +1,164 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  namespace: argocd
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik-dashboard
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: traefik-dashboard
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: traefik-dashboard
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: basic-auth
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: basic-auth
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: basic-auth
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argocd
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argocd
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: prometheus-community
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://prometheus-community.github.io/helm-charts
+#     targetRevision: 66.2.1
+#     chart: kube-prometheus-stack
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: monitoring
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: prometheus
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: prometheus
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: prometheus
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: argo-workflows
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#     path: argo-workflows
+#     helm:
+#       valueFiles:
+#         - values.yaml
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: argo-workflows
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: argo-token
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: argo-token
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: argo-token
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: workflow-templates
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: argo
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: workflow-templates
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
