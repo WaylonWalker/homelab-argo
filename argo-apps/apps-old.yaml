@@ -1,0 +1,498 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  namespace: argocd
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argo
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argo
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: installer
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: installer
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: installer
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: librespeed
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: librespeed
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: librespeed
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: play-outside
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: play-outside
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: play-outside
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homelab
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: homelab
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: active
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: excalidraw
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: excalidraw
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: excalidraw
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: home
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: wayl-one
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: home
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: code-server
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: code-server
+  source:
+    path: code-server
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jupyter
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: jupyter
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: jupyter
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: status
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: status
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: status
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ntfy
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: ntfy
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: ntfy
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: minio
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: minio
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+
+# ---
+#
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: registry
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: registry
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: registry
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+#
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: matrix
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: matrix
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: matrix
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: wyze-bridge
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: wyze-bridge
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: wyze-bridge
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: frigate
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: frigate
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: frigate
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: reader
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: reader
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: reader
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: htmx-patterns
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: htmx-patterns
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: htmx-patterns
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kanboard
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: kanboard
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: kanboard
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shots
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: shots
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: shots
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: registry
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: registry
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: registry
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: emqx
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: emqx
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: emqx
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: terraria
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: terraria
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: terraria
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+#
+# ---
+#
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: terraria-challenge
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: terraria-challenge
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: terraria-challenge
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+#
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: netboot
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: netboot
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: netboot
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: www-fokais
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: www-fokais
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: www-fokais
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: fokais-apps
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: fokais-apps
+#     server: 'https://kubernetes.default.svc'
+#   source:
+#     path: argo
+#     repoURL: 'git@github.com:fokais-com/deployments.fokais.git'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
