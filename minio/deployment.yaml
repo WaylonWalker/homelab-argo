@@ -21,7 +21,6 @@ spec:
     io.kompose.service: minio
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -31,7 +30,6 @@ metadata:
   namespace: minio
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -86,16 +84,11 @@ spec:
         - name: minio-storage
           persistentVolumeClaim:
             claimName: minio-storage
-
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: minio-storage
   name: minio-storage
   namespace: minio
 spec:
@@ -104,10 +97,20 @@ spec:
   resources:
     requests:
       storage: 100Mi
-status: {}
-
+  volumeName: minio-pv
 ---
-
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-pv
+  namespace: minio
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/minio/minio-storage
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
