@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: play-outside
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: play-outside
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: play-outside
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+    targetRevision: HEAD
