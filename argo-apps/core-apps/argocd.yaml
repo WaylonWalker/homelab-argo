@@ -3,21 +3,30 @@ kind: Application
 metadata:
   name: argocd
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 7.7.7
+    helm:
+      values: |
+        global:
+          domain: argocd.wayl.one
+        configs:
+          params:
+            "server.insecure": true
+        server:
+          ingress:
+            enabled: true
   destination:
+    server: https://kubernetes.default.svc
     namespace: argocd
-    server: 'https://kubernetes.default.svc'
-  sources:
-    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
-      targetRevision: "main"
-      path: argocd
-      helm:
-        valueFiles:
-          - $values/values/argocd/prod-values.yaml
-    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
-      targetRevision: "main"
-      ref: values
   syncPolicy:
     automated:
+      selfHeal: true
       prune: true
+    syncOptions:
+      - CreateNamespace=true
