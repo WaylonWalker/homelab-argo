@@ -11,4 +11,4 @@ metadata:
   namespace: basic-auth
 spec:
   basicAuth:
-    secret: basic-auth
+    secret: basic-auth-secret
