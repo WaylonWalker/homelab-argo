@@ -16,7 +16,6 @@ spec:
     service: play-outside-wayl-one
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -26,7 +25,6 @@ metadata:
   namespace: play-outside
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -64,7 +62,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: PLAY_OUTSIDE_OPEN_WEATHER_API_KEY
-                  name: play-outside-open-weather-api-key
+                  name: play-outside-secret
           image: docker.io/waylonwalker/play-outside:0.0.29
           name: play-outside-wayl-one
           ports:
@@ -75,7 +73,6 @@ spec:
       #   - name: regcred
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: v1
 data:
@@ -88,7 +85,6 @@ metadata:
     service: play-outside-wayl-one-tank-git-play-outside--env-prod
   name: tank-git-play-outside--env-prod
   namespace: play-outside
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

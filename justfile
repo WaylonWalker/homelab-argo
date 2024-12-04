@@ -1,7 +1,7 @@
 default:
   @just --list
 
-seal:
+seal-old:
     kubeseal -f private/minio-secret.yaml -w active/sealed-minio-secret.yaml --namespace minio-homelab --name minio-secret
     kubeseal -f private/minio-minio-secret.yaml -w minio/minio-minio-secret.yaml --namespace minio --name minio-secret
     kubeseal -f private/wyze-bridge-secret.yaml -w wyze-bridge/wyze-bridge-secret.yaml --namespace wyze-bridge --name wyze-bridge
@@ -17,6 +17,12 @@ seal:
     kubeseal < private/wyze-bridge-htpasswd-secret.yaml > wyze-bridge/htpasswd-sealed.yaml -o yaml
     kubeseal -f private/shots-secret.yaml -w shots/sealed-shots-secret.yaml --namespace shot --name minio-shots
     kubeseal -f private/basic-auth.yaml -w basic-auth/basic-auth-secret.yaml --namespace basic-auth --name basic-auth
+    kubeseal -f private/reader.yaml -w reader/reader.yaml --namespace basic-auth --name basic-auth
+
+seal name:
+    kubeseal -f private/{{name}}.yaml -w {{name}}/{{name}}-sealed-secret.yaml --namespace {{name}} --name {{name}}-secret
+
+
 
 argo-patch-insecure:
     kubectl patch configmap argocd-cmd-params-cm -n argocd --type merge -p '{"data":{"server.insecure":"true"}}'
