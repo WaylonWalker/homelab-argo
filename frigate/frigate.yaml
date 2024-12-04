@@ -146,15 +146,16 @@ spec:
   volumeName: pv-hostpath-general-temp
   storageClassName: hostpath
 status: {}
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: localfrigate-auth
-  namespace: frigate
-spec:
-  basicAuth:
-    secret: localfrigate-htpasswd
+
+# ---
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: Middleware
+# metadata:
+#   name: localfrigate-auth
+#   namespace: frigate
+# spec:
+#   basicAuth:
+#     secret: localfrigate-htpasswd
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
