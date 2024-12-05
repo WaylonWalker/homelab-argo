@@ -70,7 +70,9 @@ spec:
             - containerPort: 8555
               # hostPort: 8555
               protocol: UDP
-          resources: {}
+          resources:
+            limits:
+              gpu.intel.com/i915: 1
           securityContext:
             privileged: true
           volumeMounts:
