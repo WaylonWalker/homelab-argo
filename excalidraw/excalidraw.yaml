@@ -19,7 +19,6 @@ spec:
     io.kompose.service: excalidraw
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -29,7 +28,6 @@ metadata:
   namespace: excalidraw
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -74,20 +72,17 @@ spec:
           stdin: true
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kompose.cmd: kompose convert --namespace excalidraw -o excalidraw.yaml
-    kompose.service.expose: excalidraw.wayl.one
-    kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
     io.kompose.service: excalidraw
   name: excalidraw
   namespace: excalidraw
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: excalidraw.wayl.one
@@ -100,5 +95,9 @@ spec:
                   number: 3000
             path: /
             pathType: Prefix
+  tls:
+    - hosts:
+        - excalidraw.wayl.one
+      secretName: excalidraw-cert-tls
 status:
   loadBalancer: {}
