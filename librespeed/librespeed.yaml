@@ -62,6 +62,8 @@ metadata:
     service: librespeed
   name: librespeed
   namespace: librespeed
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: librespeed.wayl.one
