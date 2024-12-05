@@ -81,9 +81,9 @@ spec:
               - devicePath: /dev/dri
                 name: dri
                 permissions: mrw
-              - devicePath: /dev/apex_0
-                name: coral
-                permissions: mrw
+                # - devicePath: /dev/apex_0
+                #   name: coral
+                #   permissions: mrw
           volumeMounts:
             - mountPath: /config
               name: config
@@ -98,9 +98,9 @@ spec:
               name: cache-volume
             - name: dev-dri
               mountPath: /dev/dri
-            - name: coral-device
-              mountPath: /dev/apex_0
-              readOnly: true
+              # - name: coral-device
+              #   mountPath: /dev/apex_0
+              #   readOnly: true
       restartPolicy: Always
       volumes:
         - name: config
@@ -189,7 +189,6 @@ metadata:
   namespace: frigate
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.middlewares: basic-auth-basic-auth@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
