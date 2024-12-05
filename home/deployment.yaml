@@ -76,16 +76,13 @@ status: {}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -o deployment.yaml -n wayl-one
-    kompose.image-pull-secret: regcred
-    kompose.service.expose: www.wayl.one
-    kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
     io.kompose.service: wayl-one
   name: wayl-one
   namespace: wayl-one
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: www.wayl.one
@@ -98,23 +95,8 @@ spec:
                   number: 80
             path: /
             pathType: Prefix
-    - host: my.home
-      http:
-        paths:
-          - backend:
-              service:
-                name: wayl-one
-                port:
-                  number: 80
-            path: /
-            pathType: Prefix
-    - host: home.localdomain
-      http:
-        paths:
-          - backend:
-              service:
-                name: wayl-one
-                port:
-                  number: 80
-            path: /
-            pathType: Prefix
+  tls:
+    - hosts:
+        - www.wayl.one
+        - wayl.one
+      secretName: www-wayl-one-cert-tls
