@@ -5,7 +5,8 @@ argo-cd:
     #   - name: regcred
   configs:
     params:
-      server.insecure: true
+      server:
+        insecure: true
   server:
     ingress:
       enabled: true
