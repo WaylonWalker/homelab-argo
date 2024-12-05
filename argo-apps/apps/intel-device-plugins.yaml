@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: intel-device-plugins
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: intel-device-plugins
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: intel-device-plugins/gpu_plugin
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
