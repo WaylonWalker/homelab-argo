@@ -71,7 +71,19 @@ spec:
               # hostPort: 8555
               protocol: UDP
           securityContext:
-            privileged: true
+            # privileged: true
+            # Remove 'privileged: true' if present
+            capabilities:
+              add:
+                - SYS_ADMIN
+                - SYS_RAWIO
+            devices:
+              - devicePath: /dev/dri
+                name: dri
+                permissions: mrw
+              - devicePath: /dev/apex_0
+                name: coral
+                permissions: mrw
           volumeMounts:
             - mountPath: /config
               name: config
@@ -86,6 +98,9 @@ spec:
               name: cache-volume
             - name: dev-dri
               mountPath: /dev/dri
+            - name: coral-device
+              mountPath: /dev/apex_0
+              readOnly: true
       restartPolicy: Always
       volumes:
         - name: config
@@ -104,6 +119,10 @@ spec:
         - name: dev-dri
           hostPath:
             path: /dev/dri
+        - name: coral-device
+          hostPath:
+            path: /dev/apex_0
+            type: CharDevice
 status: {}
 ---
 apiVersion: v1
