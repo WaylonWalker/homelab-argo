@@ -94,6 +94,8 @@ metadata:
     service: play-outside-wayl-one
   name: play-outside-wayl-one
   namespace: play-outside
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: play-outside.wayl.one
@@ -106,5 +108,9 @@ spec:
                   number: 8200
             path: /
             pathType: Prefix
+  tls:
+    - hosts:
+        - play-outside.wayl.one
+      secretName: play-outside-cert-tls
 status:
   loadBalancer: {}
