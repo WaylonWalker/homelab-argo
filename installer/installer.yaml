@@ -95,5 +95,9 @@ spec:
                   number: 3003
             path: /
             pathType: Prefix
+  tls:
+    - hosts:
+        - i.wayl.one
+      secretName: installer-cert-tls
 status:
   loadBalancer: {}
