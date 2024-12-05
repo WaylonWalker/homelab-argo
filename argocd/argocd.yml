@@ -12,11 +12,16 @@ spec:
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
       chart: argocd
       helm:
-        valueFules:
-          - $values/values/argocd/prod-values.yaml
-      targetRevision: HEAD
-    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
-      ref: values
+        values: |
+          global:
+            domain: argocd.wayl.one
+          configs:
+            params:
+              server:
+                insecure: true
+          server:
+            ingress:
+              enabled: true
       targetRevision: HEAD
   syncPolicy:
     automated:
