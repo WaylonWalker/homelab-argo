@@ -119,10 +119,10 @@ spec:
         - name: dev-dri
           hostPath:
             path: /dev/dri
-        - name: coral-device
-          hostPath:
-            path: /dev/apex_0
-            type: CharDevice
+            # - name: coral-device
+            #   hostPath:
+            #     path: /dev/apex_0
+            #     type: CharDevice
 status: {}
 ---
 apiVersion: v1
