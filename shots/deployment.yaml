@@ -85,16 +85,13 @@ status: {}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -o deployment.yaml -n shot --replicas 3
-    kompose.image-pull-secret: regcred
-    kompose.service.expose: shots.wayl.one, shots.k.waylonwalker.com
-    kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
     io.kompose.service: shot-wayl-one
   name: shot-wayl-one
   namespace: shot
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: shots.wayl.one
@@ -107,15 +104,9 @@ spec:
                   number: 5000
             path: /
             pathType: Prefix
-    - host: shots.k.waylonwalker.com
-      http:
-        paths:
-          - backend:
-              service:
-                name: shot-wayl-one
-                port:
-                  number: 5000
-            path: /
-            pathType: Prefix
+  tls:
+    - hosts:
+        - shots.wayl.one
+      secretName: shots-cert-tls
 status:
   loadBalancer: {}
