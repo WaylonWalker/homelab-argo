@@ -53,8 +53,8 @@ spec:
               value: '"password"'
             - name: TZ
               value: America/Chicago
-          image: ghcr.io/blakeblackshear/frigate:9c75123
-          # image: ghcr.io/blakeblackshear/frigate:stable
+          # image: ghcr.io/blakeblackshear/frigate:9c75123
+          image: ghcr.io/blakeblackshear/frigate:stable
           # image: ghcr.io/blakeblackshear/frigate@sha256:22e3d0b486df52c3d669682254c2b1bf4205fa6ad8bd8f8c9f7fe76b1517005d"
           name: frigate
           ports:
