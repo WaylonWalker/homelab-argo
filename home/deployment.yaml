@@ -97,7 +97,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        # forwarded by dns
-        # - www.wayl.one
-        - wayl.one
+        - www.wayl.one
       secretName: www-wayl-one-cert-tls
