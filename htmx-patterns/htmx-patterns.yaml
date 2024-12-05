@@ -19,7 +19,6 @@ spec:
     io.kompose.service: htmx-patterns
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -29,7 +28,6 @@ metadata:
   namespace: htmx-patterns
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -76,7 +74,6 @@ spec:
               value: "3"
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -90,6 +87,8 @@ metadata:
     io.kompose.service: htmx-patterns
   name: htmx-patterns
   namespace: htmx-patterns
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: htmx-patterns.wayl.one
@@ -102,5 +101,10 @@ spec:
                   number: 5000
             path: /
             pathType: Prefix
+  tls:
+    - hosts:
+        - librespeed.wayl.one
+        - speed.wayl.one
+      secretName: librespeed-cert-tls
 status:
   loadBalancer: {}
