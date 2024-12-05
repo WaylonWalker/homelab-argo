@@ -70,9 +70,6 @@ spec:
             - containerPort: 8555
               # hostPort: 8555
               protocol: UDP
-          resources:
-            limits:
-              gpu.intel.com/i915: 1
           securityContext:
             privileged: true
           volumeMounts:
@@ -87,6 +84,8 @@ spec:
               # subPath: "pv/frigate/frigate-temp"
             - mountPath: /dev/shm
               name: cache-volume
+            - name: dev-dri
+              mountPath: /dev/dri
       restartPolicy: Always
       volumes:
         - name: config
@@ -102,6 +101,9 @@ spec:
             medium: Memory
             sizeLimit: 256Mi
           name: cache-volume
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
 status: {}
 ---
 apiVersion: v1
