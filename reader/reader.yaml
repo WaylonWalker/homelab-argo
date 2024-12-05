@@ -25,6 +25,6 @@ spec:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: reader
+                      name: reader-secret
                       key: cloudflare-secret
           restartPolicy: OnFailure
