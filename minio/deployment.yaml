@@ -117,16 +117,13 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -o deployment.yaml -n minio --replicas 3
-    kompose.image-pull-secret: regcred
-    kompose.service.expose: minio.wayl.one, minio-ui.wayl.one
-    kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
     io.kompose.service: minio
   name: minio
   namespace: minio
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: minio.wayl.one
@@ -149,5 +146,10 @@ spec:
                   number: 9001
             path: /
             pathType: Prefix
+  tls:
+    - hosts:
+        - minio.wayl.one
+        - minio-ui.wayl.one
+      secretName: minio-cert-tls
 status:
   loadBalancer: {}
