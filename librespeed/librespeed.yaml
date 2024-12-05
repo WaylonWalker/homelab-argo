@@ -20,7 +20,6 @@ spec:
     service: librespeed
 status:
   loadBalancer: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -54,7 +53,6 @@ spec:
           resources: {}
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -67,6 +65,16 @@ metadata:
 spec:
   rules:
     - host: librespeed.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: librespeed
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+    - host: speed.wayl.one
       http:
         paths:
           - backend:
