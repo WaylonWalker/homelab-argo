@@ -20,7 +20,6 @@ spec:
     io.kompose.service: shot-wayl-one
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -30,7 +29,6 @@ metadata:
   namespace: shot
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -74,18 +72,15 @@ spec:
             - name: ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-shots
+                  name: shots-secret
                   key: ACCESS_KEY
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: minio-shots
+                  name: shots-secret
                   key: SECRET_KEY
-      # imagePullSecrets:
-      #   - name: regcred
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
