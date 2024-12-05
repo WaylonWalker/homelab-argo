@@ -20,7 +20,6 @@ spec:
     io.kompose.service: wayl-one
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -30,7 +29,6 @@ metadata:
   namespace: wayl-one
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -74,7 +72,6 @@ spec:
       #   - name: regcred
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
