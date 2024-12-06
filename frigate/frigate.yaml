@@ -97,7 +97,7 @@ spec:
             - mountPath: /dev/shm
               name: cache-volume
             - name: dev-dri
-              mountPath: /dev/dri
+              mountPath: /dev/dri/renderD128
             - name: coral-device
               mountPath: /dev/apex_0
               readOnly: true
@@ -122,7 +122,6 @@ spec:
         - name: coral-device
           hostPath:
             path: /dev/apex_0
-            type: CharDevice
 status: {}
 ---
 apiVersion: v1
