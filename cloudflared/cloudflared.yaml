@@ -24,12 +24,12 @@ spec:
             - --metrics
             - 0.0.0.0:2000
             - run
-          args:
-            - --credentials-file
-            - /etc/cloudflared/token.txt
           # args:
-          #   - --token
-          #   - "$(CLOUDFLARED_TOKEN)"
+          # - --credentials-file
+          # - /etc/cloudflared/token.txt
+          args:
+            - --token
+            - "$(CLOUDFLARED_TOKEN)"
           image: cloudflare/cloudflared:latest
           name: cloudflared
           volumeMounts:
