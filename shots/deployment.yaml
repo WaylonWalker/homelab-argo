@@ -44,7 +44,6 @@ metadata:
   name: shot-wayl-one
   namespace: shot
 spec:
-  replicas: 3
   selector:
     matchLabels:
       io.kompose.service: shot-wayl-one
