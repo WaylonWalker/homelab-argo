@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: testauth
+  name: whoami
   namespace: argocd
 spec:
   project: default
@@ -9,7 +9,7 @@ spec:
     namespace: wayl-one
     server: 'https://kubernetes.default.svc'
   source:
-    path: testauth
+    path: whoami
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
