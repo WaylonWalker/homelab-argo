@@ -72,7 +72,6 @@ spec:
               cpu: "10m" # Minimum CPU required (100 millicores)
             limits:
               cpu: "500m" # Maximum CPU the container can use
-          resources: {}
           env:
             - name: ACCESS_KEY
               valueFrom:
