@@ -33,7 +33,7 @@ spec:
             - name: CLOUDFLARED_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: cloudflared-token
+                  name: cloudflared-secret
                   key: token
           livenessProbe:
             httpGet:
