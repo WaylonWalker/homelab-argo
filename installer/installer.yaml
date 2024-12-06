@@ -25,15 +25,6 @@ spec:
 status:
   loadBalancer: {}
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  creationTimestamp: null
-  name: installer
-  namespace: installer
-spec: {}
-status: {}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
