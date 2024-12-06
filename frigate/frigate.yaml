@@ -114,7 +114,7 @@ spec:
             claimName: frigate-temp
         - emptyDir:
             medium: Memory
-            sizeLimit: 256Mi
+            sizeLimit: 1Gi
           name: cache-volume
         - name: dev-dri
           hostPath:
