@@ -25,10 +25,17 @@ spec:
             - 0.0.0.0:2000
             - run
           args:
-            - --token
-            - "$(CLOUDFLARED_TOKEN)"
+            - --credentials-file
+            - /etc/cloudflared/token.txt
+          # args:
+          #   - --token
+          #   - "$(CLOUDFLARED_TOKEN)"
           image: cloudflare/cloudflared:latest
           name: cloudflared
+          volumeMounts:
+            - name: cloudflared-token
+              mountPath: /etc/cloudflared
+              readOnly: true
           env:
             - name: CLOUDFLARED_TOKEN
               valueFrom:
@@ -41,4 +48,7 @@ spec:
               port: 2000
             failureThreshold: 1
             initialDelaySeconds: 10
-            periodSeconds: 10
+          volumes:
+            - name: cloudflared-token
+              secret:
+                secretName: cloudflared-token-file           periodSeconds: 10
