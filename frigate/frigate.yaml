@@ -71,19 +71,19 @@ spec:
               # hostPort: 8555
               protocol: UDP
           securityContext:
-            # privileged: true
+            privileged: true
             # Remove 'privileged: true' if present
-            capabilities:
-              add:
-                - SYS_ADMIN
-                - SYS_RAWIO
-            devices:
-              - devicePath: /dev/dri
-                name: dri
-                permissions: mrw
-              - devicePath: /dev/apex_0
-                name: coral
-                permissions: mrw
+            # capabilities:
+            #   add:
+            #     - SYS_ADMIN
+            #     - SYS_RAWIO
+            # devices:
+            #   - devicePath: /dev/dri
+            #     name: dri
+            #     permissions: mrw
+            #   - devicePath: /dev/apex_0
+            #     name: coral
+            #     permissions: mrw
           volumeMounts:
             - mountPath: /config
               name: config
@@ -121,6 +121,7 @@ spec:
             path: /dev/dri
         - name: coral-device
           hostPath:
+            type: CharDevice
             path: /dev/apex_0
 status: {}
 ---
@@ -186,8 +187,8 @@ metadata:
     service: frigate
   name: frigate
   namespace: frigate
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+  # annotations:
+  #   cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
   rules:
