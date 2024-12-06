@@ -264,7 +264,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/vault/nfs/general/pv/frigate3/frigate-config
+    path: /mnt/vault/nfs/general/pv/frigate4/frigate-config
     type: DirectoryOrCreate
 ---
 apiVersion: v1
@@ -279,7 +279,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/vault/nfs/general/pv/frigate3/frigate-storage
+    path: /mnt/vault/nfs/general/pv/frigate4/frigate-storage
     type: DirectoryOrCreate
 ---
 apiVersion: v1
@@ -295,5 +295,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/vault/nfs/general/pv/frigate3/frigate-temp
+    path: /mnt/vault/nfs/general/pv/frigate4/frigate-temp
     type: DirectoryOrCreate
