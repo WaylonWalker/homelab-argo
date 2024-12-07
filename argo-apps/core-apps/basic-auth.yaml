@@ -9,7 +9,7 @@ spec:
     namespace: basic-auth
     server: 'https://kubernetes.default.svc'
   source:
-    path: basic-auth
+    path: k8s/basic-auth
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

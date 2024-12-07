@@ -9,7 +9,7 @@ spec:
     namespace: traefik-dashboard
     server: 'https://kubernetes.default.svc'
   source:
-    path: traefik-dashboard
+    path: k8s/traefik-dashboard
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

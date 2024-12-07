@@ -9,7 +9,7 @@ spec:
     namespace: minio
     server: 'https://kubernetes.default.svc'
   source:
-    path: minio
+    path: k8s/minio
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

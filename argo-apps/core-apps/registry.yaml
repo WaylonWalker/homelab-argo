@@ -9,7 +9,7 @@ spec:
     namespace: registry
     server: 'https://kubernetes.default.svc'
   source:
-    path: registry
+    path: k8s/registry
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
