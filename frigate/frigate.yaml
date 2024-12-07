@@ -77,13 +77,13 @@ spec:
             #   add:
             #     - SYS_ADMIN
             #     - SYS_RAWIO
-            # devices:
-            #   - devicePath: /dev/dri
-            #     name: dri
-            #     permissions: mrw
-            #   - devicePath: /dev/apex_0
-            #     name: coral
-            #     permissions: mrw
+            devices:
+              - devicePath: /dev/dri
+                name: dri
+                permissions: mrw
+              - devicePath: /dev/apex_0
+                name: coral
+                permissions: mrw
           volumeMounts:
             - mountPath: /config
               name: config
