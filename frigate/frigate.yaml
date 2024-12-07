@@ -104,9 +104,9 @@ spec:
             - name: coral-device
               mountPath: /dev/apex_0
               readOnly: true
-          resources:
-            requests:
-              gpu.intel.com/i915: 1
+          # resources:
+          #   requests:
+          #     gpu.intel.com/i915: 1
       restartPolicy: Always
       volumes:
         - name: config
