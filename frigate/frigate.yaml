@@ -99,11 +99,14 @@ spec:
               # subPath: "pv/frigate/frigate-temp"
             - mountPath: /dev/shm
               name: cache-volume
-            - name: dev-dri
-              mountPath: /dev/dri/renderD128
+            # - name: dev-dri
+            #   mountPath: /dev/dri/renderD128
             - name: coral-device
               mountPath: /dev/apex_0
               readOnly: true
+          resources:
+            requests:
+              gpu.intel.com/i915: 1
       restartPolicy: Always
       volumes:
         - name: config
@@ -119,9 +122,9 @@ spec:
             medium: Memory
             sizeLimit: 1Gi
           name: cache-volume
-        - name: dev-dri
-          hostPath:
-            path: /dev/dri
+        # - name: dev-dri
+        #   hostPath:
+        #     path: /dev/dri
         - name: coral-device
           hostPath:
             type: CharDevice
