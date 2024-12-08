@@ -3,8 +3,6 @@ kind: Namespace
 metadata:
   name: frigate
   namespace: frigate
-spec: {}
-status: {}
 ---
 apiVersion: v1
 kind: Service
@@ -75,38 +73,18 @@ spec:
               protocol: UDP
           securityContext:
             privileged: true
-            # Remove 'privileged: true' if present
-            # capabilities:
-            #   add:
-            #     - SYS_ADMIN
-            #     - SYS_RAWIO
-            # devices:
-            #   - devicePath: /dev/dri
-            #     name: dri
-            #     permissions: mrw
-            #   - devicePath: /dev/apex_0
-            #     name: coral
-            #     permissions: mrw
           volumeMounts:
             - mountPath: /config
               name: config
-              # subPath: "pv/frigate/frigate-config"
             - mountPath: /media/frigate
               name: storage
-              # subPath: "pv/frigate/frigate-storage"
             - mountPath: /tmp/cache
               name: frigate-temp
-              # subPath: "pv/frigate/frigate-temp"
             - mountPath: /dev/shm
               name: cache-volume
-            # - name: dev-dri
-            #   mountPath: /dev/dri/renderD128
             - name: coral-device
               mountPath: /dev/apex_0
               readOnly: true
-          # resources:
-          #   requests:
-          #     gpu.intel.com/i915: 1
       restartPolicy: Always
       volumes:
         - name: config
@@ -122,9 +100,6 @@ spec:
             medium: Memory
             sizeLimit: 1Gi
           name: cache-volume
-        # - name: dev-dri
-        #   hostPath:
-        #     path: /dev/dri
         - name: coral-device
           hostPath:
             type: CharDevice
@@ -174,17 +149,6 @@ spec:
       storage: 100Mi
   volumeName: pv-hostpath-general-temp
   storageClassName: hostpath
-status: {}
-
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: Middleware
-# metadata:
-#   name: localfrigate-auth
-#   namespace: frigate
-# spec:
-#   basicAuth:
-#     secret: localfrigate-htpasswd
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -193,8 +157,6 @@ metadata:
     service: frigate
   name: frigate
   namespace: frigate
-  # annotations:
-  #   cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
   rules:
