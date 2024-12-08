@@ -36,7 +36,6 @@ spec:
       labels:
         service: home-assistant
     spec:
-      hostNetwork: true
       containers:
         - name: home-assistant
           image: ghcr.io/home-assistant/home-assistant:2023.1
