@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: home-assistant
+  namespace: home-assistant
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: home-assistant
+  namespace: home-assistant
+spec:
+  selector:
+    app: home-assistant
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8123
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-assistant
+  namespace: home-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home-assistant
+  template:
+    metadata:
+      labels:
+        app: home-assistant
+    spec:
+      hostNetwork: true
+      containers:
+        - name: home-assistant
+          image: ghcr.io/home-assistant/home-assistant:2023.1
+          ports:
+            - containerPort: 8123
+          volumeMounts:
+            - name: home-assistant-storage
+              mountPath: /config
+          env:
+            - name: TZ
+              value: America/Chicago
+      volumes:
+        - name: home-assistant-storage
+          persistentVolumeClaim:
+            claimName: home-assistant-config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: home-assistant-config
+  namespace: home-assistant
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: home-assistant-ingress
+  namespace: home-assistant
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: frigate-localfrigate-auth@kubernetescrd
+spec:
+  rules:
+    - host: home-assistant.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: home-assistant
+                port:
+                  name: http
+  tls:
+    - secretName: home-assistant-tls
+      hosts:
+        - my-home-assistant.com
