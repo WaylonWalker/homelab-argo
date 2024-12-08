@@ -64,6 +64,22 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  volumeName: pv-hostpath-general-home-assistant-config
+  storageClassName: hostpath
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath-general-home-assistant-config
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/home-assistant/home-assistant-config
+    type: DirectoryOrCreate
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
