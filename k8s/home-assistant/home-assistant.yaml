@@ -34,7 +34,7 @@ spec:
   template:
     metadata:
       labels:
-        app: home-assistant
+        service: home-assistant
     spec:
       hostNetwork: true
       containers:
