@@ -23,6 +23,8 @@ kind: Deployment
 metadata:
   name: home-assistant
   namespace: home-assistant
+  labels:
+    app: home-assistant
 spec:
   replicas: 1
   selector:
@@ -71,6 +73,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.middlewares: frigate-localfrigate-auth@kubernetescrd
 spec:
+  ingressClassName: traefik
   rules:
     - host: home-assistant.wayl.one
       http:
@@ -81,8 +84,8 @@ spec:
               service:
                 name: home-assistant
                 port:
-                  name: http
+                  number: 8123
   tls:
     - secretName: home-assistant-tls
       hosts:
-        - my-home-assistant.com
+        - home-assistant.wayl.one
