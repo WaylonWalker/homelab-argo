@@ -90,7 +90,7 @@ metadata:
   namespace: home-assistant
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-specc:
+spec:
   ingressClassName: traefik
   rules:
     - host: home-assistant.wayl.one
