@@ -18,10 +18,6 @@ spec:
       port: 1883
       targetPort: 1883
       protocol: TCP
-    - name: http
-      port: 9001
-      targetPort: 9001
-      protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,7 +39,6 @@ spec:
           image: eclipse-mosquitto:latest
           ports:
             - containerPort: 1883
-            - containerPort: 9001
           volumeMounts:
             - name: mosquitto-config
               mountPath: /mosquitto/config
@@ -69,13 +64,16 @@ kind: Ingress
 metadata:
   name: mosquitto-ingress
   namespace: mqtt
+  annotations:
+    traefik.ingress.kubernetes.io/service.serversscheme: mqtt
+    traefik.ingress.kubernetes.io/router.entrypoints: mqtt
 spec:
   rules:
     - host: mqtt.wayl.one
       http:
         paths:
           - path: /
-            pathType: ImplementationSpecific
+            pathType: Prefix
             backend:
               service:
                 name: mosquitto
