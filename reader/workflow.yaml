@@ -16,6 +16,8 @@ spec:
         steps:
           - - name: build
               template: build
+          - - name: ls-workspace
+              template: ls-workspace
               # - name: deploy
               #   template: deploy
       - name: build
@@ -40,6 +42,22 @@ spec:
 
               mkdir -p markout
               markata build
+          workingDir: /workspace
+          env:
+            - name: HOME
+              value: /workspace
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      - name: ls-workspace
+        container:
+          image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
+          command: ["sh", "-c"]
+          args:
+            - |
+              echo
+              echo 'whats in /workspace'
+              ls /workspace
           workingDir: /workspace
           env:
             - name: HOME
