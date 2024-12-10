@@ -16,8 +16,8 @@ spec:
         steps:
           - - name: build
               template: build
-            - name: deploy
-              template: deploy
+              # - name: deploy
+              #   template: deploy
       - name: build
         container:
           image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
