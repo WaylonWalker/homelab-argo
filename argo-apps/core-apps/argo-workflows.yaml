@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-workflows
+    targetRevision: 0.45.1
+    helm:
+      values: |
+        # Namespace where Argo Workflows will be deployed
+        namespace: argo-workflows
+        server:
+          # serviceType: LoadBalancer # Expose the UI via a LoadBalancer
+          # Enable authentication
+          authMode: client # Options: 'server', 'client', 'sso', 'hybrid'
+          # Server configuration settings
+          config:
+            url: https://argo-workflows.wayl.one # Replace with your domain
+          # Ingress configuration to expose the UI
+          ingress:
+            enabled: true
+            ingressClassName: traefik # Adjust based on your Ingress controller
+            annotations:
+              kubernetes.io/ingress.class: treafik
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+            hosts:
+              - argo-workflows.wayl.one # Replace with your domain
+            tls:
+              - secretName: argo-workflows-tls # Name of the secret where cert-manager will store the certificate
+                hosts:
+                  - argo-workflows.wayl.one
+        workflow:
+          serviceAccount:
+            create: true # Specifies whether a service account should be created
+            name: argo-workflows # Service account name used by workflows
+            # annotations: # Annotations applied to created service account
+        controller:
+          # Specify all namespaces where this workflow controller instance will
+          # manage workflows. This controls where the service account and RBAC
+          # resources will be created. Only valid when singleNamespace is false.
+          workflowNamespaces:
+            - argo
+      # Additional settings (if needed)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo-workflows
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
