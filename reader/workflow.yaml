@@ -10,7 +10,7 @@ spec:
   failedJobsHistoryLimit: 3
   workflowSpec:
     entrypoint: deploy-reader-pipeline
-    serviceAccountName: waylon
+    serviceAccountName: reader
     templates:
       - name: deploy-reader-pipeline
         steps:
