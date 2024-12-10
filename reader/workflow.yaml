@@ -24,15 +24,22 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
+              echo 'workingDir: /workspace'
+              ls /workspace
+              echo 'whats in /app'
+              ls /app
+
+              echo 'starting build'
+
               mkdir -p markout
               markata build
-          workingDir: /app
+          workingDir: /workspace
           env:
             - name: HOME
-              value: /app
+              value: /workspace
           volumeMounts:
-            - name: app
-              mountPath: /app
+            - name: workspace
+              mountPath: /workspace
       - name: deploy
         dependencies: ["build"]
         container:
@@ -43,18 +50,18 @@ spec:
               wrangler pages deploy markout \
                 --project-name reader-waylonwalker-com \
                 --branch markout
-          workingDir: /app
+          workingDir: /workspace
           env:
             - name: HOME
-              value: /app
+              value: /workspace
             - name: CLOUDFLARE_API_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: reader-secret
                   key: cloudflare-secret
           volumeMounts:
-            - name: app
-              mountPath: /app
+            - name: workspace
+              mountPath: /workspace
     volumes:
-      - name: app
+      - name: workspace
         emptyDir: {}
