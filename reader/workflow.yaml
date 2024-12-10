@@ -24,9 +24,6 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              mkdir -p markout && \
-              markata clean && \
-              mkdir -p markout && \
               markata build
           workingDir: /workspace
           env:
