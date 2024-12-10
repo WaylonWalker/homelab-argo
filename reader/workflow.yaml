@@ -10,7 +10,7 @@ spec:
   failedJobsHistoryLimit: 3
   workflowSpec:
     entrypoint: deploy-reader-pipeline
-    serviceAccountName: reader
+    serviceAccountName: waylon
     templates:
       - name: deploy-reader-pipeline
         steps:
@@ -32,7 +32,11 @@ spec:
           env:
             - name: HOME
               value: /workspace
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
       - name: deploy
+        dependencies: ["build"]
         container:
           image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
           command: ["sh", "-c"]
@@ -50,9 +54,9 @@ spec:
                 secretKeyRef:
                   name: reader-secret
                   key: cloudflare-secret
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
     volumes:
       - name: workspace
         emptyDir: {}
-    volumeMounts:
-      - name: workspace
-        mountPath: /workspace
