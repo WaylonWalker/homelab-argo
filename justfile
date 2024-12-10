@@ -1,3 +1,5 @@
+set dotenv-load
+
 default:
   @just --list
 
@@ -20,7 +22,36 @@ seal-old:
     kubeseal -f private/reader.yaml -w reader/reader.yaml --namespace basic-auth --name basic-auth
 
 seal name:
+    #!/bin/bash
+    set -euxo pipefail
+    if [[ "{{name}}" == "all" ]]; then
+        just seal-all
+        exit 0
+    fi
+    git diff --cached --quiet
     kubeseal -f private/{{name}}.yaml -w {{name}}/{{name}}-sealed-secret.yaml --namespace {{name}} --name {{name}}-secret
+    git add {{name}}/{{name}}-sealed-secret.yaml
+    git commit -vm "seal {{name}}"
+
+seal-all:
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    secrets="
+    basic-auth
+    minio
+    play-outside
+    reader
+    shots
+    "
+    for secret in $secrets; do
+        echo "sealing $secret"
+        just seal $secret
+    done
+
+    
+
+
 
 
 
@@ -32,6 +63,8 @@ forward: argo-echo-password argo-copy-password argo-forward
 argo-forward:
     kubectl port-forward svc/argocd-server -n argocd 8080:443
 
+argo-password: argo-echo-password argo-copy-password
+
 argo-echo-password:
     #!/bin/bash
     echo -n 'admin password: '
@@ -41,4 +74,31 @@ argo-copy-password:
     kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d | xclip -selection clipboard
     echo 'password copied to clipboard'
 
+argo-workflows-token: argo-workflows-echo-token argo-workflows-copy-token
 
+argo-workflows-echo-token:
+    #!/bin/bash
+    echo 'workflows token: '
+    echo -n 'Bearer: '
+    kubectl get secret waylon.service-account-token -o=jsonpath='{.data.token}' -n argo-workflows | base64 --decode; echo
+
+argo-workflows-copy-token:
+    #!/bin/bash
+    kubectl get secret waylon.service-account-token -o=jsonpath='{.data.token}' -n argo-workflows | base64 --decode | tr -d '\n' | xargs -I {} echo 'Bearer: {}' | xclip -selection clipboard
+    echo 'token copied to clipboard'
+
+play playbook='common':
+    #!/bin/bash
+    set -euxo pipefail
+    ansible-playbook -i ansible/inventory.ini ansible/{{playbook}}.yaml --vault-password-file ansible/vault_password
+
+edit-ansible-secret:
+    #!/bin/bash
+    set -euxo pipefail
+    ansible-vault edit ansible/secrets.yml --vault-password-file ansible/vault_password
+
+s3-ls:
+    #!/bin/bash
+    set -euxo pipefail
+    aws s3 cp requirements.txt s3://my-test-bucket
+    aws s3 ls s3://my-test-bucket
