@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: waylon
-  namespace: argo
+  namespace: argo-workflows
 rules:
   - apiGroups: ["argoproj.io"]
     resources:
@@ -36,17 +36,17 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: waylon
-  namespace: argo
+  namespace: argo-workflows
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: waylon
-  namespace: argo
+  namespace: argo-workflows
 subjects:
   - kind: ServiceAccount
     name: waylon
-    namespace: argo
+    namespace: argo-workflows
 roleRef:
   kind: Role
   name: waylon
@@ -56,7 +56,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: waylon.service-account-token
-  namespace: argo
+  namespace: argo-workflows
   annotations:
     kubernetes.io/service-account.name: waylon
 type: kubernetes.io/service-account-token
