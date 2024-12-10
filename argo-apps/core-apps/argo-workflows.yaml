@@ -43,7 +43,7 @@ spec:
           # manage workflows. This controls where the service account and RBAC
           # resources will be created. Only valid when singleNamespace is false.
           workflowNamespaces:
-            - argo
+            - argo-workflows
       # Additional settings (if needed)
   destination:
     server: https://kubernetes.default.svc
