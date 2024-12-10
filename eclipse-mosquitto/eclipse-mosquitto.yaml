@@ -18,6 +18,9 @@ spec:
       port: 1883
       targetPort: 1883
       protocol: TCP
+    - name: ws
+      port: 9001
+      targetPort: 9001
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,6 +42,7 @@ spec:
           image: eclipse-mosquitto:latest
           ports:
             - containerPort: 1883
+            - containerPort: 9001
           volumeMounts:
             - name: mosquitto-config
               mountPath: /mosquitto/config
@@ -79,3 +83,13 @@ spec:
                 name: mosquitto
                 port:
                   number: 1883
+    - host: mqtt-ws.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mosquitto
+                port:
+                  number: 9001
