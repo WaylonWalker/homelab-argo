@@ -9,7 +9,7 @@ spec:
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   workflowSpec:
-    entrypoint: deploy-pipeline
+    entrypoint: deploy-reader-pipeline
     serviceAccountName: reader
     templates:
       - name: deploy-reader-pipeline
