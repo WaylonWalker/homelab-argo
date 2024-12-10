@@ -20,7 +20,7 @@ spec:
         spec:
           containers:
             - name: reader-container
-              image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.5
+              image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
               env:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
