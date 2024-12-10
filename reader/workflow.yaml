@@ -26,9 +26,16 @@ spec:
             - |
               echo 'workingDir: /workspace'
               ls /workspace
+              echo
               echo 'whats in /app'
               ls /app
+              cp /app/* /workspace
 
+              echo
+              echo 'whats in /workspace'
+              ls /workspace
+
+              echo
               echo 'starting build'
 
               mkdir -p markout
