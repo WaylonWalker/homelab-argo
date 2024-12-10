@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: reader-waylonwalker-com-deploy-cron
+  namespace: reader
+spec:
+  schedule: "0 * * * *" # Runs every hour
+  concurrencyPolicy: "Replace"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  workflowSpec:
+    entrypoint: deploy-pipeline
+    serviceAccountName: reader
+    templates:
+      - name: deploy-reader-pipeline
+        steps:
+          - - name: build
+              template: build
+            - name: deploy
+              template: deploy
+      - name: build
+        container:
+          image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
+          command: ["sh", "-c"]
+          args:
+            - |
+              mkdir -p markout && \
+              markata clean && \
+              mkdir -p markout && \
+              markata build
+          workingDir: /workspace
+          env:
+            - name: HOME
+              value: /workspace
+      - name: deploy
+        container:
+          image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
+          command: ["sh", "-c"]
+          args:
+            - |
+              wrangler pages deploy markout \
+                --project-name reader-waylonwalker-com \
+                --branch markout
+          workingDir: /workspace
+          env:
+            - name: HOME
+              value: /workspace
+            - name: CLOUDFLARE_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: reader-secret
+                  key: cloudflare-secret
+    volumes:
+      - name: workspace
+        emptyDir: {}
+    volumeMounts:
+      - name: workspace
+        mountPath: /workspace

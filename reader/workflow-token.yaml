@@ -1,0 +1,62 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: reader
+  namespace: reader
+rules:
+  - apiGroups: ["argoproj.io"]
+    resources:
+      - workflows
+      - workflows/finalizers
+      - workfloweventbindings
+      - workfloweventbindings/finalizers
+      - workflowtemplates
+      - workflowtemplates/finalizers
+      - cronworkflows
+      - cronworkflows/finalizers
+      - clusterworkflowtemplates
+      - clusterworkflowtemplates/finalizers
+      - workflowtasksets
+      - workflowtasksets/finalizers
+      - workflowtaskresults
+      - workflowtaskresults/finalizers
+      - workflowartifactgctasks
+      - workflowartifactgctasks/finalizers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: reader
+  namespace: reader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: reader-workflow-binding
+  namespace: reader
+subjects:
+  - kind: ServiceAccount
+    name: reader
+    namespace: reader
+roleRef:
+  kind: Role
+  name: reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: reader.service-account-token
+  namespace: argo-workflows
+  annotations:
+    kubernetes.io/service-account.name: reader
+type: kubernetes.io/service-account-token
