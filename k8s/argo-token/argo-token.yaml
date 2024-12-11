@@ -3,33 +3,43 @@ kind: ClusterRole
 metadata:
   name: waylon
 rules:
-  - apiGroups: ["argoproj.io"]
+  - apiGroups:
+      - "*"
     resources:
-      - workflows
-      - workflows/finalizers
-      - workfloweventbindings
-      - workfloweventbindings/finalizers
-      - workflowtemplates
-      - workflowtemplates/finalizers
-      - cronworkflows
-      - cronworkflows/finalizers
-      - clusterworkflowtemplates
-      - clusterworkflowtemplates/finalizers
-      - workflowtasksets
-      - workflowtasksets/finalizers
-      - workflowtaskresults
-      - workflowtaskresults/finalizers
-      - workflowartifactgctasks
-      - workflowartifactgctasks/finalizers
+      - "*"
     verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      - "*"
+  - nonResourceURLs:
+      - "*"
+    verbs:
+      - "*"
+      # - apiGroups: ["argoproj.io"]
+      #   resources:
+      #     - workflows
+      #     - workflows/finalizers
+      #     - workfloweventbindings
+      #     - workfloweventbindings/finalizers
+      #     - workflowtemplates
+      #     - workflowtemplates/finalizers
+      #     - cronworkflows
+      #     - cronworkflows/finalizers
+      #     - clusterworkflowtemplates
+      #     - clusterworkflowtemplates/finalizers
+      #     - workflowtasksets
+      #     - workflowtasksets/finalizers
+      #     - workflowtaskresults
+      #     - workflowtaskresults/finalizers
+      #     - workflowartifactgctasks
+      #     - workflowartifactgctasks/finalizers
+      #   verbs:
+      #     - create
+      #     - delete
+      #     - deletecollection
+      #     - get
+      #     - list
+      #     - patch
+      #     - update
+      #     - watch
 ---
 apiVersion: v1
 kind: ServiceAccount
