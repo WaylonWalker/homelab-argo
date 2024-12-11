@@ -30,17 +30,13 @@ rules:
       - patch
       - update
       - watch
-
 ---
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: waylon
   namespace: argo-workflows
-
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -54,9 +50,7 @@ roleRef:
   kind: Role
   name: waylon
   apiGroup: rbac.authorization.k8s.io
-
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -69,9 +63,7 @@ roleRef:
   kind: ClusterRole
   name: argo-workflow
   apiGroup: rbac.authorization.k8s.io
-
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -79,4 +71,39 @@ metadata:
   namespace: argo-workflows
   annotations:
     kubernetes.io/service-account.name: waylon
-type: kubernetes.io/service-account-token
+type: ckubernetes.io/service-account-token
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argo-admin
+  namespace: argo-workflows
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-admin-role
+rules:
+  - apiGroups:
+      - "*"
+    resources:
+      - "*"
+    verbs:
+      - "*"
+  - nonResourceURLs:
+      - "*"
+    verbs:
+      - "*"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-admin-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argo-admin-role
+subjects:
+  - kind: ServiceAccount
+    name: argo-admin
+    namespace: argo-workflows
