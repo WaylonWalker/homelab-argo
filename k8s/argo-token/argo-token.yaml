@@ -80,4 +80,3 @@ metadata:
   annotations:
     kubernetes.io/service-account.name: waylon
 type: kubernetes.io/service-account-token
-c
