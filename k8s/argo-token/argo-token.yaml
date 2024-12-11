@@ -140,3 +140,66 @@ metadata:
   annotations:
     kubernetes.io/service-account.name: waylon
 type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: waylon
+  namespace: build
+rules:
+  - apiGroups:
+      - argoproj.io
+    resources:
+      - workflows
+      - workflows/finalizers
+      - workflowtemplates
+      - workflowtemplates/finalizers
+      - cronworkflows
+      - cronworkflows/finalizers
+      - workfloweventbindings
+      - workfloweventbindings/finalizers
+      - clusterworkflowtemplates
+      - clusterworkflowtemplates/finalizers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/exec
+      - pods/log
+      - services
+      - events
+      - persistentvolumeclaims
+      - configmaps
+      - secrets
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: waylon
+  namespace: build
+subjects:
+  - kind: ServiceAccount
+    name: waylon
+    namespace: argo-workflows
+roleRef:
+  kind: Role
+  name: waylon
+  apiGroup: rbac.authorization.k8s.io
