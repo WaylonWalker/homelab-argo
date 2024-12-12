@@ -84,6 +84,43 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: immich-machine-learning
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-machine-learning
+  template:
+    metadata:
+      labels:
+        app: immich-machine-learning
+    spec:
+      containers:
+        - name: immich-machine-learning
+          image: ghcr.io/immich-app/immich-machine-learning:release
+          volumeMounts:
+            - name: model-cache-storage
+              mountPath: /cache
+          envFrom:
+            - configMapRef:
+                name: immich-env
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+      volumes:
+        - name: model-cache-storage
+          persistentVolumeClaim:
+            claimName: immich-model-cache-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: immich-server
   namespace: immich
 spec:
@@ -98,7 +135,7 @@ spec:
     spec:
       containers:
         - name: immich-server
-          image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+          image: ghcr.io/immich-app/immich-server:release
           ports:
             - containerPort: 2283
           volumeMounts:
