@@ -1,0 +1,181 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: jellyfin
+  name: jellyfin
+  namespace: jellyfin
+spec:
+  ports:
+    - name: "8096"
+      port: 8096
+      targetPort: 8096
+  selector:
+    service: jellyfin
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jellyfin
+  namespace: jellyfin
+spec: {}
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: jellyfin
+  name: jellyfin
+  namespace: jellyfin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: jellyfin
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: jellyfin
+    spec:
+      containers:
+        - env:
+            - name: JELLYFIN_PublishedServerUrl
+              value: https://jellyfin.wayl.one
+          image: docker.io/jellyfin/jellyfin
+          name: jellyfin
+          ports:
+            - containerPort: 8096
+              hostPort: 8096
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /config
+              name: jellyfin-config
+            - mountPath: /cache
+              name: jellyfin-cache
+            - mountPath: /media
+              name: jellyfin-media
+      restartPolicy: Always
+      volumes:
+        - name: jellyfin-config
+          persistentVolumeClaim:
+            claimName: jellyfin-config
+        - name: jellyfin-cache
+          persistentVolumeClaim:
+            claimName: jellyfin-cache
+        - name: jellyfin-media
+          persistentVolumeClaim:
+            claimName: jellyfin-media
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: jellyfin
+  name: jellyfin
+  namespace: jellyfin
+spec:
+  ports:
+    - name: "8096"
+      port: 8096
+      targetPort: 8096
+  selector:
+    service: jellyfin
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    service: jellyfin
+  name: jellyfin
+  namespace: jellyfin
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: jellyfin.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: jellyfin
+                port:
+                  number: 8096
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - jellyfin.wayl.one
+      secretName: jellyfin-cert-tls
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: jellyfin-config
+  name: jellyfin-config
+  namespace: jellyfin
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: jellyfin-cache
+  name: jellyfin-cache
+  namespace: jellyfin
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: jellyfin-media
+  name: jellyfin-media
+  namespace: jellyfin
+spec:
+  storageClassName: manual
+  volumeName: jellyfin-media
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3000Gi
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-media
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 3000Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/vault
