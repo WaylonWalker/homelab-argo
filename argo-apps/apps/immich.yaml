@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: immich-pvcs
+  name: immich
   namespace: argocd
 spec:
   project: default
   destination:
-    server: https://kubernetes.default.svc
     namespace: immich
+    server: https://kubernetes.default.svc
   source:
+    path: k8s/immich
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
-    path: k8s/immich
   syncPolicy:
     automated:
       selfHeal: true
