@@ -21,6 +21,15 @@ spec:
               existingClaim: immich-redis-pvc
             postgres:
               existingClaim: immich-postgres-pvc
+          server:
+            enabled: true
+            ingress:
+              main:
+                enabled: true
+                annotations:
+                  cert-manager.io/cluster-issuer: letsencrypt-prod
+                hosts:
+                  - host: immich.wayl.one
   destination:
     server: https://kubernetes.default.svc
     namespace: immich
