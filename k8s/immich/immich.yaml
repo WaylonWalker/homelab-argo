@@ -9,6 +9,7 @@ metadata:
   name: immich-upload-pv
   namespace: immich
 spec:
+  storageClassName: ""
   capacity:
     storage: 100Gi
   accessModes:
@@ -22,6 +23,7 @@ metadata:
   name: immich-upload-pvc
   namespace: immich
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
@@ -35,6 +37,7 @@ metadata:
   name: immich-model-cache-pv
   namespace: immich
 spec:
+  storageClassName: ""
   capacity:
     storage: 10Gi
   accessModes:
@@ -48,6 +51,7 @@ metadata:
   name: immich-model-cache-pvc
   namespace: immich
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
@@ -61,6 +65,7 @@ metadata:
   name: immich-db-data-pv
   namespace: immich
 spec:
+  storageClassName: ""
   capacity:
     storage: 50Gi
   accessModes:
@@ -74,6 +79,7 @@ metadata:
   name: immich-db-data-pvc
   namespace: immich
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
