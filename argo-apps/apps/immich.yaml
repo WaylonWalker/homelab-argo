@@ -10,7 +10,17 @@ spec:
     chart: immich
     targetRevision: 0.8.5
     helm:
-      values: ""
+      values: |
+        immich:
+          persistence:
+            library:
+              existingClaim: immich-library-pvc
+            typesense:
+              existingClaim: immich-typesense-pvc
+            redis:
+              existingClaim: immich-redis-pvc
+            postgres:
+              existingClaim: immich-postgres-pvc
   destination:
     server: https://kubernetes.default.svc
     namespace: immich
