@@ -84,6 +84,101 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: immich-database
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-database
+  template:
+    metadata:
+      labels:
+        app: immich-database
+    spec:
+      containers:
+        - name: immich-database
+          image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: immich-env
+                  key: DB_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: immich-env
+                  key: DB_USERNAME
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: immich-env
+                  key: DB_DATABASE_NAME
+          volumeMounts:
+            - name: db-data-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: db-data-storage
+          persistentVolumeClaim:
+            claimName: immich-db-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-database
+  namespace: immich
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: immich-database
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-redis
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-redis
+  template:
+    metadata:
+      labels:
+        app: immich-redis
+    spec:
+      containers:
+        - name: immich-redis
+          image: redis:6.2-alpine
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-redis
+  namespace: immich
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    app: immich-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: immich-machine-learning
   namespace: immich
 spec:
