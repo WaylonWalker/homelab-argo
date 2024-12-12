@@ -11,15 +11,16 @@ spec:
     targetRevision: 0.8.5
     helm:
       values: |
-        persistence:
-          library:
-            existingClaim: immich-library-pvc
-          typesense:
-            existingClaim: immich-typesense-pvc
-          redis:
-            existingClaim: immich-redis-pvc
-          postgres:
-            existingClaim: immich-postgres-pvc
+        immich:
+          persistence:
+            library:
+              existingClaim: immich-library-pvc
+            typesense:
+              existingClaim: immich-typesense-pvc
+            redis:
+              existingClaim: immich-redis-pvc
+            postgres:
+              existingClaim: immich-postgres-pvc
         server:
           enabled: true
           ingress:
