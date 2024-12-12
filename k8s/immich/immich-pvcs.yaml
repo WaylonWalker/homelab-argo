@@ -9,6 +9,18 @@ spec:
   resources:
     requests:
       storage: 100Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-library-pv
+  namespace: immich
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /mnt/vault/nfs/general/pv/immich/immich-library
 ---
@@ -23,6 +35,18 @@ spec:
   resources:
     requests:
       storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-typesense-pv
+  namespace: immich
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /mnt/vault/nfs/general/pv/immich/immich-typesense
 ---
@@ -37,8 +61,6 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  hostPath:
-    path: /mnt/vault/nfs/general/pv/immich/immich-redis
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -51,5 +73,17 @@ spec:
   resources:
     requests:
       storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-postgres-pv
+  namespace: immich
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /mnt/vault/nfs/general/pv/immich/immich-postgres
