@@ -21,6 +21,8 @@ spec:
               existingClaim: immich-redis-pvc
             postgres:
               existingClaim: immich-postgres-pvc
+        env:
+          REDIS_HOSTNAME: immich-redis-master-0
         redis:
           enabled: true
         server:
