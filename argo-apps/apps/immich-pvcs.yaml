@@ -5,13 +5,13 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://github.com/waylon/homelab-argo.git
-    targetRevision: HEAD
-    path: k8s/immich
   destination:
     server: https://kubernetes.default.svc
     namespace: immich
+  source:
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+    path: k8s/immich
   syncPolicy:
     automated:
       selfHeal: true
