@@ -21,6 +21,8 @@ spec:
               existingClaim: immich-redis-pvc
             postgres:
               existingClaim: immich-postgres-pvc
+        redis:
+          enabled: true
         server:
           enabled: true
           ingress:
