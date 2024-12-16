@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: clone-and-check-
+  namespace: argo-workflows
+spec:
+  entrypoint: clone-and-check
+  serviceAccountName: waylon
+  volumes:
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: workspace
+  templates:
+    - name: clone-and-check
+      dag:
+        tasks:
+          - name: clone-repo
+            template: clone-repo
+          - name: list-files
+            template: list-files
+            dependencies:
+              - clone-repo
+    - name: clone-repo
+      script:
+        image: alpine/git
+        command: [sh]
+        source: |
+          git clone https://github.com/waylonwalker/devtainer.git /workspace/devtainer
+          echo "devtainer cloned"
+          ls -la /workspace
+          echo
+          echo "listing /workspace/devtainer"
+          ls -la /workspace/devtainer
+        workingDir: /workspace
+        env:
+          - name: HOME
+            value: /workspace
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+    - name: list-files
+      script:
+        image: alpine
+        command: [sh]
+        source: |
+          echo
+          echo "listing /"
+          ls -la /
+          echo
+          echo "listing /workspace"
+          ls -la /workspace
+          echo
+          echo "listing /workspace/devtainer"
+          ls -la /workspace/devtainer
+        workingDir: /workspace
+        env:
+          - name: HOME
+            value: /workspace
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace

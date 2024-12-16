@@ -1,0 +1,178 @@
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   name: build
+#   namespace: build
+# rules:
+#   - apiGroups: ["argoproj.io"]
+#     resources:
+#       - workflows
+#       - workflows/finalizers
+#       - workfloweventbindings
+#       - workfloweventbindings/finalizers
+#       - workflowtemplates
+#       - workflowtemplates/finalizers
+#       - cronworkflows
+#       - cronworkflows/finalizers
+#       - clusterworkflowtemplates
+#       - clusterworkflowtemplates/finalizers
+#       - workflowtasksets
+#       - workflowtasksets/finalizers
+#       - workflowtaskresults
+#       - workflowtaskresults/finalizers
+#       - workflowartifactgctasks
+#       - workflowartifactgctasks/finalizers
+#     verbs:
+#       - create
+#       - delete
+#       - deletecollection
+#       - get
+#       - list
+#       - patch
+#       - update
+#       - watch
+# ---
+# apiVersion: v1
+# kind: ServiceAccount
+# metadata:
+#   name: build
+#   namespace: build
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: build-workflow-binding
+#   namespace: build
+# subjects:
+#   - kind: ServiceAccount
+#     name: build
+#     namespace: build
+# roleRef:
+#   kind: Role
+#   name: build
+#   apiGroup: rbac.authorization.k8s.io
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: build.service-account-token
+#   namespace: build
+#   annotations:
+#     kubernetes.io/service-account.name: build
+# type: kubernetes.io/service-account-token
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: kaniko-docker-build-
+  namespace: build
+spec:
+  entrypoint: main
+  serviceAccountName: build
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: regcred
+    - name: docker-config
+      projected:
+        sources:
+          - secret:
+              name: regcred
+              items:
+                - key: .dockerconfigjson
+                  path: config.json
+  templates:
+    - name: main
+      steps:
+        - - name: get-sha
+            template: git-get-sha
+        - - name: get-version
+            template: git-get-version
+            arguments:
+              parameters:
+                - name: commit-sha
+                  value: "{{steps.get-sha.outputs.parameters.commit-sha}}"
+        - - name: ruff-lint
+            template: ruff-lint
+            arguments:
+              parameters:
+                - name: commit-sha
+                  value: "{{steps.get-sha.outputs.parameters.commit-sha}}"
+                - name: version
+                  value: "{{steps.get-version.outputs.parameters.version}}"
+        - - name: kaniko-build
+            template: kaniko-build
+            arguments:
+              parameters:
+                - name: commit-sha
+                  value: "{{steps.get-sha.outputs.parameters.commit-sha}}"
+                - name: version
+                  value: "{{steps.get-version.outputs.parameters.version}}"
+    - name: git-get-sha
+      script:
+        image: alpine/git:latest
+        command: [sh]
+        source: |
+          set -e
+          git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
+          cd repo
+          COMMIT_SHA=$(git rev-parse HEAD)
+          echo $COMMIT_SHA > /tmp/commit-sha.txt
+      outputs:
+        parameters:
+          - name: commit-sha
+            valueFrom:
+              path: /tmp/commit-sha.txt
+    - name: git-get-version
+      inputs:
+        parameters:
+          - name: commit-sha
+      script:
+        image: alpine:latest
+        command: [sh]
+        source: |
+          set -e
+          apk add --no-cache git
+          git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
+          cd repo/htmx_patterns
+          VERSION=$(grep '__version__ =' __about__.py | cut -d\" -f2)
+          echo $VERSION > /tmp/version.txt
+      outputs:
+        parameters:
+          - name: version
+            valueFrom:
+              path: /tmp/version.txt
+    - name: ruff-lint
+      inputs:
+        parameters:
+          - name: commit-sha
+          - name: version
+      script:
+        image: registry.wayl.one/uv:latest
+        command: [sh]
+        source: |
+          set -e
+          git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
+          cd repo
+          uvx ruff check .
+    - name: kaniko-build
+      inputs:
+        parameters:
+          - name: commit-sha
+          - name: version
+      container:
+        image: gcr.io/kaniko-project/executor:latest
+        args:
+          - "--context=git://github.com/waylonwalker/htmx-patterns.git#main"
+          - "--dockerfile=Dockerfile"
+          - "--destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.commit-sha}}"
+          - "--destination=registry.wayl.one/htmx-patterns:latest"
+          - "--destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.version}}"
+          - "--verbosity=info"
+          - "--cache=true"
+          - "--cache-repo=registry.wayl.one/htmx-patterns-cache"
+        env:
+          - name: DOCKER_CONFIG
+            value: "/kaniko/.docker"
+        volumeMounts:
+          - name: docker-config
+            mountPath: /kaniko/.docker

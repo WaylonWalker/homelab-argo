@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: uv-kaniko-build-
+  namespace: build
+spec:
+  entrypoint: main
+  serviceAccountName: build
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: regcred
+    - name: docker-config
+      projected:
+        sources:
+          - secret:
+              name: regcred
+              items:
+                - key: .dockerconfigjson
+                  path: config.json
+  templates:
+    - name: main
+      steps:
+        - - name: get-sha
+            template: git-get-sha
+        - - name: kaniko-build
+            template: kaniko-build
+            arguments:
+              parameters:
+                - name: commit-sha
+                  value: "{{steps.get-sha.outputs.parameters.commit-sha}}"
+    - name: git-get-sha
+      script:
+        image: alpine/git:latest
+        command: [sh]
+        source: |
+          set -e
+          git clone --depth 1 --branch main https://github.com/waylonwalker/homelab-argo.git repo
+          cd repo
+          COMMIT_SHA=$(git rev-parse HEAD)
+          echo $COMMIT_SHA > /tmp/commit-sha.txt
+      outputs:
+        parameters:
+          - name: commit-sha
+            valueFrom:
+              path: /tmp/commit-sha.txt
+    - name: kaniko-build
+      inputs:
+        parameters:
+          - name: commit-sha
+      container:
+        image: gcr.io/kaniko-project/executor:latest
+        args:
+          - "--context=git://github.com/waylonwalker/homelab-argo.git#main"
+          - "--dockerfile=dockerfiles/uv.Dockerfile"
+          - "--destination=registry.wayl.one/uv:{{inputs.parameters.commit-sha}}"
+          - "--destination=registry.wayl.one/uv:latest"
+          - "--verbosity=info"
+          - "--cache=true"
+          - "--cache-repo=registry.wayl.one/uv-cache"
+        env:
+          - name: DOCKER_CONFIG
+            value: "/kaniko/.docker"
+        volumeMounts:
+          - name: docker-config
+            mountPath: /kaniko/.docker

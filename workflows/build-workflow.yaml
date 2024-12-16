@@ -32,13 +32,18 @@ spec:
             echo "Listing contents of /workspace/devtainer"
             ls -la /workspace/devtainer
         workingDir: /workspace
-        volumeMounts:
-          - name: workspace
-            mountPath: /workspace
+        outputs:
+          artifacts:
+            - name: repo
+              path: /workspace/devtainer
     # Step 1b: show the repository
     - name: ls-repo
       container:
         image: alpine/git
+        inputs:
+          artifacts:
+            - name: repo
+              path: /workspace/repo
         command: [sh, -c]
         args:
           - |
@@ -49,13 +54,14 @@ spec:
             echo "Contents of the repo"
             ls -la /workspace/devtainer
         workingDir: /workspace
-        volumeMounts:
-          - name: workspace
-            mountPath: /workspace
     # Step 2: Build the Podman image
     - name: build-image
       container:
         image: quay.io/podman/stable
+        inputs:
+          artifacts:
+            - name: repo
+              path: /workspace/repo
         command: [sh, -c]
         args:
           - |
@@ -65,11 +71,6 @@ spec:
             mkdir -p $STORAGE_ROOT
             podman --storage-driver=$STORAGE_DRIVER --root=$STORAGE_ROOT build -f /workspace/docker/Dockerfile -t waylonwalker/devtainer /workspace/devtainer
         workingDir: /workspace
-        volumeMounts:
-          - name: workspace
-            mountPath: /workspace
-          - name: podman-storage
-            mountPath: /tmp/containers-storage
     # Step 3: Run something using the Podman container
     - name: run-container
       container:
@@ -81,11 +82,3 @@ spec:
             export STORAGE_ROOT=/tmp/containers-storage
             podman --storage-driver=$STORAGE_DRIVER --root=$STORAGE_ROOT run --rm waylonwalker/devtainer echo "Hello from the Podman container!"
         workingDir: /workspace
-        volumeMounts:
-          - name: workspace
-            mountPath: /workspace
-    volumes:
-      - name: workspace
-        emptyDir: {}
-      - name: podman-storage
-        emptyDir: {}

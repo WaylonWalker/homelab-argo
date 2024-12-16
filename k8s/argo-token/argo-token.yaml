@@ -99,6 +99,107 @@ rules:
       #     - update
       #     - watch
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: waylon
+  namespace: build
+rules:
+  - apiGroups:
+      - argoproj.io
+    resources:
+      - workflows
+      - workflows/finalizers
+      - workflowtemplates
+      - workflowtemplates/finalizers
+      - cronworkflows
+      - cronworkflows/finalizers
+      - workfloweventbindings
+      - workfloweventbindings/finalizers
+      - clusterworkflowtemplates
+      - clusterworkflowtemplates/finalizers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/exec
+      - pods/log
+      - services
+      - events
+      - persistentvolumeclaims
+      - configmaps
+      - secrets
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - argoproj.io
+    resources:
+      - eventsources
+      - sensors
+      - workflows
+      - workflowtemplates
+      - cronworkflows
+      - clusterworkflowtemplates
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+      # - apiGroups: ["argoproj.io"]
+      #   resources:
+      #     - workflows
+      #     - workflows/finalizers
+      #     - workfloweventbindings
+      #     - workfloweventbindings/finalizers
+      #     - workflowtemplates
+      #     - workflowtemplates/finalizers
+      #     - cronworkflows
+      #     - cronworkflows/finalizers
+      #     - clusterworkflowtemplates
+      #     - clusterworkflowtemplates/finalizers
+      #     - workflowtasksets
+      #     - workflowtasksets/finalizers
+      #     - workflowtaskresults
+      #     - workflowtaskresults/finalizers
+      #     - workflowartifactgctasks
+      #     - workflowartifactgctasks/finalizers
+      #   verbs:
+      #     - create
+      #     - delete
+      #     - deletecollection
+      #     - get
+      #     - list
+      #     - patch
+      #     - update
+      #     - watch
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:

@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: build
+  namespace: build
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS53YXlsLm9uZSI6eyJ1c2VybmFtZSI6IndheWxvbiIsInBhc3N3b3JkIjoid2Fsa2VycyIsImF1dGgiOiJkMkY1Ykc5dU9uZGhiR3RsY25NPSJ9fX0=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: build
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko-docker-build
+  namespace: build
+spec:
+  containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:latest
+      args:
+        - "--context=git://github.com/waylonwalker/htmx-patterns.git#main"
+        - "--dockerfile=Dockerfile"
+        - "--destination=registry.wayl.one/htmx-patterns"
+        - "--verbosity=debug"
+      env:
+        - name: DOCKER_CONFIG
+          value: "/kaniko/.docker"
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+  restartPolicy: Never
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: regcred
+  volumes:
+    - name: docker-config
+      projected:
+        sources:
+          - secret:
+              name: regcred
+              items:
+                - key: .dockerconfigjson
+                  path: config.json

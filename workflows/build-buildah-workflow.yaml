@@ -1,77 +1,16 @@
-# apiVersion: rbac.authorization.k8s.io/v1
-# kind: Role
-# metadata:
-#   name: build
-#   namespace: build
-# rules:
-#   - apiGroups: ["argoproj.io"]
-#     resources:
-#       - workflows
-#       - workflows/finalizers
-#       - workfloweventbindings
-#       - workfloweventbindings/finalizers
-#       - workflowtemplates
-#       - workflowtemplates/finalizers
-#       - cronworkflows
-#       - cronworkflows/finalizers
-#       - clusterworkflowtemplates
-#       - clusterworkflowtemplates/finalizers
-#       - workflowtasksets
-#       - workflowtasksets/finalizers
-#       - workflowtaskresults
-#       - workflowtaskresults/finalizers
-#       - workflowartifactgctasks
-#       - workflowartifactgctasks/finalizers
-#     verbs:
-#       - create
-#       - delete
-#       - deletecollection
-#       - get
-#       - list
-#       - patch
-#       - update
-#       - watch
-# ---
-# apiVersion: v1
-# kind: ServiceAccount
-# metadata:
-#   name: build
-#   namespace: build
-# ---
-# apiVersion: rbac.authorization.k8s.io/v1
-# kind: RoleBinding
-# metadata:
-#   name: build-workflow-binding
-#   namespace: build
-# subjects:
-#   - kind: ServiceAccount
-#     name: build
-#     namespace: build
-# roleRef:
-#   kind: Role
-#   name: build
-#   apiGroup: rbac.authorization.k8s.io
-# ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: build.service-account-token
-#   namespace: build
-#   annotations:
-#     kubernetes.io/service-account.name: build
-# type: kubernetes.io/service-account-token
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: kaniko-docker-build-
+  generateName: buildah-docker-build-
   namespace: build
 spec:
   entrypoint: main
   serviceAccountName: build
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
   volumes:
-    - name: kaniko-secret
-      secret:
-        secretName: regcred
     - name: docker-config
       projected:
         sources:
@@ -80,6 +19,8 @@ spec:
               items:
                 - key: .dockerconfigjson
                   path: config.json
+    - name: shared-tmp
+      emptyDir: {}
   templates:
     - name: main
       steps:
@@ -99,8 +40,8 @@ spec:
                   value: "{{steps.get-sha.outputs.parameters.commit-sha}}"
                 - name: version
                   value: "{{steps.get-version.outputs.parameters.version}}"
-        - - name: kaniko-build
-            template: kaniko-build
+        - - name: buildah-build
+            template: buildah-build
             arguments:
               parameters:
                 - name: commit-sha
@@ -116,12 +57,15 @@ spec:
           git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
           cd repo
           COMMIT_SHA=$(git rev-parse HEAD)
-          echo $COMMIT_SHA > /tmp/commit-sha.txt
+          echo $COMMIT_SHA > /mnt/shared-tmp/commit-sha.txt
       outputs:
         parameters:
           - name: commit-sha
             valueFrom:
-              path: /tmp/commit-sha.txt
+              path: /mnt/shared-tmp/commit-sha.txt
+      volumeMounts:
+        - name: shared-tmp
+          mountPath: /mnt/shared-tmp
     - name: git-get-version
       inputs:
         parameters:
@@ -135,46 +79,53 @@ spec:
           git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
           cd repo/htmx_patterns
           VERSION=$(grep '__version__ =' __about__.py | cut -d\" -f2)
-          echo $VERSION > /tmp/version.txt
+          echo $VERSION > /mnt/shared-tmp/version.txt
       outputs:
         parameters:
           - name: version
             valueFrom:
-              path: /tmp/version.txt
+              path: /mnt/shared-tmp/version.txt
+      volumeMounts:
+        - name: shared-tmp
+          mountPath: /mnt/shared-tmp
     - name: ruff-lint
       inputs:
         parameters:
           - name: commit-sha
           - name: version
       script:
-        image: registry.wayl.one/uv:latest
-        imagePullSecrets:
-          - name: regcred
+        image: python:3.11-slim
         command: [sh]
         source: |
           set -e
+          apt-get update && apt-get install -y git
           git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
           cd repo
-          uvx ruff check .
-    - name: kaniko-build
+          pip install ruff
+          ruff check .
+    - name: buildah-build
       inputs:
         parameters:
           - name: commit-sha
           - name: version
       container:
-        image: gcr.io/kaniko-project/executor:latest
+        image: quay.io/buildah/stable:latest
+        command: ["buildah"]
         args:
-          - "--context=git://github.com/waylonwalker/htmx-patterns.git#main"
-          - "--dockerfile=Dockerfile"
-          - "--destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.commit-sha}}"
-          - "--destination=registry.wayl.one/htmx-patterns:latest"
-          - "--destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.version}}"
-          - "--verbosity=info"
-          - "--cache=true"
-          - "--cache-repo=registry.wayl.one/htmx-patterns-cache"
+          - "bud"
+          - "--file=Dockerfile"
+          - "--tag=registry.wayl.one/htmx-patterns:{{inputs.parameters.commit-sha}}"
+          - "--tag=registry.wayl.one/htmx-patterns:latest"
+          - "--tag=registry.wayl.one/htmx-patterns:{{inputs.parameters.version}}"
+          - "."
         env:
           - name: DOCKER_CONFIG
-            value: "/kaniko/.docker"
+            value: "/var/lib/containers/auth.json"
+        securityContext:
+          privileged: true
         volumeMounts:
           - name: docker-config
-            mountPath: /kaniko/.docker
+            mountPath: /var/lib/containers/auth.json
+            subPath: config.json
+          - name: shared-tmp
+            mountPath: /mnt/shared-tmp
