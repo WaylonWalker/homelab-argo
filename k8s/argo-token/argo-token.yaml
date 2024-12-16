@@ -104,6 +104,16 @@ kind: ServiceAccount
 metadata:
   name: waylon
   namespace: argo-workflows
+imagePullSecrets:
+  - name: regcred
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: waylon
+  namespace: build
+imagePullSecrets:
+  - name: regcred
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
