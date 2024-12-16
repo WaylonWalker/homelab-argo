@@ -1,4 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
+kind: EventBus
+metadata:
+  name: default
+  namespace: build
+spec:
+  nats:
+    native:
+      replicas: 1
+---
+apiVersion: argoproj.io/v1alpha1
 kind: EventSource
 metadata:
   name: dropper-github
