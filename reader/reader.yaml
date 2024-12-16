@@ -27,4 +27,6 @@ spec:
                     secretKeyRef:
                       name: reader-secret
                       key: cloudflare-secret
+          imagePullSecrets:
+            - name: regcred
           restartPolicy: OnFailure
