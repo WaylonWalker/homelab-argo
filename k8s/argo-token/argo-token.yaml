@@ -7,16 +7,27 @@ rules:
   - apiGroups:
       - argoproj.io
     resources:
+      - clusterworkflowtemplates
+      - clusterworkflowtemplates/finalizers
+      - configmaps
+      - cronworkflows
+      - cronworkflows/finalizers
+      - events
+      - eventsources
+      - persistentvolumeclaims
+      - pods
+      - pods/exec
+      - pods/log
+      - secrets
+      - sensors
+      - serviceaccounts
+      - services
+      - workfloweventbindings
+      - workfloweventbindings/finalizers
       - workflows
       - workflows/finalizers
       - workflowtemplates
       - workflowtemplates/finalizers
-      - cronworkflows
-      - cronworkflows/finalizers
-      - workfloweventbindings
-      - workfloweventbindings/finalizers
-      - clusterworkflowtemplates
-      - clusterworkflowtemplates/finalizers
     verbs:
       - create
       - delete
@@ -26,18 +37,6 @@ rules:
       - patch
       - update
       - watch
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-      - pods/exec
-      - pods/log
-      - services
-      - events
-      - persistentvolumeclaims
-      - configmaps
-      - secrets
-    verbs:
       - create
       - delete
       - deletecollection
@@ -46,31 +45,8 @@ rules:
       - patch
       - update
       - watch
-  - apiGroups:
-      - ""
-    resources:
-      - serviceaccounts
-    verbs:
-      - get
-      - list
   - apiGroups:
       - argoproj.io
-    resources:
-      - eventsources
-      - sensors
-      - workflows
-      - workflowtemplates
-      - cronworkflows
-      - clusterworkflowtemplates
-    verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -133,42 +109,29 @@ rules:
   - apiGroups:
       - argoproj.io
     resources:
-      - workflows
-      - workflows/finalizers
-      - workflowtemplates
-      - workflowtemplates/finalizers
+      - configmaps
       - cronworkflows
       - cronworkflows/finalizers
-      - workfloweventbindings
-      - workfloweventbindings/finalizers
-      - clusterworkflowtemplates
-      - clusterworkflowtemplates/finalizers
-      - workflowtasksets
-      - workflowtasksets/finalizers
-      - workflowtaskresults
-      - workflowtaskresults/finalizers
-      - workflowartifactgctasks
-      - workflowartifactgctasks/finalizers
-    verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - ""
-    resources:
+      - eventbus
+      - events
+      - eventsources
+      - persistentvolumeclaims
       - pods
       - pods/exec
       - pods/log
-      - services
-      - events
-      - persistentvolumeclaims
-      - configmaps
       - secrets
+      - sensors
+      - services
+      - workfloweventbindings
+      - workfloweventbindings/finalizers
+      - workflows
+      - workflows/finalizers
+      - workflowtaskresults
+      - workflowtaskresults/finalizers
+      - workflowtasksets
+      - workflowtasksets/finalizers
+      - workflowtemplates
+      - workflowtemplates/finalizers
     verbs:
       - create
       - delete
@@ -187,7 +150,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: waylon
-    namespace: argo-workflows
+    namespace: build
 roleRef:
   kind: Role
   name: waylon
@@ -201,43 +164,31 @@ rules:
   - apiGroups:
       - argoproj.io
     resources:
-      - workflows
-      - workflows/finalizers
-      - workflowtemplates
-      - workflowtemplates/finalizers
-      - cronworkflows
-      - cronworkflows/finalizers
-      - workfloweventbindings
-      - workfloweventbindings/finalizers
       - clusterworkflowtemplates
       - clusterworkflowtemplates/finalizers
-      - eventsources
-      - sensors
+      - configmaps
+      - cronworkflows
+      - cronworkflows/finalizers
       - eventbus
-      - workflowtasksets
-      - workflowtasksets/finalizers
-      - workflowtaskresults
-      - workflowtaskresults/finalizers
-    verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - ""
-    resources:
+      - events
+      - eventsources
+      - persistentvolumeclaims
       - pods
       - pods/exec
       - pods/log
-      - services
-      - events
-      - persistentvolumeclaims
-      - configmaps
       - secrets
+      - sensors
+      - services
+      - workfloweventbindings
+      - workfloweventbindings/finalizers
+      - workflows
+      - workflows/finalizers
+      - workflowtaskresults
+      - workflowtaskresults/finalizers
+      - workflowtasksets
+      - workflowtasksets/finalizers
+      - workflowtemplates
+      - workflowtemplates/finalizers
     verbs:
       - create
       - delete
