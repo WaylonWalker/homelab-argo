@@ -40,10 +40,9 @@ spec:
   strategy: {}
   template:
     metadata:
+      creationTimestamp: null
       labels:
         service: dropper-wayl-one
-    metadata:
-      creationTimestamp: null
     spec:
       containers:
         - image: registry.wayl.one/dropper:0.0.1
