@@ -143,6 +143,12 @@ rules:
       - workfloweventbindings/finalizers
       - clusterworkflowtemplates
       - clusterworkflowtemplates/finalizers
+      - workflowtasksets
+      - workflowtasksets/finalizers
+      - workflowtaskresults
+      - workflowtaskresults/finalizers
+      - workflowartifactgctasks
+      - workflowartifactgctasks/finalizers
     verbs:
       - create
       - delete
@@ -163,39 +169,6 @@ rules:
       - persistentvolumeclaims
       - configmaps
       - secrets
-    verbs:
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: waylon
-  namespace: build
-rules:
-  - apiGroups:
-      - argoproj.io
-    resources:
-      - workflows
-      - workflows/finalizers
-      - workflowtemplates
-      - workflowtemplates/finalizers
-      - cronworkflows
-      - cronworkflows/finalizers
-      - workfloweventbindings
-      - workfloweventbindings/finalizers
-      - workflowtasksets
-      - workflowtasksets/finalizers
-      - workflowtaskresults
-      - workflowtaskresults/finalizers
-      - workflowartifactgctasks
-      - workflowartifactgctasks/finalizers
     verbs:
       - create
       - delete
