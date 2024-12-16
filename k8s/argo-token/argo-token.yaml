@@ -37,16 +37,6 @@ rules:
       - patch
       - update
       - watch
-      - create
-      - delete
-      - deletecollection
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - argoproj.io
 ---
 apiVersion: v1
 kind: ServiceAccount
