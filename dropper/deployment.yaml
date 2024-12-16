@@ -99,6 +99,11 @@ spec:
                 secretKeyRef:
                   name: dropper-secret
                   key: AWS_ENDPOINT_URL
+            - name: BACKEND_CORS_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  name: dropper-secret
+                  key: BACKEND_CORS_ORIGINS
       imagePullSecrets:
         - name: regcred
       restartPolicy: Always
