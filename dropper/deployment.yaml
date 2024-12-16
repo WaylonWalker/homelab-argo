@@ -8,9 +8,9 @@ metadata:
   namespace: dropper
 spec:
   ports:
-    - name: "5000"
-      port: 5000
-      targetPort: 5000
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
   selector:
     service: dropper-wayl-one
 status:
@@ -48,7 +48,7 @@ spec:
         - image: registry.wayl.one/dropper:0.0.0
           name: dropper-wayl-one
           ports:
-            - containerPort: 5000
+            - containerPort: 8000
               protocol: TCP
           resources:
             requests:
@@ -103,7 +103,7 @@ spec:
               service:
                 name: dropper-wayl-one
                 port:
-                  number: 5000
+                  number: 8000
             path: /
             pathType: Prefix
   tls:
