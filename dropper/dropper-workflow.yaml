@@ -85,7 +85,7 @@ spec:
                 namespace: build
               spec:
                 entrypoint: main
-                serviceAccountName: build
+                serviceAccountName: waylon
                 imagePullSecrets:
                   - name: regcred
                 volumes:
