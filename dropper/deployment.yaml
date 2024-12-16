@@ -45,7 +45,7 @@ spec:
         service: dropper-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.0
+        - image: registry.wayl.one/dropper:0.0.2
           name: dropper-wayl-one
           ports:
             - containerPort: 8000
