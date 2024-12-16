@@ -147,6 +147,41 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: workflow-controller
+  namespace: build
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - configmaps
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - update
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: workflow-controller-build
+  namespace: build
+subjects:
+  - kind: ServiceAccount
+    name: argo-workflows-workflow-controller
+    namespace: argo-workflows
+roleRef:
+  kind: Role
+  name: workflow-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: argo-events-workflow
