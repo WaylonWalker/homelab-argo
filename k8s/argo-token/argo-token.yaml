@@ -112,7 +112,7 @@ subjects:
     namespace: argo-workflows
 roleRef:
   kind: ClusterRole
-  name: argo-workflow
+  name: argo-events-workflow
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
@@ -192,3 +192,58 @@ roleRef:
   kind: Role
   name: waylon
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-events-workflow
+rules:
+  - apiGroups:
+      - argoproj.io
+    resources:
+      - workflows
+      - workflows/finalizers
+      - workflowtemplates
+      - workflowtemplates/finalizers
+      - cronworkflows
+      - cronworkflows/finalizers
+      - workfloweventbindings
+      - workfloweventbindings/finalizers
+      - clusterworkflowtemplates
+      - clusterworkflowtemplates/finalizers
+      - eventsources
+      - sensors
+      - eventbus
+      - workflowtasksets
+      - workflowtasksets/finalizers
+      - workflowtaskresults
+      - workflowtaskresults/finalizers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/exec
+      - pods/log
+      - services
+      - events
+      - persistentvolumeclaims
+      - configmaps
+      - secrets
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
