@@ -61,16 +61,16 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: docker.io/waylonwalker/shot-scraper-api:0.0.1
+        - image: registry.wayl.one/shot-scraper-api:0.0.1
           name: shot-wayl-one
           ports:
             - containerPort: 5000
               protocol: TCP
           resources:
             requests:
-              cpu: "200m" # Minimum CPU required (100 millicores)
+              cpu: "200m"
             limits:
-              cpu: "500m" # Maximum CPU the container can use
+              cpu: "500m"
           env:
             - name: ACCESS_KEY
               valueFrom:
@@ -82,8 +82,9 @@ spec:
                 secretKeyRef:
                   name: shots-secret
                   key: SECRET_KEY
+        imagePullSecrets:
+          - name: regcred
       restartPolicy: Always
-status: {}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
