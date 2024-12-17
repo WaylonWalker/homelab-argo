@@ -82,8 +82,8 @@ spec:
                 secretKeyRef:
                   name: shots-secret
                   key: SECRET_KEY
-        imagePullSecrets:
-          - name: regcred
+      imagePullSecrets:
+        - name: regcred
       restartPolicy: Always
 ---
 apiVersion: networking.k8s.io/v1
