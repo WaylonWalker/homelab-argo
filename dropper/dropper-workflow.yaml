@@ -97,6 +97,9 @@ spec:
                             items:
                               - key: .dockerconfigjson
                                 path: config.json
+                  - name: build-secret
+                    secret:
+                      secretName: build-secret
                 templates:
                   - name: main
                     steps:
@@ -118,16 +121,22 @@ spec:
                       command: [bash]
                       source: |
                         set -euxo pipefail
-                        git clone --depth 1 --branch main https://github.com/waylonwalker/dropper.git repo
+                        GITHUB_TOKEN=$(cat /github/token)
+                        git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/waylonwalker/dropper.git repo
                         cd repo
                         uvx ruff check .
+                      volumeMounts:
+                        - name: build-secret
+                          mountPath: /github
+                          readOnly: true
                   - name: get-version
                     script:
                       image: registry.wayl.one/uv:latest
                       command: [bash]
                       source: |
                         set -euxo pipefail
-                        git clone --depth 1 --branch main https://github.com/waylonwalker/dropper.git repo
+                        GITHUB_TOKEN=$(cat /github/token)
+                        git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/waylonwalker/dropper.git repo
                         cd repo
                         version=$(python -c "from dropper.__about__ import __version__; print(__version__)")
                         echo $version
@@ -135,6 +144,10 @@ spec:
                         COMMIT_SHA=$(git rev-parse HEAD)
                         echo $COMMIT_SHA > /tmp/commit-sha.txt
                         echo $version > /tmp/version.txt
+                      volumeMounts:
+                        - name: build-secret
+                          mountPath: /github
+                          readOnly: true
                       imagePullPolicy: Always
                     outputs:
                       parameters:
@@ -151,8 +164,9 @@ spec:
                         - name: commit-sha
                     container:
                       image: gcr.io/kaniko-project/executor:debug
+                      command: ["/kaniko/executor"]
                       args:
-                        - --context=git://github.com/waylonwalker/dropper.git#refs/heads/main
+                        - --context=https://$(cat /github/token)@github.com/waylonwalker/dropper.git#refs/heads/main
                         - --destination=registry.wayl.one/dropper:{{inputs.parameters.version}}
                         - --destination=registry.wayl.one/dropper:{{inputs.parameters.commit-sha}}
                         - --dockerfile=Dockerfile
@@ -162,3 +176,7 @@ spec:
                       volumeMounts:
                         - name: container-config
                           mountPath: /kaniko/.docker
+                          readOnly: true
+                        - name: build-secret
+                          mountPath: /github
+                          readOnly: true
