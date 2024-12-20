@@ -17,14 +17,14 @@ spec:
   jobTemplate:
     spec:
       template:
-        tolerations:
-          - key: "performance"
-            operator: "Equal"
-            value: "low"
-            effect: "NoSchedule"
-        nodeSelector:
-          kubernetes.io/hostname: falcon-fx6860
         spec:
+          tolerations:
+            - key: "performance"
+              operator: "Equal"
+              value: "low"
+              effect: "NoSchedule"
+          nodeSelector:
+            kubernetes.io/hostname: falcon-fx6860
           containers:
             - name: reader-container
               image: registry.wayl.one/reader-waylonwalker-com:0.2.8
