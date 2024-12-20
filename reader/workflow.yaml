@@ -1,92 +1,92 @@
-apiVersion: argoproj.io/v1alpha1
-kind: CronWorkflow
-metadata:
-  name: reader-waylonwalker-com-deploy-cron
-  namespace: reader
-spec:
-  schedule: "0 * * * *" # Runs every hour
-  concurrencyPolicy: "Replace"
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 3
-  workflowSpec:
-    entrypoint: deploy-reader-pipeline
-    serviceAccountName: reader
-    templates:
-      - name: deploy-reader-pipeline
-        steps:
-          - - name: build
-              template: build
-          - - name: ls-workspace
-              template: ls-workspace
-              # - name: deploy
-              #   template: deploy
-      - name: build
-        container:
-          image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
-          command: ["sh", "-c"]
-          args:
-            - |
-              echo 'workingDir: /workspace'
-              ls /workspace
-              echo
-              echo 'whats in /app'
-              ls /app
-              cp /app/* /workspace
-
-              echo
-              echo 'whats in /workspace'
-              ls /workspace
-
-              echo
-              echo 'starting build'
-
-              mkdir -p markout
-              markata build
-          workingDir: /workspace
-          env:
-            - name: HOME
-              value: /workspace
-          volumeMounts:
-            - name: workspace
-              mountPath: /workspace
-      - name: ls-workspace
-        container:
-          image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
-          command: ["sh", "-c"]
-          args:
-            - |
-              echo
-              echo 'whats in /workspace'
-              ls /workspace
-          workingDir: /workspace
-          env:
-            - name: HOME
-              value: /workspace
-          volumeMounts:
-            - name: workspace
-              mountPath: /workspace
-      - name: deploy
-        dependencies: ["build"]
-        container:
-          image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
-          command: ["sh", "-c"]
-          args:
-            - |
-              wrangler pages deploy markout \
-                --project-name reader-waylonwalker-com \
-                --branch markout
-          workingDir: /workspace
-          env:
-            - name: HOME
-              value: /workspace
-            - name: CLOUDFLARE_API_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: reader-secret
-                  key: cloudflare-secret
-          volumeMounts:
-            - name: workspace
-              mountPath: /workspace
-    volumes:
-      - name: workspace
-        emptyDir: {}
+# apiVersion: argoproj.io/v1alpha1
+# kind: CronWorkflow
+# metadata:
+#   name: reader-waylonwalker-com-deploy-cron
+#   namespace: reader
+# spec:
+#   schedule: "0 * * * *" # Runs every hour
+#   concurrencyPolicy: "Replace"
+#   successfulJobsHistoryLimit: 3
+#   failedJobsHistoryLimit: 3
+#   workflowSpec:
+#     entrypoint: deploy-reader-pipeline
+#     serviceAccountName: reader
+#     templates:
+#       - name: deploy-reader-pipeline
+#         steps:
+#           - - name: build
+#               template: build
+#           - - name: ls-workspace
+#               template: ls-workspace
+#               # - name: deploy
+#               #   template: deploy
+#       - name: build
+#         container:
+#           image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
+#           command: ["sh", "-c"]
+#           args:
+#             - |
+#               echo 'workingDir: /workspace'
+#               ls /workspace
+#               echo
+#               echo 'whats in /app'
+#               ls /app
+#               cp /app/* /workspace
+#
+#               echo
+#               echo 'whats in /workspace'
+#               ls /workspace
+#
+#               echo
+#               echo 'starting build'
+#
+#               mkdir -p markout
+#               markata build
+#           workingDir: /workspace
+#           env:
+#             - name: HOME
+#               value: /workspace
+#           volumeMounts:
+#             - name: workspace
+#               mountPath: /workspace
+#       - name: ls-workspace
+#         container:
+#           image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
+#           command: ["sh", "-c"]
+#           args:
+#             - |
+#               echo
+#               echo 'whats in /workspace'
+#               ls /workspace
+#           workingDir: /workspace
+#           env:
+#             - name: HOME
+#               value: /workspace
+#           volumeMounts:
+#             - name: workspace
+#               mountPath: /workspace
+#       - name: deploy
+#         dependencies: ["build"]
+#         container:
+#           image: docker.io/waylonwalker/reader-waylonwalker-com:0.2.6
+#           command: ["sh", "-c"]
+#           args:
+#             - |
+#               wrangler pages deploy markout \
+#                 --project-name reader-waylonwalker-com \
+#                 --branch markout
+#           workingDir: /workspace
+#           env:
+#             - name: HOME
+#               value: /workspace
+#             - name: CLOUDFLARE_API_TOKEN
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: reader-secret
+#                   key: cloudflare-secret
+#           volumeMounts:
+#             - name: workspace
+#               mountPath: /workspace
+#     volumes:
+#       - name: workspace
+#         emptyDir: {}
