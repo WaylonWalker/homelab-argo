@@ -11,7 +11,7 @@ spec:
   capacity:
     storage: 5Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany # Ensure your use case allows this, as hostPath is node-specific
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
@@ -27,7 +27,7 @@ spec:
   volumeName: markata-cache-pv
   storageClassName: hostpath
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   resources:
     requests:
