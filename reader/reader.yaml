@@ -1,9 +1,33 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  creationTimestamp: null
   name: reader
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: markata-cache-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/reader/markata-cache
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: markata-cache-pvc
   namespace: reader
+spec:
+  volumeName: markata-cache-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -23,17 +47,22 @@ spec:
               operator: "Equal"
               value: "low"
               effect: "NoSchedule"
-          nodeSelector:
-            kubernetes.io/hostname: falcon-fx6860
+          volumes:
+            - name: markata-cache
+              persistentVolumeClaim:
+                claimName: markata-cache-pvc
           containers:
             - name: reader-container
-              image: registry.wayl.one/reader-waylonwalker-com:0.2.8
+              image: registry.wayl.one/reader-waylonwalker-com:0.2.9
               env:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
                     secretKeyRef:
                       name: reader-secret
                       key: cloudflare-secret
+              volumeMounts:
+                - name: markata-cache
+                  mountPath: /app/.markata.cache
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
