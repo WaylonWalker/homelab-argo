@@ -9,12 +9,14 @@ metadata:
   name: markata-cache-pv
 spec:
   capacity:
-    storage: 1Gi
+    storage: 5Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
   hostPath:
     path: /mnt/vault/nfs/general/pv/reader/markata-cache
+    type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -23,6 +25,7 @@ metadata:
   namespace: reader
 spec:
   volumeName: markata-cache-pv
+  storageClassName: hostpath
   accessModes:
     - ReadWriteOnce
   resources:
