@@ -15,7 +15,6 @@ spec:
     service: www-fokais
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -25,7 +24,6 @@ metadata:
   namespace: www-fokais
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,7 +46,7 @@ spec:
         service: www-fokais
     spec:
       containers:
-        - image: docker.io/fokais/fokais:www-fokais-0.1.0
+        - image: registry.wayl.one:www-fokais-0.1.0
           name: www-fokais
           ports:
             - containerPort: 80
@@ -58,7 +56,6 @@ spec:
         - name: regcred
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -92,7 +89,6 @@ spec:
             pathType: Prefix
 status:
   loadBalancer: {}
-
 ---
 apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
