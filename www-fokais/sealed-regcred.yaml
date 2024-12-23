@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: www-fokais
+spec:
+  encryptedData:
+    .dockerconfigjson: AgATfwjznF5u9igak0ufv9d1014InyjsohuES7MsVt6aTzblaiNPjrea6nIbUuL3nz1w+NyYeOP0rqAyOIVDpCK94tkh54IUT1z8YgTWQkwzp93lV6yF/J+oVRRAoB/wT6w02vTorRI6M337QaZWet6aS73lFWX4s8w1woFwfIlBpBAf5cgH3v243XAZTszEt9rGiQSOHNbb+TX2GKmAGrMQBBYPlclC4gHMp4jSPN2ShwExEoTzdSSGKfzY76g7aXgqrlqwmwpt+qB4o5XEpHnT/QF3R6Xm6IGPwu2gUV+m5nQnCDl79FLBJcvNhb+d7HtOTbUlOMPyHMpysyddMnq+KUz+hP2lEamQNYlaTrZtGlLDDcxKN7KWepo45h+EK2V7Zbx+jmu2tTh/0qWou3gr26elnQClakm4qIyrj5L02V44ixzdF/4evrch7C9/qfL2odc7Xp1Sg2YqqrM+7MgUPUufV5HO04MdqKK/eAuFJ17KnnEyRfx6dagmaaHdD4ityuP3+rZP6EGlo60QMMGRSHiP5FTw99tjwlyxLQdh5eEbojVD0S72gH0Is5+YKwKRAQEHSPAXLn0zF+5RzKRlQpgYhT4uDlKN6jv97tGS5QTX2xyLXVmukC1bLo/xyfblFL1iithVPvKWMvF3rStlTC9dsTfdEFtxtfEHCvNt3bW3u19QZ5IS5zDMDN1HKhcY9EfX3ktUlY2Xl/3TxgGkkmO9FB1hWNhHNa/m7tYe78JWtsJirWcwbGgSXGiEkQ0+KARO/vYn3YG8OxGtPcWwSq2cuhTL79vyg4Tf/MsUI6NWuSxmHVUgA0M5skNdGNJpg23F+tZTCA==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: regcred
+      namespace: www-fokais
+    type: kubernetes.io/dockerconfigjson
