@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: l-fokais
+  name: 1-fokais
   namespace: argocd
 spec:
   project: default
