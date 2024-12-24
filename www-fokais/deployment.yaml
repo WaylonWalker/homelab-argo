@@ -46,7 +46,7 @@ spec:
         service: www-fokais
     spec:
       containers:
-        - image: registry.wayl.one:www-fokais-0.1.0
+        - image: registry.wayl.one/www-fokais:0.1.0
           name: www-fokais
           ports:
             - containerPort: 80
