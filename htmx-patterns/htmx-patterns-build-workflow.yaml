@@ -1,0 +1,182 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventBus
+metadata:
+  name: default
+  namespace: build
+spec:
+  nats:
+    native:
+      replicas: 1
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: htmx-patterns-github-eventsource
+  namespace: build
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - htmx-patterns-github-eventsource.wayl.one
+      secretName: htmx-patterns-github-eventsource-tls
+  rules:
+    - host: htmx-patterns-github-eventsource.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: htmx-patterns-github-eventsource-svc
+                port:
+                  number: 12000
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: htmx-patterns-github
+  namespace: build
+spec:
+  service:
+    ports:
+      - port: 12000
+        targetPort: 12000
+  github:
+    htmx-patterns:
+      owner: waylonwalker
+      repository: htmx-patterns
+      webhook:
+        endpoint: /webhook
+        port: "12000"
+        method: POST
+        url: https://htmx-patterns-github-eventsource.wayl.one/webhook
+      events:
+        - push
+      active: true
+      contentType: json
+      insecure: true
+      branches:
+        - "main"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: htmx-patterns-github
+  namespace: build
+spec:
+  template:
+    serviceAccountName: waylon
+  dependencies:
+    - name: htmx-patterns-github-dep
+      eventSourceName: htmx-patterns-github
+      eventName: htmx-patterns
+  triggers:
+    - template:
+        name: htmx-patterns-workflow-trigger
+        k8s:
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: htmx-patterns-build-
+                namespace: build
+              spec:
+                entrypoint: main
+                serviceAccountName: waylon
+                imagePullSecrets:
+                  - name: regcred
+                volumes:
+                  - name: container-config
+                    projected:
+                      sources:
+                        - secret:
+                            name: regcred
+                            items:
+                              - key: .dockerconfigjson
+                                path: config.json
+                  - name: build-secret
+                    secret:
+                      secretName: build-secret
+                templates:
+                  - name: main
+                    steps:
+                      - - name: lint
+                          template: lint
+                      - - name: get-version
+                          template: get-version
+                      - - name: container-build
+                          template: container-build
+                          arguments:
+                            parameters:
+                              - name: commit-sha
+                                value: "{{steps.get-version.outputs.parameters.commit-sha}}"
+                              - name: version
+                                value: "{{steps.get-version.outputs.parameters.version}}"
+                  - name: lint
+                    script:
+                      image: registry.wayl.one/uv:latest
+                      command: [bash]
+                      source: |
+                        set -euxo pipefail
+                        GITHUB_TOKEN=$(cat /github/token)
+                        git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/waylonwalker/htmx-patterns.git repo
+                        cd repo
+                        uvx ruff check .
+                      volumeMounts:
+                        - name: build-secret
+                          mountPath: /github
+                          readOnly: true
+                  - name: get-version
+                    script:
+                      image: registry.wayl.one/uv:latest
+                      command: [bash]
+                      source: |
+                        set -euxo pipefail
+                        GITHUB_TOKEN=$(cat /github/token)
+                        git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/waylonwalker/htmx-patterns.git repo
+                        cd repo
+                        version=$(python -c "from htmx_patterns.__about__ import __version__; print(__version__)")
+                        echo $version
+                        echo {{image}}:$version
+                        COMMIT_SHA=$(git rev-parse HEAD)
+                        echo $COMMIT_SHA > /tmp/commit-sha.txt
+                        echo $version > /tmp/version.txt
+                      volumeMounts:
+                        - name: build-secret
+                          mountPath: /github
+                          readOnly: true
+                      imagePullPolicy: Always
+                    outputs:
+                      parameters:
+                        - name: version
+                          valueFrom:
+                            path: /tmp/version.txt
+                        - name: commit-sha
+                          valueFrom:
+                            path: /tmp/commit-sha.txt
+                  - name: container-build
+                    inputs:
+                      parameters:
+                        - name: version
+                        - name: commit-sha
+                    container:
+                      image: gcr.io/kaniko-project/executor:debug
+                      command: ["/kaniko/executor"]
+                      args:
+                        - --context=https://$(cat /github/token)@github.com/waylonwalker/htmx-patterns.git#refs/heads/main
+                        - --destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.version}}
+                        - --destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.commit-sha}}
+                        - --dockerfile=Dockerfile
+                      env:
+                        - name: DOCKER_CONFIG
+                          value: "/kaniko/.docker"
+                      volumeMounts:
+                        - name: container-config
+                          mountPath: /kaniko/.docker
+                          readOnly: true
+                        - name: build-secret
+                          mountPath: /github
+                          readOnly: true
