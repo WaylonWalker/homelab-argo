@@ -108,8 +108,7 @@ spec:
                       command: [bash]
                       source: |
                         set -euxo pipefail
-                        GITHUB_TOKEN=$(cat /github/token)
-                        git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/waylonwalker/htmx-patterns.git repo
+                        git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
                         cd repo
                         uvx ruff check .
                   - name: get-version
@@ -118,8 +117,7 @@ spec:
                       command: [bash]
                       source: |
                         set -euxo pipefail
-                        GITHUB_TOKEN=$(cat /github/token)
-                        git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/waylonwalker/htmx-patterns.git repo
+                        git clone --depth 1 --branch main https://github.com/waylonwalker/htmx-patterns.git repo
                         cd repo
                         version=$(python -c "from htmx_patterns.__about__ import __version__; print(__version__)")
                         echo $version
