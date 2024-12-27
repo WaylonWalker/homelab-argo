@@ -143,7 +143,7 @@ spec:
                       image: gcr.io/kaniko-project/executor:debug
                       command: ["/kaniko/executor"]
                       args:
-                        - --context=https://@github.com/waylonwalker/htmx-patterns.git#refs/heads/main
+                        - --context=https://github.com/waylonwalker/htmx-patterns.git#refs/heads/main
                         - --destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.version}}
                         - --destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.commit-sha}}
                         - --dockerfile=Dockerfile
