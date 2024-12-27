@@ -1,13 +1,3 @@
-apiVersion: argoproj.io/v1alpha1
-kind: EventBus
-metadata:
-  name: default
-  namespace: build
-spec:
-  nats:
-    native:
-      replicas: 1
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
