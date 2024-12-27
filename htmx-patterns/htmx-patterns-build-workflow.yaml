@@ -97,9 +97,6 @@ spec:
                             items:
                               - key: .dockerconfigjson
                                 path: config.json
-                  - name: build-secret
-                    secret:
-                      secretName: build-secret
                 templates:
                   - name: main
                     steps:
@@ -125,10 +122,6 @@ spec:
                         git clone --depth 1 --branch main https://${GITHUB_TOKEN}@github.com/waylonwalker/htmx-patterns.git repo
                         cd repo
                         uvx ruff check .
-                      volumeMounts:
-                        - name: build-secret
-                          mountPath: /github
-                          readOnly: true
                   - name: get-version
                     script:
                       image: registry.wayl.one/uv:latest
@@ -144,10 +137,6 @@ spec:
                         COMMIT_SHA=$(git rev-parse HEAD)
                         echo $COMMIT_SHA > /tmp/commit-sha.txt
                         echo $version > /tmp/version.txt
-                      volumeMounts:
-                        - name: build-secret
-                          mountPath: /github
-                          readOnly: true
                       imagePullPolicy: Always
                     outputs:
                       parameters:
@@ -166,7 +155,7 @@ spec:
                       image: gcr.io/kaniko-project/executor:debug
                       command: ["/kaniko/executor"]
                       args:
-                        - --context=https://$(cat /github/token)@github.com/waylonwalker/htmx-patterns.git#refs/heads/main
+                        - --context=https://@github.com/waylonwalker/htmx-patterns.git#refs/heads/main
                         - --destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.version}}
                         - --destination=registry.wayl.one/htmx-patterns:{{inputs.parameters.commit-sha}}
                         - --dockerfile=Dockerfile
@@ -176,7 +165,4 @@ spec:
                       volumeMounts:
                         - name: container-config
                           mountPath: /kaniko/.docker
-                          readOnly: true
-                        - name: build-secret
-                          mountPath: /github
                           readOnly: true
