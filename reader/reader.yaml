@@ -64,9 +64,9 @@ spec:
                     secretKeyRef:
                       name: reader-secret
                       key: cloudflare-secret
-              volumeMounts:
-                - name: markata-cache
-                  mountPath: /app/.markata.cache
+                      # volumeMounts:
+                      #   - name: markata-cache
+                      #     mountPath: /app/.markata.cache
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
