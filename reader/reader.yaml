@@ -51,10 +51,10 @@ spec:
               operator: "Equal"
               value: "low"
               effect: "NoSchedule"
-          volumes:
-            - name: markata-cache
-              persistentVolumeClaim:
-                claimName: markata-cache-pvc
+          # volumes:
+          #   - name: markata-cache
+          #     persistentVolumeClaim:
+          #       claimName: markata-cache-pvc
           containers:
             - name: reader-container
               image: registry.wayl.one/reader-waylonwalker-com:0.2.11
