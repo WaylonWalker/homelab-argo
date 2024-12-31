@@ -67,7 +67,7 @@ spec:
                 key: db-password
 
           - name: REDIS_HOST
-            value: "redis.example.local"
+            value: "immich-redis-master.immich.svc.cluster.local"
           - name: REDIS_PORT
             value: "6379"
 
