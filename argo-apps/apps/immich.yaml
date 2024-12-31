@@ -51,25 +51,6 @@ spec:
         # 3) DB and Redis config
         #    (example references external instances)
         # -------------------------------------------------
-        env:
-          - name: DB_HOST
-            value: "postgres.example.local"
-          - name: DB_DATABASE_NAME
-            value: "immich"
-          - name: DB_PORT
-            value: "5432"
-          - name: DB_USERNAME
-            value: "immich"
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: immich-secret
-                key: db-password
-
-          - name: REDIS_HOST
-            value: "immich-redis-master.immich.svc.cluster.local"
-          - name: REDIS_PORT
-            value: "6379"
 
         # -------------------------------------------------
         # 4) Ingress for immich.wayl.one
@@ -95,6 +76,8 @@ spec:
           architecture: standalone
           auth:
             enabled: false
+        postgresql:
+          enabled: true
         machine-learning:
           enabled: true
           image:
