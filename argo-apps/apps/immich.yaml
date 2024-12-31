@@ -90,8 +90,12 @@ spec:
                   paths:
                     - path: "/"
               tls: []
-
-        machine-learning:
+          redis:
+            enabled: false
+            architecture: standalone
+            auth:
+              enabled: false
+                  machine-learning:
           enabled: true
           image:
             repository: ghcr.io/immich-app/immich-machine-learning
