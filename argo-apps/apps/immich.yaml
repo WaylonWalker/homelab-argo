@@ -39,12 +39,13 @@ spec:
         image:
           tag: v1.119.0
 
+        immich:
         # -------------------------------------------------
         # 2) Persistence: point to the existing PVC
         # -------------------------------------------------
-        persistence:
-          library:
-            existingClaim: "immich-library"
+          persistence:
+            library:
+              existingClaim: "immich-library"
 
         # -------------------------------------------------
         # 3) DB and Redis config
@@ -71,41 +72,38 @@ spec:
         # -------------------------------------------------
         # 4) Ingress for immich.wayl.one
         # -------------------------------------------------
-        ingress:
-          api:
-            enabled: true
-            hosts:
-              - host: immich.wayl.one
-                paths:
-                  - path: /api
-                    pathType: Prefix
-            # Uncomment for TLS:
-            # tls:
-            #   - secretName: immich-tls
-            #     hosts:
-            #       - immich.wayl.one
+        server: 
+          enabled: true
+          image:
+            repository: ghcr.io/immich-app/immich-server
+            pullPolicy: IfNotPresent
+          ingress:
+            main:
+              enabled: true
+              annotations:
+                # proxy-body-size is set to 0 to remove the body limit on file uploads
+                nginx.ingress.kubernetes.io/proxy-body-size: "0"
+              hosts:
+                - host: immich.wayl.one
+                  paths:
+                    - path: "/"
+              tls: []
 
-          web:
-            enabled: true
-            hosts:
-              - host: immich.wayl.one
-                paths:
-                  - path: /
-                    pathType: Prefix
-            # Uncomment for TLS:
-            # tls:
-            #   - secretName: immich-tls
-            #     hosts:
-            #       - immich.wayl.one
-
-        # -------------------------------------------------
-        # 5) Base URLs for Immich
-        # -------------------------------------------------
-        server:
-          config:
-            environment:
-              APP_BASE_URL: "https://immich.wayl.one"
-              APP_SERVER_URL: "https://immich.wayl.one/api"
+        machine-learning:
+          enabled: true
+          image:
+            repository: ghcr.io/immich-app/immich-machine-learning
+            pullPolicy: IfNotPresent
+          env:
+            TRANSFORMERS_CACHE: /cache
+          persistence:
+            cache:
+              enabled: true
+              size: 10Gi
+              # Optional: Set this to pvc to avoid downloading the ML models every start.
+              type: emptyDir
+              accessMode: ReadWriteMany
+              # storageClass: your-class
   destination:
     namespace: immich
     server: https://kubernetes.default.svc
