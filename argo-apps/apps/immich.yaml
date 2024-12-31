@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: immich
+  name: immich-pvc
   namespace: argocd
 spec:
   project: default
@@ -18,3 +18,98 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: immich
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://immich-app.github.io/immich-charts
+    chart: immich
+    targetRevision: latest
+    helm:
+      releaseName: immich
+      values: |
+        # -------------------------------------------------
+        # 1) Required: specify the Immich image tag
+        # -------------------------------------------------
+        image:
+          tag: "1.71.1"  # pick the exact version you want
+
+        # -------------------------------------------------
+        # 2) Persistence: point to the existing PVC
+        # -------------------------------------------------
+        persistence:
+          library:
+            existingClaim: "immich-library"
+
+        # -------------------------------------------------
+        # 3) DB and Redis config
+        #    (example references external instances)
+        # -------------------------------------------------
+        env:
+          - name: DB_HOST
+            value: "postgres.example.local"
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_USERNAME
+            value: "immich"
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: immich-secrets
+                key: db-password
+
+          - name: REDIS_HOST
+            value: "redis.example.local"
+          - name: REDIS_PORT
+            value: "6379"
+
+        # -------------------------------------------------
+        # 4) Ingress for immich.wayl.one
+        # -------------------------------------------------
+        ingress:
+          api:
+            enabled: true
+            hosts:
+              - host: immich.wayl.one
+                paths:
+                  - path: /api
+                    pathType: Prefix
+            # Uncomment for TLS:
+            # tls:
+            #   - secretName: immich-tls
+            #     hosts:
+            #       - immich.wayl.one
+
+          web:
+            enabled: true
+            hosts:
+              - host: immich.wayl.one
+                paths:
+                  - path: /
+                    pathType: Prefix
+            # Uncomment for TLS:
+            # tls:
+            #   - secretName: immich-tls
+            #     hosts:
+            #       - immich.wayl.one
+
+        # -------------------------------------------------
+        # 5) Base URLs for Immich
+        # -------------------------------------------------
+        server:
+          config:
+            environment:
+              APP_BASE_URL: "https://immich.wayl.one"
+              APP_SERVER_URL: "https://immich.wayl.one/api"
+  destination:
+    namespace: immich
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
