@@ -1,303 +1,303 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: immich
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: immich-upload-pv
-  namespace: immich
-spec:
-  storageClassName: ""
-  capacity:
-    storage: 100Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /mnt/tank/nfs/general/immich/immich-upload-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: immich-upload-pvc
-  namespace: immich
-spec:
-  storageClassName: ""
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Gi
-  volumeName: immich-upload-pv
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: immich-model-cache-pv
-  namespace: immich
-spec:
-  storageClassName: ""
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /mnt/tank/nfs/general/immich/immich-model-cache-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: immich-model-cache-pvc
-  namespace: immich
-spec:
-  storageClassName: ""
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  volumeName: immich-model-cache-pv
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: immich-db-data-pv
-  namespace: immich
-spec:
-  storageClassName: ""
-  capacity:
-    storage: 50Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /mnt/tank/nfs/general/immich/immich-db-data-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: immich-db-data-pvc
-  namespace: immich
-spec:
-  storageClassName: ""
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 50Gi
-  volumeName: immich-db-data-pv
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: immich-database
-  namespace: immich
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: immich-database
-  template:
-    metadata:
-      labels:
-        app: immich-database
-    spec:
-      containers:
-        - name: immich-database
-          image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0
-          env:
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  name: immich-env
-                  key: DB_PASSWORD
-            - name: POSTGRES_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: immich-env
-                  key: DB_USERNAME
-            - name: POSTGRES_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: immich-env
-                  key: DB_DATABASE_NAME
-          volumeMounts:
-            - name: db-data-storage
-              mountPath: /var/lib/postgresql/data
-      volumes:
-        - name: db-data-storage
-          persistentVolumeClaim:
-            claimName: immich-db-data-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: immich-database
-  namespace: immich
-spec:
-  ports:
-    - port: 5432
-      targetPort: 5432
-  selector:
-    app: immich-database
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: immich-redis
-  namespace: immich
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: immich-redis
-  template:
-    metadata:
-      labels:
-        app: immich-redis
-    spec:
-      containers:
-        - name: immich-redis
-          image: redis:6.2-alpine
-          livenessProbe:
-            exec:
-              command:
-                - redis-cli
-                - ping
-          readinessProbe:
-            exec:
-              command:
-                - redis-cli
-                - ping
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: immich-redis
-  namespace: immich
-spec:
-  ports:
-    - port: 6379
-      targetPort: 6379
-  selector:
-    app: immich-redis
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: immich-machine-learning
-  namespace: immich
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: immich-machine-learning
-  template:
-    metadata:
-      labels:
-        app: immich-machine-learning
-    spec:
-      containers:
-        - name: immich-machine-learning
-          image: ghcr.io/immich-app/immich-machine-learning:release
-          volumeMounts:
-            - name: model-cache-storage
-              mountPath: /cache
-          envFrom:
-            - configMapRef:
-                name: immich-env
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 3001
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 3001
-      volumes:
-        - name: model-cache-storage
-          persistentVolumeClaim:
-            claimName: immich-model-cache-pvc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: immich-server
-  namespace: immich
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: immich-server
-  template:
-    metadata:
-      labels:
-        app: immich-server
-    spec:
-      containers:
-        - name: immich-server
-          image: ghcr.io/immich-app/immich-server:release
-          ports:
-            - containerPort: 2283
-          volumeMounts:
-            - name: upload-storage
-              mountPath: /usr/src/app/upload
-            - name: timezone-config
-              mountPath: /etc/localtime
-              readOnly: true
-          envFrom:
-            - configMapRef:
-                name: immich-env
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 2283
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 2283
-      volumes:
-        - name: upload-storage
-          persistentVolumeClaim:
-            claimName: immich-upload-pvc
-        - name: timezone-config
-          hostPath:
-            path: /etc/localtime
-            type: FileOrCreate
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: immich-env
-  namespace: immich
-  labels:
-    app: immich
-  data:
-    DB_USERNAME: postgres
-    DB_PASSWORD: changeme
-    DB_DATABASE_NAME: immich
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: immich-ingress
-  namespace: immich
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-spec:
-  rules:
-    - host: immich.wayl.one
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: immich-server
-                port:
-                  number: 2283
-  tls:
-    - hosts:
-        - immich.wayl.one
-      secretName: immich-tls
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: immich
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: immich-upload-pv
+#   namespace: immich
+# spec:
+#   storageClassName: ""
+#   capacity:
+#     storage: 100Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: /mnt/tank/nfs/general/immich/immich-upload-pvc
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: immich-upload-pvc
+#   namespace: immich
+# spec:
+#   storageClassName: ""
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 100Gi
+#   volumeName: immich-upload-pv
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: immich-model-cache-pv
+#   namespace: immich
+# spec:
+#   storageClassName: ""
+#   capacity:
+#     storage: 10Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: /mnt/tank/nfs/general/immich/immich-model-cache-pvc
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: immich-model-cache-pvc
+#   namespace: immich
+# spec:
+#   storageClassName: ""
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 10Gi
+#   volumeName: immich-model-cache-pv
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: immich-db-data-pv
+#   namespace: immich
+# spec:
+#   storageClassName: ""
+#   capacity:
+#     storage: 50Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: /mnt/tank/nfs/general/immich/immich-db-data-pvc
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: immich-db-data-pvc
+#   namespace: immich
+# spec:
+#   storageClassName: ""
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 50Gi
+#   volumeName: immich-db-data-pv
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: immich-database
+#   namespace: immich
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: immich-database
+#   template:
+#     metadata:
+#       labels:
+#         app: immich-database
+#     spec:
+#       containers:
+#         - name: immich-database
+#           image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0
+#           env:
+#             - name: POSTGRES_PASSWORD
+#               valueFrom:
+#                 configMapKeyRef:
+#                   name: immich-env
+#                   key: DB_PASSWORD
+#             - name: POSTGRES_USER
+#               valueFrom:
+#                 configMapKeyRef:
+#                   name: immich-env
+#                   key: DB_USERNAME
+#             - name: POSTGRES_DB
+#               valueFrom:
+#                 configMapKeyRef:
+#                   name: immich-env
+#                   key: DB_DATABASE_NAME
+#           volumeMounts:
+#             - name: db-data-storage
+#               mountPath: /var/lib/postgresql/data
+#       volumes:
+#         - name: db-data-storage
+#           persistentVolumeClaim:
+#             claimName: immich-db-data-pvc
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: immich-database
+#   namespace: immich
+# spec:
+#   ports:
+#     - port: 5432
+#       targetPort: 5432
+#   selector:
+#     app: immich-database
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: immich-redis
+#   namespace: immich
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: immich-redis
+#   template:
+#     metadata:
+#       labels:
+#         app: immich-redis
+#     spec:
+#       containers:
+#         - name: immich-redis
+#           image: redis:6.2-alpine
+#           livenessProbe:
+#             exec:
+#               command:
+#                 - redis-cli
+#                 - ping
+#           readinessProbe:
+#             exec:
+#               command:
+#                 - redis-cli
+#                 - ping
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: immich-redis
+#   namespace: immich
+# spec:
+#   ports:
+#     - port: 6379
+#       targetPort: 6379
+#   selector:
+#     app: immich-redis
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: immich-machine-learning
+#   namespace: immich
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: immich-machine-learning
+#   template:
+#     metadata:
+#       labels:
+#         app: immich-machine-learning
+#     spec:
+#       containers:
+#         - name: immich-machine-learning
+#           image: ghcr.io/immich-app/immich-machine-learning:release
+#           volumeMounts:
+#             - name: model-cache-storage
+#               mountPath: /cache
+#           envFrom:
+#             - configMapRef:
+#                 name: immich-env
+#           livenessProbe:
+#             httpGet:
+#               path: /health
+#               port: 3001
+#           readinessProbe:
+#             httpGet:
+#               path: /health
+#               port: 3001
+#       volumes:
+#         - name: model-cache-storage
+#           persistentVolumeClaim:
+#             claimName: immich-model-cache-pvc
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: immich-server
+#   namespace: immich
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: immich-server
+#   template:
+#     metadata:
+#       labels:
+#         app: immich-server
+#     spec:
+#       containers:
+#         - name: immich-server
+#           image: ghcr.io/immich-app/immich-server:release
+#           ports:
+#             - containerPort: 2283
+#           volumeMounts:
+#             - name: upload-storage
+#               mountPath: /usr/src/app/upload
+#             - name: timezone-config
+#               mountPath: /etc/localtime
+#               readOnly: true
+#           envFrom:
+#             - configMapRef:
+#                 name: immich-env
+#           livenessProbe:
+#             httpGet:
+#               path: /
+#               port: 2283
+#           readinessProbe:
+#             httpGet:
+#               path: /
+#               port: 2283
+#       volumes:
+#         - name: upload-storage
+#           persistentVolumeClaim:
+#             claimName: immich-upload-pvc
+#         - name: timezone-config
+#           hostPath:
+#             path: /etc/localtime
+#             type: FileOrCreate
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: immich-env
+#   namespace: immich
+#   labels:
+#     app: immich
+#   data:
+#     DB_USERNAME: postgres
+#     DB_PASSWORD: changeme
+#     DB_DATABASE_NAME: immich
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: immich-ingress
+#   namespace: immich
+#   annotations:
+#     kubernetes.io/ingress.class: nginx
+#     cert-manager.io/cluster-issuer: letsencrypt-prod
+# spec:
+#   rules:
+#     - host: immich.wayl.one
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: immich-server
+#                 port:
+#                   number: 2283
+#   tls:
+#     - hosts:
+#         - immich.wayl.one
+#       secretName: immich-tls
