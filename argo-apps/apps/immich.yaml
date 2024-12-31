@@ -45,7 +45,7 @@ spec:
         # -------------------------------------------------
           persistence:
             library:
-              existingClaim: "immich-library"
+              existingClaim: "immich-library-pvc"
 
         # -------------------------------------------------
         # 3) DB and Redis config
