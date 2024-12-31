@@ -29,7 +29,7 @@ spec:
   source:
     repoURL: https://immich-app.github.io/immich-charts
     chart: immich
-    targetRevision: latest
+    targetRevision: 0.9.0
     helm:
       releaseName: immich
       values: |
@@ -37,7 +37,7 @@ spec:
         # 1) Required: specify the Immich image tag
         # -------------------------------------------------
         image:
-          tag: "1.71.1"  # pick the exact version you want
+          tag: v1.119.0
 
         # -------------------------------------------------
         # 2) Persistence: point to the existing PVC
