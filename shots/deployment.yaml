@@ -72,6 +72,8 @@ spec:
             limits:
               cpu: "500m"
           env:
+            - name: ENV
+              value: "prod"
             - name: ACCESS_KEY
               valueFrom:
                 secretKeyRef:
