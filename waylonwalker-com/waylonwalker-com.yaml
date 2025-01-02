@@ -64,9 +64,9 @@ spec:
                     secretKeyRef:
                       name: waylonwalker-com-secret
                       key: cloudflare-secret
-              volumeMounts:
-                - name: site
-                  mountPath: /site
+                      # volumeMounts:
+                      #   - name: site
+                      #     mountPath: /site
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
