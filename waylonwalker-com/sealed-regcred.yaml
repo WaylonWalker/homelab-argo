@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: waylonwalker-com
+spec:
+  encryptedData:
+    .dockerconfigjson: AgANIFJKela3RZLBFTRstm6ZZsjz3Zqw0Cbg6TEfvH0wnD5aF8yXpqmqTo0kr9k/D8CBpR1qP/YRnwm/Fzhpeu3kbLbWOgaVYhGmir9/2Zf/I40Ik7QeS3saCwdAMxS14roD2s9g53ESW2u/u7kNl7QmsXsJO56M6Uf/L2GfpI5uoziinE4JehegDOFHZLbwLcsHD4mDiG0N9u/EwUgtjEqpbkH3mdz6CoCOIhLUz8XwaviRaHz3CmzFRIhHFAHieiFF9L5kRDo6cPXo5xyoqoDXA1FCI04lBdXgH7++aXtqgYFE3csJmY9sdYzk6hapROUtmvahvI1OPUKXep0jAyJ3t0OEkQ9+Cajrfy3iKbgm/LEeWJUQeOOsUrYp6afUIKfmA9QhIQULLZIU720pA+C/zOREgZ3qGkDbG4KJX+eHN7dGDyRkNTDXZ916Wzg5BCa462JC2CuAboHEtrwrrH6Jg9N1YPuIWpuU670BuI37HyPFuJHBF3MXGHrbWqyeV4XGsb4Sh7DeDybePC64vXX5OVd0ta7ljh94HwwLlYI0G1W7Sg07gxKLO0sFZKYzb+wgKY+zoqPRYYoUtI3EIo0/CWqofLplhWL9xaKpHqUEe84hoPfr3E++C1BhvYle7dR1KWUNcM8e6ZxFs76ufv0/iBgT4bKu354Zg9WTkNewSqnVjTA25cfSWdDKVoHaoHlqC7WCytNt0wmcL+Gk5UvwALeUPKmPimVBj4SePKc1EDLCKqsF/LZBO7aJOHoQhFgxsilo3JnC2HOJXlRb8RCbA/+VkJhe9CLuCBRS/BBz3HuPtTgFVqd4Zo2MJryTQCiPyXZYcY7Zsw==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: regcred
+      namespace: waylonwalker-com
+    type: kubernetes.io/dockerconfigjson
