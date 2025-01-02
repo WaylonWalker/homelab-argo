@@ -15,7 +15,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/vault/nfs/general/pv/waylonwalker-com/site
+    # path: /mnt/vault/nfs/general/pv/waylonwalker-com/site
     path: /var/home/core/waylonwalker-com
     type: DirectoryOrCreate
 ---
