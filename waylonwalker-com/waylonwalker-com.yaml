@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: waylonwalker-com
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: site-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany # Ensure your use case allows this, as hostPath is node-specific
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/waylonwalker-com/site
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: site-pvc
+  namespace: waylonwalker-com
+spec:
+  volumeName: site-pv
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: waylonwalker-com-cronjob
+  namespace: waylonwalker-com
+spec:
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 6
+  failedJobsHistoryLimit: 6
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          tolerations:
+            - key: "performance"
+              operator: "Equal"
+              value: "low"
+              effect: "NoSchedule"
+          volumes:
+            - name: site
+              persistentVolumeClaim:
+                claimName: site-pvc
+          containers:
+            - name: waylonwalker-com-container
+              image: registry.wayl.one/waylonwalker-com:29
+              env:
+                - name: CLOUDFLARE_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: waylonwalker-com-secret
+                      key: cloudflare-secret
+              volumeMounts:
+                - name: site
+                  mountPath: /site
+          imagePullSecrets:
+            - name: regcred
+          restartPolicy: OnFailure

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: waylonwalker-com
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: waylonwalker-com
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: waylonwalker-com
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
