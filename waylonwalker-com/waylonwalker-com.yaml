@@ -16,6 +16,7 @@ spec:
   storageClassName: hostpath
   hostPath:
     path: /mnt/vault/nfs/general/pv/waylonwalker-com/site
+    path: /var/home/core/waylonwalker-com
     type: DirectoryOrCreate
 ---
 apiVersion: v1
@@ -64,9 +65,9 @@ spec:
                     secretKeyRef:
                       name: waylonwalker-com-secret
                       key: cloudflare-secret
-                      # volumeMounts:
-                      #   - name: site
-                      #     mountPath: /site
+              volumeMounts:
+                - name: site
+                  mountPath: /site
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
