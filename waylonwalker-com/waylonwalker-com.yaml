@@ -91,7 +91,7 @@ spec:
                 claimName: site-pvc
           containers:
             - name: markata-clean-container
-              image: registry.wayl.one/markata-clean:latest
+              image: registry.wayl.one/waylonwalker-com:38
               command: ["markata", "clean"]
               volumeMounts:
                 - name: site
