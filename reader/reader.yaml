@@ -57,7 +57,7 @@ spec:
           #       claimName: markata-cache-pvc
           containers:
             - name: reader-container
-              image: registry.wayl.one/reader-waylonwalker-com:0.2.11
+              image: registry.wayl.one/reader-waylonwalker-com:0.2.13
               env:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
