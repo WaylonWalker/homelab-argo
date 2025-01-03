@@ -40,7 +40,7 @@ metadata:
   name: waylonwalker-com-cronjob
   namespace: waylonwalker-com
 spec:
-  schedule: "0 * * * *"
+  schedule: "0/10 * * * *"
   successfulJobsHistoryLimit: 6
   failedJobsHistoryLimit: 6
   jobTemplate:
