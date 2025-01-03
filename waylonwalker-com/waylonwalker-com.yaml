@@ -93,6 +93,7 @@ spec:
             - name: markata-clean-container
               image: registry.wayl.one/waylonwalker-com:38
               command: ["markata", "clean"]
+              workingDir: /site
               volumeMounts:
                 - name: site
                   mountPath: /site
