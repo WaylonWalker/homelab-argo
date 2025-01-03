@@ -15,8 +15,8 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    # path: /mnt/vault/nfs/general/pv/waylonwalker-com/site
-    path: /var/home/core/waylonwalker-com
+    path: /mnt/vault/nfs/general/pv/waylonwalker-com/site
+    # path: /var/home/core/waylonwalker-com
     type: DirectoryOrCreate
 ---
 apiVersion: v1
@@ -48,10 +48,10 @@ spec:
       template:
         spec:
           tolerations:
-            - key: "performance"
-              operator: "Equal"
-              value: "low"
-              effect: "NoSchedule"
+          # - key: "performance"
+          #   operator: "Equal"
+          #   value: "low"
+          #   effect: "NoSchedule"
           volumes:
             - name: site
               persistentVolumeClaim:
