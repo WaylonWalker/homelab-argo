@@ -71,3 +71,31 @@ spec:
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: markata-clean-cronjob
+  namespace: waylonwalker-com
+spec:
+  schedule: "0 0 * * *" # Midnight every day
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: site
+              persistentVolumeClaim:
+                claimName: site-pvc
+          containers:
+            - name: markata-clean-container
+              image: registry.wayl.one/markata-clean:latest
+              command: ["markata", "clean"]
+              volumeMounts:
+                - name: site
+                  mountPath: /site
+          imagePullSecrets:
+            - name: regcred
+          restartPolicy: OnFailure
