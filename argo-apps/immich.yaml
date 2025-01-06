@@ -1,0 +1,45 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: immich
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://immich-app.github.io/immich-charts
+#     chart: immich
+#     targetRevision: 0.8.5
+#     helm:
+#       values: |
+#         immich:
+#           persistence:
+#             library:
+#               existingClaim: immich-library-pvc
+#             typesense:
+#               existingClaim: immich-typesense-pvc
+#             redis:
+#               existingClaim: immich-redis-pvc
+#             postgres:
+#               existingClaim: immich-postgres-pvc
+#         env:
+#           REDIS_HOSTNAME: immich-redis-master.immich.svc.cluster.local
+#         redis:
+#           enabled: true
+#         server:
+#           enabled: true
+#           ingress:
+#             main:
+#               enabled: true
+#               annotations:
+#                 cert-manager.io/cluster-issuer: letsencrypt-prod
+#               hosts:
+#                 - host: immich.wayl.one
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: immich
+#   syncPolicy:
+#     automated:
+#       selfHeal: true
+#       prune: true
+#     syncOptions:
+#       - CreateNamespace=true
