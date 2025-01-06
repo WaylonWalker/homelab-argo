@@ -1,15 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: immich-pvc
+  name: immich-aio
   namespace: argocd
 spec:
   project: default
   destination:
-    namespace: immich
+    namespace: immich-aio
     server: https://kubernetes.default.svc
   source:
-    path: k8s/immich
+    path: immich-aio
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
@@ -18,102 +18,123 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: immich
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://immich-app.github.io/immich-charts
-    chart: immich
-    targetRevision: 0.9.0
-    helm:
-      releaseName: immich
-      values: |
-        # -------------------------------------------------
-        # 1) Required: specify the Immich image tag
-        # -------------------------------------------------
-        image:
-          tag: v1.119.0
-
-        immich:
-        # -------------------------------------------------
-        # 2) Persistence: point to the existing PVC
-        # -------------------------------------------------
-          persistence:
-            library:
-              existingClaim: "immich-library-pvc"
-
-        # -------------------------------------------------
-        # 3) DB and Redis config
-        #    (example references external instances)
-        # -------------------------------------------------
-        env:
-          - name: DB_HOST
-            value: "postgres.example.local"
-          - name: DB_DATABASE_NAME
-            value: "immich"
-          - name: DB_PORT
-            value: "5432"
-          - name: DB_USERNAME
-            value: "immich"
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: immich-secret
-                key: db-password
-
-          - name: REDIS_HOSTNAME
-            value: "immich-redis-master.immich.svc.cluster.local"
-          - name: REDIS_PORT
-            value: "6379"
-
-        # -------------------------------------------------
-        # 4) Ingress for immich.wayl.one
-        # -------------------------------------------------
-        server: 
-          enabled: true
-          image:
-            repository: ghcr.io/immich-app/immich-server
-            pullPolicy: IfNotPresent
-          ingress:
-            main:
-              enabled: true
-              annotations:
-                # proxy-body-size is set to 0 to remove the body limit on file uploads
-                nginx.ingress.kubernetes.io/proxy-body-size: "0"
-              hosts:
-                - host: immich.wayl.one
-                  paths:
-                    - path: "/"
-              tls: []
-        redis:
-          enabled: true
-          architecture: standalone
-          auth:
-            enabled: false
-        machine-learning:
-          enabled: true
-          image:
-            repository: ghcr.io/immich-app/immich-machine-learning
-            pullPolicy: IfNotPresent
-          env:
-            TRANSFORMERS_CACHE: /cache
-          persistence:
-            cache:
-              enabled: true
-              size: 10Gi
-              # Optional: Set this to pvc to avoid downloading the ML models every start.
-              type: emptyDir
-              accessMode: ReadWriteMany
-              # storageClass: your-class
-  destination:
-    namespace: immich
-    server: https://kubernetes.default.svc
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: immich-pvc
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: immich
+#     server: https://kubernetes.default.svc
+#   source:
+#     path: k8s/immich
+#     repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       selfHeal: true
+#       prune: true
+#     syncOptions:
+#       - CreateNamespace=true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: immich
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://immich-app.github.io/immich-charts
+#     chart: immich
+#     targetRevision: 0.9.0
+#     helm:
+#       releaseName: immich
+#       values: |
+#         # -------------------------------------------------
+#         # 1) Required: specify the Immich image tag
+#         # -------------------------------------------------
+#         image:
+#           tag: v1.119.0
+#
+#         immich:
+#         # -------------------------------------------------
+#         # 2) Persistence: point to the existing PVC
+#         # -------------------------------------------------
+#           persistence:
+#             library:
+#               existingClaim: "immich-library-pvc"
+#
+#         # -------------------------------------------------
+#         # 3) DB and Redis config
+#         #    (example references external instances)
+#         # -------------------------------------------------
+#         env:
+#           - name: DB_HOST
+#             value: "postgres.example.local"
+#           - name: DB_DATABASE_NAME
+#             value: "immich"
+#           - name: DB_PORT
+#             value: "5432"
+#           - name: DB_USERNAME
+#             value: "immich"
+#           - name: DB_PASSWORD
+#             valueFrom:
+#               secretKeyRef:
+#                 name: immich-secret
+#                 key: db-password
+#
+#           - name: REDIS_HOSTNAME
+#             value: "immich-redis-master.immich.svc.cluster.local"
+#           - name: REDIS_PORT
+#             value: "6379"
+#
+#         # -------------------------------------------------
+#         # 4) Ingress for immich.wayl.one
+#         # -------------------------------------------------
+#         server: 
+#           enabled: true
+#           image:
+#             repository: ghcr.io/immich-app/immich-server
+#             pullPolicy: IfNotPresent
+#           ingress:
+#             main:
+#               enabled: true
+#               annotations:
+#                 # proxy-body-size is set to 0 to remove the body limit on file uploads
+#                 nginx.ingress.kubernetes.io/proxy-body-size: "0"
+#               hosts:
+#                 - host: immich.wayl.one
+#                   paths:
+#                     - path: "/"
+#               tls: []
+#         redis:
+#           enabled: true
+#           architecture: standalone
+#           auth:
+#             enabled: false
+#         machine-learning:
+#           enabled: true
+#           image:
+#             repository: ghcr.io/immich-app/immich-machine-learning
+#             pullPolicy: IfNotPresent
+#           env:
+#             TRANSFORMERS_CACHE: /cache
+#           persistence:
+#             cache:
+#               enabled: true
+#               size: 10Gi
+#               # Optional: Set this to pvc to avoid downloading the ML models every start.
+#               type: emptyDir
+#               accessMode: ReadWriteMany
+#               # storageClass: your-class
+#   destination:
+#     namespace: immich
+#     server: https://kubernetes.default.svc
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true

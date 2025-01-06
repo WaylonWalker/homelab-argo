@@ -1,0 +1,273 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: immich
+  name: immich
+  namespace: immich-aio
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: immich
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: postgres14
+  name: postgres14
+  namespace: immich-aio
+spec:
+  ports:
+    - name: "5432"
+      port: 5432
+      targetPort: 5432
+  selector:
+    io.kompose.service: postgres14
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: redis
+  name: redis
+  namespace: immich-aio
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+  selector:
+    io.kompose.service: redis
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: immich-aio
+  namespace: immich-aio
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: immich
+  name: immich
+  namespace: immich-aio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: immich
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+        kompose.version: 1.35.0 (9532ceef3)
+      labels:
+        io.kompose.service: immich
+    spec:
+      containers:
+        - env:
+            - name: DB_DATABASE_NAME
+              value: immich
+            - name: DB_HOSTNAME
+              value: 192.168.1.x
+            - name: DB_PASSWORD
+              value: postgres
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USERNAME
+              value: postgres
+            - name: MACHINE_LEARNING_HOST
+              value: 0.0.0.0
+            - name: MACHINE_LEARNING_PORT
+              value: "3003"
+            - name: MACHINE_LEARNING_WORKERS
+              value: "1"
+            - name: MACHINE_LEARNING_WORKER_TIMEOUT
+              value: "120"
+            - name: PGID
+              value: "1000"
+            - name: PUID
+              value: "1000"
+            - name: REDIS_HOSTNAME
+              value: 192.168.1.x
+            - name: REDIS_PASSWORD
+            - name: REDIS_PORT
+              value: "6379"
+            - name: TZ
+              value: Etc/UTC
+          image: ghcr.io/imagegenius/immich:latest
+          name: immich
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: immich-config
+            - mountPath: /photos
+              name: immich-photos
+            - mountPath: /libraries
+              name: immich-libraries
+      restartPolicy: Always
+      volumes:
+        - name: immich-config
+          persistentVolumeClaim:
+            claimName: immich-config
+        - name: immich-photos
+          persistentVolumeClaim:
+            claimName: immich-photos
+        - name: immich-libraries
+          persistentVolumeClaim:
+            claimName: immich-libraries
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: immich-config
+  name: immich-config
+  namespace: immich-aio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: immich-photos
+  name: immich-photos
+  namespace: immich-aio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: immich-libraries
+  name: immich-libraries
+  namespace: immich-aio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: postgres14
+  name: postgres14
+  namespace: immich-aio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: postgres14
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+        kompose.version: 1.35.0 (9532ceef3)
+      labels:
+        io.kompose.service: postgres14
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: immich
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_USER
+              value: postgres
+          image: tensorchord/pgvecto-rs:pg14-v0.2.0
+          name: postgres14
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      restartPolicy: Always
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: postgres-data
+  name: postgres-data
+  namespace: immich-aio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: redis
+  name: redis
+  namespace: immich-aio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -n immich-aio -o deployment.yaml
+        kompose.version: 1.35.0 (9532ceef3)
+      labels:
+        io.kompose.service: redis
+    spec:
+      containers:
+        - image: redis
+          name: redis
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+      restartPolicy: Always
