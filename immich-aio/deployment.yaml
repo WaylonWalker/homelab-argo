@@ -271,3 +271,32 @@ spec:
             - containerPort: 6379
               protocol: TCP
       restartPolicy: Always
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    service: immich
+  name: immich
+  namespace: immich-aio
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: immich.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: immich
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - frigate.wayl.one
+      secretName: immich-cert-tls
+status:
+  loadBalancer: {}
