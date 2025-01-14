@@ -45,7 +45,7 @@ spec:
         service: dropper-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.7
+        - image: registry.wayl.one/dropper:0.0.8
           name: dropper-wayl-one
           ports:
             - containerPort: 8000
@@ -84,11 +84,11 @@ spec:
                 secretKeyRef:
                   name: dropper-secret
                   key: AWS_SECRET_ACCESS_KEY
-            - name: AWS_BUCKET_NAME
+            - name: AWS_BUCKET
               valueFrom:
                 secretKeyRef:
                   name: dropper-secret
-                  key: AWS_BUCKET_NAME
+                  key: AWS_BUCKET
             - name: AWS_REGION
               valueFrom:
                 secretKeyRef:
