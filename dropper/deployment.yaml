@@ -84,7 +84,7 @@ spec:
                 secretKeyRef:
                   name: dropper-secret
                   key: AWS_SECRET_ACCESS_KEY
-            - name: AWS_BUCKET
+            - name: AWS_BUCKET_NAME
               value: dropper
             - name: AWS_REGION
               valueFrom:
