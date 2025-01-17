@@ -87,11 +87,6 @@ spec:
                 secretKeyRef:
                   name: shots-secret
                   key: SECRET_KEY
-            - name: AWS_SERVER_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: shots-secret
-                  key: AWS_SERVER_HOST
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
