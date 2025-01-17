@@ -61,8 +61,8 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        # - image: registry.wayl.one/shot-scraper-api:0.0.6
-        - image: registry.wayl.one/shot-scraper-api:0.0.10
+        - image: registry.wayl.one/shot-scraper-api:0.0.6
+          # - image: registry.wayl.one/shot-scraper-api:0.0.10
           name: shot-wayl-one
           ports:
             - containerPort: 5000
