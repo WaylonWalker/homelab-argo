@@ -61,7 +61,8 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.6
+        # - image: registry.wayl.one/shot-scraper-api:0.0.6
+        - image: registry.wayl.one/shot-scraper-api:0.0.10
           name: shot-wayl-one
           ports:
             - containerPort: 5000
@@ -86,6 +87,36 @@ spec:
                 secretKeyRef:
                   name: shots-secret
                   key: SECRET_KEY
+            - name: AWS_SERVER_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: AWS_SERVER_HOST
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: AWS_BUCKET_NAME
+            - name: AWS_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: AWS_ENDPOINT_URL
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: AWS_REGION
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: AWS_SECRET_ACCESS_KEY
       imagePullSecrets:
         - name: regcred
       imagePullPolicy: Always
