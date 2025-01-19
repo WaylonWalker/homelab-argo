@@ -109,10 +109,7 @@ spec:
                   name: shots-secret
                   key: AWS_ENDPOINT_URL
             - name: AWS_REGION
-              valueFrom:
-                secretKeyRef:
-                  name: shots-secret
-                  key: AWS_REGION
+              value: 'us-east-1'
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
