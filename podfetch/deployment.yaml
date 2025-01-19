@@ -57,7 +57,7 @@ spec:
             - name: POLLING_INTERVAL
               value: "60"
             - name: SERVER_URL
-              value: http://localhost:80
+              value: https://podfetch.wayl.one
           image: samuel19982/podfetch:latest
           name: podfetch
           ports:
