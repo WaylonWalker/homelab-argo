@@ -94,6 +94,16 @@ spec:
                 name: podgrab
                 port:
                   number: 8080
+            path: /settings
+            pathType: Prefix
+            # Apply basic auth only for /settings
+            annotations:
+              traefik.ingress.kubernetes.io/router.middlewares: basic-auth-basic-auth@kubernetescrd
+          - backend:
+              service:
+                name: podgrab
+                port:
+                  number: 8080
             path: /
             pathType: Prefix
 ---
