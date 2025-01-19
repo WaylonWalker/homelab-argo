@@ -81,8 +81,6 @@ spec:
               value: 'https://minio.wayl.one'
             - name: BUCKET_NAME
               value: 'shots'
-            - name: AWS_BUCKET_NAME
-              value: 'shots'
             - name: ACCESS_KEY
               valueFrom:
                 secretKeyRef:
