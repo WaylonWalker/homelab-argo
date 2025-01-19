@@ -61,9 +61,9 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        # - image: registry.wayl.one/shot-scraper-api:0.0.6
-        # - image: registry.wayl.one/shot-scraper-api:0.0.13
-        - image: registry.wayl.one/shot-scraper-api:0.0.15
+        - image: registry.wayl.one/shot-scraper-api:0.0.6
+          # - image: registry.wayl.one/shot-scraper-api:0.0.13
+          # - image: registry.wayl.one/shot-scraper-api:0.0.15
           name: shot-wayl-one
           ports:
             - containerPort: 5000
@@ -157,7 +157,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: shot-wayl-one
-  minReplicas: 5
+  minReplicas: 1
   maxReplicas: 10
   metrics:
     - type: Resource
