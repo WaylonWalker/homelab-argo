@@ -62,7 +62,8 @@ spec:
     spec:
       containers:
         # - image: registry.wayl.one/shot-scraper-api:0.0.6
-        - image: registry.wayl.one/shot-scraper-api:0.0.13
+        # - image: registry.wayl.one/shot-scraper-api:0.0.13
+        - image: registry.wayl.one/shot-scraper-api:0.0.14
           name: shot-wayl-one
           ports:
             - containerPort: 5000
@@ -70,17 +71,17 @@ spec:
           resources:
             requests:
               cpu: "200m"
-              memory: "256Mi"
+              memory: "300Mi"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "200m"
+              memory: "2Gi"
           env:
             - name: ENV
               value: "prod"
             - name: MINIO_URL
               value: 'https://minio.wayl.one'
             - name: BUCKET_NAME
-              value: 'shots'
+              value: 'shots-dev'
             - name: ACCESS_KEY
               valueFrom:
                 secretKeyRef:
@@ -156,7 +157,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: shot-wayl-one
-  minReplicas: 1
+  minReplicas: 2
   maxReplicas: 10
   metrics:
     - type: Resource
@@ -165,3 +166,33 @@ spec:
         target:
           type: Utilization
           averageUtilization: 50
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cache
+  namespace: shot
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+  volumeName: pv-hostpath-general-cache
+  storageClassName: hostpath
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath-general-cache
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteMany # Ensure your use case allows this, as hostPath is node-specific
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/shots/cache
+    type: DirectoryOrCreate
