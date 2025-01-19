@@ -120,7 +120,6 @@ spec:
                   key: AWS_SECRET_ACCESS_KEY
       imagePullSecrets:
         - name: regcred
-      imagePullPolicy: Always
       restartPolicy: Always
 ---
 apiVersion: networking.k8s.io/v1
