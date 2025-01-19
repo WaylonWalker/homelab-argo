@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n podgrab -o deployment.yaml
+    kompose.service.expose: podgrab.wayl.one
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: podgrab
+  name: podgrab
+  namespace: podgrab
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: podgrab
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: podgrab
+  namespace: podgrab
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n podgrab -o deployment.yaml
+    kompose.service.expose: podgrab.wayl.one
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: podgrab
+  name: podgrab
+  namespace: podgrab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: podgrab
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -n podgrab -o deployment.yaml
+        kompose.service.expose: podgrab.wayl.one
+        kompose.version: 1.35.0 (9532ceef3)
+      labels:
+        io.kompose.service: podgrab
+    spec:
+      containers:
+        - env:
+            - name: CHECK_FREQUENCY
+              value: "240"
+          image: akhilrex/podgrab
+          name: podgrab
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /assets
+              name: data
+      restartPolicy: Always
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: config
+        - name: data
+          persistentVolumeClaim:
+            claimName: data
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -n podgrab -o deployment.yaml
+    kompose.service.expose: podgrab.wayl.one
+    kompose.version: 1.35.0 (9532ceef3)
+  labels:
+    io.kompose.service: podgrab
+  name: podgrab
+  namespace: podgrab
+spec:
+  rules:
+    - host: podgrab.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: podgrab
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: config
+  name: config
+  namespace: podgrab
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1000Mi
+  volumeName: pv-hostpath-general-podgrab-config
+  storageClassName: hostpath
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath-general-podgrab-config
+  namespace: podgrab
+spec:
+  capacity:
+    storage: 1000Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/podgrab/config
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: data
+  name: data
+  namespace: podgrab
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: pv-hostpath-general-podgrab-data
+  storageClassName: hostpath
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath-general-podgrab-data
+  namespace: podgrab
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/podgrab/data
+    type: DirectoryOrCreate
