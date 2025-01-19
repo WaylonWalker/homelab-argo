@@ -63,9 +63,9 @@ spec:
           ports:
             - containerPort: 8000
               protocol: TCP
-          securityContext:
-            runAsGroup: 1000
-            runAsUser: 1000
+          # securityContext:
+          #   runAsGroup: 1000
+          #   runAsUser: 1000
           volumeMounts:
             - mountPath: /app/podcasts
               name: podfetch-podcasts
