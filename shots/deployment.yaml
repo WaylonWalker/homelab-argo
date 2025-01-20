@@ -61,9 +61,10 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.6
-          # - image: registry.wayl.one/shot-scraper-api:0.0.13
-          # - image: registry.wayl.one/shot-scraper-api:0.0.15
+        # - image: registry.wayl.one/shot-scraper-api:0.0.6
+        # - image: registry.wayl.one/shot-scraper-api:0.0.13
+        # - image: registry.wayl.one/shot-scraper-api:0.0.15
+        - image: registry.wayl.one/shot-scraper-api:0.0.16
           name: shot-wayl-one
           ports:
             - containerPort: 5000
@@ -78,6 +79,8 @@ spec:
           env:
             - name: ENV
               value: "prod"
+            - name: CACHE_DIR
+              value: '/cache'
             - name: MINIO_URL
               value: 'https://minio.wayl.one'
             - name: BUCKET_NAME
@@ -114,9 +117,16 @@ spec:
                 secretKeyRef:
                   name: shots-secret
                   key: AWS_SECRET_ACCESS_KEY
+          volumeMounts:
+            - mountPath: /cache
+              name: cache
       imagePullSecrets:
         - name: regcred
       restartPolicy: Always
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: cache
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
