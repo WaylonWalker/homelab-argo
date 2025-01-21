@@ -151,7 +151,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 50Gi
+      storage: 10Gi
   volumeName: pv-hostpath-general-podgrab-data
   storageClassName: hostpath
 ---
