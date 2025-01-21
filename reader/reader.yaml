@@ -39,6 +39,8 @@ metadata:
   namespace: reader
 spec:
   schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 60
   successfulJobsHistoryLimit: 6
   failedJobsHistoryLimit: 6
   jobTemplate:
@@ -69,3 +71,4 @@ spec:
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
+          activeDeadlineSeconds: 60
