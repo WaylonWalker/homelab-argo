@@ -96,14 +96,6 @@ spec:
                 name: podgrab
                 port:
                   number: 8080
-            path: /settings
-            pathType: Prefix
-            # Apply basic auth only for /settings
-          - backend:
-              service:
-                name: podgrab
-                port:
-                  number: 8080
             path: /
             pathType: Prefix
 ---
