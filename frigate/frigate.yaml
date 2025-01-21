@@ -19,7 +19,8 @@ spec:
       port: 8554
     - name: "webrtc"
       port: 8555
-    - port: 8555
+    - name: "8555-udp"
+      port: 8555
       protocol: UDP
   type: ClusterIP
   selector:
