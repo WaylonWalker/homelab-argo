@@ -84,6 +84,8 @@ metadata:
     io.kompose.service: podgrab
   name: podgrab
   namespace: podgrab
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: basic-auth-basic-auth@kubernetescrd
 spec:
   rules:
     - host: podgrab.wayl.one
@@ -97,8 +99,6 @@ spec:
             path: /settings
             pathType: Prefix
             # Apply basic auth only for /settings
-            annotations:
-              traefik.ingress.kubernetes.io/router.middlewares: basic-auth-basic-auth@kubernetescrd
           - backend:
               service:
                 name: podgrab
