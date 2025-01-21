@@ -20,7 +20,6 @@ spec:
       labels:
         app: whoami
     spec:
-      replicas: 2
       containers:
         - name: whoami
           imagePullPolicy: Always
