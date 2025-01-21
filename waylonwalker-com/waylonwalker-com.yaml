@@ -29,7 +29,6 @@ spec:
   storageClassName: hostpath
   accessModes:
     - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
   resources:
     requests:
       storage: 5Gi
