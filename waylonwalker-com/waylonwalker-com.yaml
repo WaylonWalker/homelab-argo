@@ -40,6 +40,8 @@ metadata:
   namespace: waylonwalker-com
 spec:
   schedule: "0/10 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 60
   successfulJobsHistoryLimit: 6
   failedJobsHistoryLimit: 6
   jobTemplate:
@@ -70,6 +72,7 @@ spec:
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
+          activeDeadlineSeconds: 900
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -78,6 +81,8 @@ metadata:
   namespace: waylonwalker-com
 spec:
   schedule: "0 0 * * *" # Midnight every day
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 60
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   jobTemplate:
@@ -99,3 +104,4 @@ spec:
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
+          activeDeadlineSeconds: 60
