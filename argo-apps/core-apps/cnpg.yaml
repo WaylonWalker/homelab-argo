@@ -9,9 +9,12 @@ spec:
     server: https://kubernetes.default.svc
     namespace: cloudnative-pg
   source:
-    path: releases/cnpg-1.25.0.yaml
-    repoURL: https://github.com/cloudnative-pg/cloudnative-pg
-    targetRevision: HEAD
+    chart: cloudnative-pg
+    repoURL: https://charts.cloudnative-pg.io
+    targetRevision: 1.25.0
+    # path: releases/cnpg-1.25.0.yaml
+    # repoURL: https://github.com/cloudnative-pg/cloudnative-pg
+    # targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true
