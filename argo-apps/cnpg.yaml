@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudnative-pg-operator
+  namespace: argocd # Change if ArgoCD is installed in a different namespace
+spec:
+  project: default # Adjust the project name as needed
+  source:
+    repoURL: https://raw.githubusercontent.com/cloudnative-pg/artifacts/release-1.17/manifests/
+    path: operator-manifest.yaml
+    targetRevision: HEAD
+    helm: {} # Remove if not using Helm
+  destination:
+    server: https://kubernetes.default.svc # Target Kubernetes cluster
+    namespace: cloudnative-pg # Adjust the namespace as needed
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
