@@ -69,11 +69,11 @@ spec:
               protocol: TCP
           resources:
             requests:
-              cpu: "200m"
+              cpu: "100m"
               memory: "300Mi"
             limits:
-              cpu: "200m"
-              memory: "2Gi"
+              cpu: "500m"
+              memory: "4Gi"
           env:
             - name: ENV
               value: "prod"
