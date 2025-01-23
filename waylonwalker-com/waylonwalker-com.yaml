@@ -72,7 +72,7 @@ spec:
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
-          activeDeadlineSeconds: 900
+          activeDeadlineSeconds: 3600
 ---
 apiVersion: batch/v1
 kind: CronJob
