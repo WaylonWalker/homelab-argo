@@ -40,7 +40,7 @@ metadata:
 spec:
   schedule: "0 * * * *"
   concurrencyPolicy: Forbid
-  startingDeadlineSeconds: 60
+  startingDeadlineSeconds: 120
   successfulJobsHistoryLimit: 6
   failedJobsHistoryLimit: 6
   jobTemplate:
@@ -71,4 +71,4 @@ spec:
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
-          activeDeadlineSeconds: 60
+          activeDeadlineSeconds: 1800
