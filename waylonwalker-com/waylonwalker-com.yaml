@@ -59,7 +59,7 @@ spec:
                 claimName: site-pvc
           containers:
             - name: waylonwalker-com-container
-              image: registry.wayl.one/waylonwalker-com:40
+              image: registry.wayl.one/waylonwalker-com:41
               env:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
