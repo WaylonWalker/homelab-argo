@@ -24,7 +24,7 @@ spec:
           - name: k8s-pages
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
-            minioURL: "minio.minio.svc.cluster.local:9000"
+            minioURL: "https://minio.wayl.one"
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             # Error Page
@@ -34,7 +34,7 @@ spec:
           - name: config-editor
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
-            minioURL: "minio.minio.svc.cluster.local:9000"
+            minioURL: "https://minio.wayl.one"
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             # Error Page
