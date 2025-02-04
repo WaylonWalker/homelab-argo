@@ -1,0 +1,27 @@
+# The namespace where all resources will be created.
+namespace: k8s-pages
+# Number of replicas for the deployment.
+replicaCount: 1
+# List of sites to configure.
+bucket: "k8s-pages"
+sites:
+  - name: k8s-pages
+    host: wayl.one
+    # URL to which the proxy_pass should direct traffic. (Include protocol and path)
+    minioURL: "minio.minio.svc.cluster.local:9000"
+    # The host header to set when proxying.
+    minioHost: "minio.wayl.one"
+    # Error Page
+    errorPage: "/404.html"
+    maxAge: 31536000
+    staleWhileRevalidate: 86400
+  - name: config-editor
+    host: wayl.one
+    # URL to which the proxy_pass should direct traffic. (Include protocol and path)
+    minioURL: "minio.minio.svc.cluster.local:9000"
+    # The host header to set when proxying.
+    minioHost: "minio.wayl.one"
+    # Error Page
+    errorPage: "/404.html"
+    maxAge: 31536000
+    staleWhileRevalidate: 86400
