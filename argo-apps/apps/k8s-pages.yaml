@@ -2,20 +2,49 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: k8s-pages
-  namespace: argocd
+  namespace: argocd # Namespace where Argo CD is installed.
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/waylonwalker/homelab-argo.git'
-    targetRevision: HEAD
-    path: k8s-pages
+    repoURL: 'https://github.com/waylonwalker/k8s-pages.git'
+    targetRevision: HEAD # Adjust if you need a specific branch, tag, or commit.
+    path: helm-chart # For example, if the chart root is at the repository’s root, use '.'
     helm:
-      valueFiles:
-        - values.yaml
+      # Instead of valueFiles, paste the contents of your values file inline here.
+      # You can copy the content from:
+      # https://github.com/waylonwalker/homelab-argo/blob/HEAD/k8s-pages/values.yaml
+      values: |
+        # The namespace where all resources will be created.
+        namespace: k8s-pages
+        # Number of replicas for the deployment.
+        replicaCount: 1
+        # List of sites to configure.
+        bucket: "k8s-pages"
+        sites:
+          - name: k8s-pages
+            host: wayl.one
+            # URL to which the proxy_pass should direct traffic. (Include protocol and path)
+            minioURL: "minio.minio.svc.cluster.local:9000"
+            # The host header to set when proxying.
+            minioHost: "minio.wayl.one"
+            # Error Page
+            errorPage: "/404.html"
+            maxAge: 31536000
+            staleWhileRevalidate: 86400
+          - name: config-editor
+            host: wayl.one
+            # URL to which the proxy_pass should direct traffic. (Include protocol and path)
+            minioURL: "minio.minio.svc.cluster.local:9000"
+            # The host header to set when proxying.
+            minioHost: "minio.wayl.one"
+            # Error Page
+            errorPage: "/404.html"
+            maxAge: 31536000
+            staleWhileRevalidate: 86400
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: k8s-pages
+    namespace: mypages # Target namespace where resources will be deployed.
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: true # Remove resources that are no longer tracked in Git.
+      selfHeal: true # Automatically correct any drift from the Git state.
