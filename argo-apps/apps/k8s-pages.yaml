@@ -20,6 +20,8 @@ spec:
         replicaCount: 1
         # List of sites to configure.
         bucket: "k8s-pages"
+        maxAge: '120960'
+        staleWhileRevalidate: '86400'
         sites:
           - name: k8s-pages
             host: wayl.one
@@ -29,8 +31,6 @@ spec:
             minioHost: "minio.wayl.one"
             # Error Page
             errorPage: "/404.html"
-            maxAge: 31536000
-            staleWhileRevalidate: 86400
           - name: config-editor
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -39,8 +39,6 @@ spec:
             minioHost: "minio.wayl.one"
             # Error Page
             errorPage: "/404.html"
-            maxAge: 31536000
-            staleWhileRevalidate: 86400
           - name: tic-tac-toe
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -48,8 +46,6 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
-            maxAge: 31536000
-            staleWhileRevalidate: 86400
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: mypages # Target namespace where resources will be deployed.
