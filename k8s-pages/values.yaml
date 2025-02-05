@@ -4,6 +4,8 @@ namespace: k8s-pages
 replicaCount: 1
 # List of sites to configure.
 bucket: "k8s-pages"
+maxAge: 1209600
+staleWhileRevalidate: 86400
 sites:
   - name: k8s-pages
     host: wayl.one
@@ -13,8 +15,6 @@ sites:
     minioHost: "minio.wayl.one"
     # Error Page
     errorPage: "/404.html"
-    maxAge: 31536000
-    staleWhileRevalidate: 86400
   - name: config-editor
     host: wayl.one
     # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -23,5 +23,3 @@ sites:
     minioHost: "minio.wayl.one"
     # Error Page
     errorPage: "/404.html"
-    maxAge: 31536000
-    staleWhileRevalidate: 86400
