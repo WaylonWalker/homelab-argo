@@ -47,7 +47,6 @@ spec:
             minioURL: "https://minio.wayl.one"
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
-            # Error Page
             errorPage: "/404.html"
             maxAge: 31536000
             staleWhileRevalidate: 86400
