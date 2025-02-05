@@ -41,6 +41,16 @@ spec:
             errorPage: "/404.html"
             maxAge: 31536000
             staleWhileRevalidate: 86400
+          - name: tic-tac-toe
+            host: wayl.one
+            # URL to which the proxy_pass should direct traffic. (Include protocol and path)
+            minioURL: "https://minio.wayl.one"
+            # The host header to set when proxying.
+            minioHost: "minio.wayl.one"
+            # Error Page
+            errorPage: "/404.html"
+            maxAge: 31536000
+            staleWhileRevalidate: 86400
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: mypages # Target namespace where resources will be deployed.
