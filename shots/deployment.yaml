@@ -163,7 +163,7 @@ spec:
     kind: Deployment
     name: shot-wayl-one
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 5
   metrics:
     - type: Resource
       resource:
