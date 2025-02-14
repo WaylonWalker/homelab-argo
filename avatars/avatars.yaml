@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: avatars
+  namespace: avatars
+spec: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  creationTimestamp: null
+  labels:
+    service: avatars-wayl-one
+  name: avatars-wayl-one
+  namespace: avatars
+spec:
+  ports:
+    - name: "8800"
+      port: 8800
+      targetPort: 8800
+  selector:
+    service: avatars-wayl-one
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: avatars-wayl-one
+  name: avatars-wayl-one
+  namespace: avatars
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: avatars-wayl-one
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: avatars-wayl-one
+    spec:
+      containers:
+        - image: registry.wayl.one/avatars:0.0.1
+          name: avatars-wayl-one
+          ports:
+            - containerPort: 8800
+              protocol: TCP
+          resources: {}
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always
+status: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  labels:
+    service: avatars-wayl-one
+  name: avatars-wayl-one
+  namespace: avatars
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: avatars.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: avatars-wayl-one
+                port:
+                  number: 8800
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - avatars.wayl.one
+      secretName: avatars-cert-tls
+status:
+  loadBalancer: {}

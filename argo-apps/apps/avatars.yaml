@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: avatars
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: avatars
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: avatars
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
