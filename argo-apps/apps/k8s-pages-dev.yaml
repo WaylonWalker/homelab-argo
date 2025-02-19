@@ -6,8 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/WaylonWalker/k8s-pages/releases/download/v2.0.0/k8s-pages-2.0.0.tgz'
-    targetRevision: 2.0.0 # Adjust if you need a specific branch, tag, or commit.
+    repoURL: 'https://github.com/waylonwalker/k8s-pages.git'
+    targetRevision: HEAD # Adjust if you need a specific branch, tag, or commit.
+    path: helm-chart # For example, if the chart root is at the repository’s root, use '.'
     helm:
       # Instead of valueFiles, paste the contents of your values file inline here.
       # You can copy the content from:
@@ -22,35 +23,13 @@ spec:
         maxAge: '120960'
         staleWhileRevalidate: '86400'
         sites:
-          - name: k8s-pages
+          - name: k8s-pages-dev
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
             minioURL: "https://minio.wayl.one"
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             # Error Page
-            errorPage: "/404.html"
-          - name: config-editor
-            host: wayl.one
-            # URL to which the proxy_pass should direct traffic. (Include protocol and path)
-            minioURL: "https://minio.wayl.one"
-            # The host header to set when proxying.
-            minioHost: "minio.wayl.one"
-            # Error Page
-            errorPage: "/404.html"
-          - name: tic-tac-toe
-            host: wayl.one
-            # URL to which the proxy_pass should direct traffic. (Include protocol and path)
-            minioURL: "https://minio.wayl.one"
-            # The host header to set when proxying.
-            minioHost: "minio.wayl.one"
-            errorPage: "/404.html"
-          - name: wwdev
-            host: wayl.one
-            # URL to which the proxy_pass should direct traffic. (Include protocol and path)
-            minioURL: "https://minio.wayl.one"
-            # The host header to set when proxying.
-            minioHost: "minio.wayl.one"
             errorPage: "/404.html"
   destination:
     server: 'https://kubernetes.default.svc'
