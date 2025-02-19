@@ -15,7 +15,7 @@ spec:
       # https://github.com/waylonwalker/homelab-argo/blob/HEAD/k8s-pages/values.yaml
       values: |
         # The namespace where all resources will be created.
-        namespace: k8s-pages
+        namespace: k8s-pages-dev
         # Number of replicas for the deployment.
         replicaCount: 1
         # List of sites to configure.
