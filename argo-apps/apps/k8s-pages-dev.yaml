@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: k8s-pages
+  name: k8s-pages-dev
   namespace: argocd # Namespace where Argo CD is installed.
 spec:
   project: default
