@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    chart: k8s-pages
-    repoURL: oci://ghcr.io/waylonwalker/charts
-    targetRevision: 2.0.0 # Adjust if you need a specific branch, tag, or commit.
+    repoURL: 'https://github.com/waylonwalker/k8s-pages.git'
+    targetRevision: v2.0.0 # Adjust if you need a specific branch, tag, or commit.
+    path: helm-chart # For example, if the chart root is at the repository’s root, use '.'
     helm:
       # Instead of valueFiles, paste the contents of your values file inline here.
       # You can copy the content from:
