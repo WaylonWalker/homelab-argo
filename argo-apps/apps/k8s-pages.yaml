@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     chart: k8s-pages
-    repoURL: oci://ghcr.io/waylonwalker/charts/k8s-pages
+    repoURL: oci://ghcr.io/waylonwalker/charts
     targetRevision: 2.0.0 # Adjust if you need a specific branch, tag, or commit.
     helm:
       # Instead of valueFiles, paste the contents of your values file inline here.
