@@ -6,6 +6,7 @@ metadata:
 spec:
   project: default
   source:
+    chart: k8s-pages
     repoURL: 'https://github.com/WaylonWalker/k8s-pages/releases/download/v2.0.0/k8s-pages-2.0.0.tgz'
     targetRevision: 2.0.0 # Adjust if you need a specific branch, tag, or commit.
     helm:
