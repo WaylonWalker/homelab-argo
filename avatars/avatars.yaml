@@ -43,7 +43,7 @@ spec:
         service: avatars-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/avatars:0.2.0
+        - image: registry.wayl.one/avatars:0.3.0
           name: avatars-wayl-one
           ports:
             - containerPort: 8800
