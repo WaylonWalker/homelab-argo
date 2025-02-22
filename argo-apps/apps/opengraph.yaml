@@ -15,12 +15,9 @@ spec:
       # Optional: Override values with parameters
       values: |
         name: opengraph
-        port: 8000
         image:
-            repository: registry.wayl.one
             name: opengraph
         tag: "0.0.1"
-        imagePullSecret: cluster-regcred
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: opengraph # Target namespace for deployment
