@@ -15,7 +15,7 @@ spec:
       # Optional: Override values with parameters
       values: |
         name: opengraph
-        port: 8800
+        port: 8000
         image:
             repository: registry.wayl.one
             name: opengraph
