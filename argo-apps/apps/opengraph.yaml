@@ -16,8 +16,8 @@ spec:
       values: |
         name: opengraph
         image:
-            name: opengraph
-        tag: "0.1.0"
+          name: opengraph
+          tag: "0.1.0"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: opengraph # Target namespace for deployment
