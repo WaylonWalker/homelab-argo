@@ -17,7 +17,7 @@ spec:
         name: avatars
         image:
           name: avatars
-          tag: "0.3.2"
+          tag: "0.3.3"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: avatars # Target namespace for deployment
