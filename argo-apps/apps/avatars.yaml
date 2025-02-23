@@ -2,18 +2,26 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: avatars
-  namespace: argocd
+  namespace: argocd # Namespace where Argo CD is installed
 spec:
   project: default
-  destination:
-    namespace: avatars
-    server: 'https://kubernetes.default.svc'
   source:
-    path: avatars
-    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    repoURL: 'https://github.com/waylonwalker/k8s-basic.git'
+    targetRevision: HEAD
+    path: helm-chart
+    helm:
+      # valueFiles:
+      #   - values.yaml
+      # Optional: Override values with parameters
+      values: |
+        name: avatars
+        image:
+          name: avatars
+          tag: "0.3.1"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: avatars # Target namespace for deployment
   syncPolicy:
     automated:
-      selfHeal: true
       prune: true
-    syncOptions:
-      - CreateNamespace=true
+      selfHeal: true
