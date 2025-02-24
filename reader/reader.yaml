@@ -47,11 +47,11 @@ spec:
     spec:
       template:
         spec:
-          tolerations:
-            - key: "performance"
-              operator: "Equal"
-              value: "low"
-              effect: "NoSchedule"
+          # tolerations:
+          #   - key: "performance"
+          #     operator: "Equal"
+          #     value: "low"
+          #     effect: "NoSchedule"
           # volumes:
           #   - name: markata-cache
           #     persistentVolumeClaim:
