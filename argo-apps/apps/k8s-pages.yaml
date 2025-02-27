@@ -53,6 +53,13 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+          - name: rwdev
+            host: wayl.one
+            # URL to which the proxy_pass should direct traffic. (Include protocol and path)
+            minioURL: "https://minio.wayl.one"
+            # The host header to set when proxying.
+            minioHost: "minio.wayl.one"
+            errorPage: "/404.html"
           - name: html-share
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
