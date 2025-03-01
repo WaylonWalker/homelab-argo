@@ -126,6 +126,8 @@ spec:
   containers:
     - name: cleanup
       image: registry.wayl.one/rhiannonwalker-com:50
+      imagePullSecrets:
+        - name: cluster-regcred
       command: ["sleep", "3600"]
       volumeMounts:
         - mountPath: /config
