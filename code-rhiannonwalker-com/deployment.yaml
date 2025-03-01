@@ -120,7 +120,7 @@ status: {}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: cleanup
+  name: watch
   namespace: rwcode
 spec:
   containers:
