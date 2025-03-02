@@ -41,6 +41,7 @@ spec:
         service: dropper-wayl-one
       annotations:
         version: 0.0.8-1
+        minio-last-rotated: "Sun Mar  2 04:52:37 PM CST 2025"
     spec:
       containers:
         - image: registry.wayl.one/dropper:0.0.8
@@ -75,24 +76,24 @@ spec:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: dropper-secret
+                  name: dropper-minio-secret
                   key: AWS_ACCESS_KEY_ID
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: dropper-secret
+                  name: dropper-minio-secret
                   key: AWS_SECRET_ACCESS_KEY
             - name: AWS_BUCKET_NAME
               value: dropper
             - name: AWS_REGION
               valueFrom:
                 secretKeyRef:
-                  name: dropper-secret
+                  name: dropper-minio-secret
                   key: AWS_REGION
             - name: AWS_ENDPOINT_URL
               valueFrom:
                 secretKeyRef:
-                  name: dropper-secret
+                  name: dropper-minio-secret
                   key: AWS_ENDPOINT_URL
             - name: BACKEND_CORS_ORIGINS
               valueFrom:
@@ -100,7 +101,7 @@ spec:
                   name: dropper-secret
                   key: BACKEND_CORS_ORIGINS
       imagePullSecrets:
-        - name: regcred
+        - name: cluster-regcred
       restartPolicy: Always
 status: {}
 ---
