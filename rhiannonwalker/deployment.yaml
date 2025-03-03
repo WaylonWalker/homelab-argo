@@ -54,7 +54,7 @@ spec:
             - name: PGID
               value: "1000"
             - name: PROXY_DOMAIN
-              value: rhiannonwalker.wayl.one
+              value: edit.rhiannonwalker.com
             - name: PUID
               value: "1000"
             - name: SUDO_PASSWORD
