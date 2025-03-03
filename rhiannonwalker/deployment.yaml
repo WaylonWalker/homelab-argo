@@ -114,6 +114,8 @@ kind: Pod
 metadata:
   name: watch
   namespace: rhiannonwalker
+  annotations:
+    minio-last-rotated: "Sun Mar  2 09:21:55 PM CST 2025"
 spec:
   containers:
     - name: watch
@@ -123,8 +125,6 @@ spec:
       volumeMounts:
         - mountPath: /config
           name: rhiannonwalker-config
-      annotations:
-        minio-last-rotated: "Sun Mar  2 09:21:55 PM CST 2025"
       env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
