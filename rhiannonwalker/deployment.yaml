@@ -160,6 +160,98 @@ spec:
       persistentVolumeClaim:
         claimName: rhiannonwalker-config
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: admin
+  name: admin
+  namespace: rhiannonwalker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: admin
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        network/code-server-default: "true"
+        service: admin
+    spec:
+      containers:
+        - name: admin
+          image: registry.wayl.one/rhiannonwalker-com:50
+          imagePullPolicy: Always
+          workingDir: /app/admin
+          command: ["/app/admin/just-server"]
+          volumeMounts:
+            - mountPath: /config
+              name: rhiannonwalker-config
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: rhiannonwalker-minio-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rhiannonwalker-minio-secret
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: rhiannonwalker-minio-secret
+                  key: AWS_BUCKET_NAME
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: rhiannonwalker-minio-secret
+                  key: AWS_REGION
+            - name: AWS_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: rhiannonwalker-minio-secret
+                  key: AWS_ENDPOINT_URL
+          ports:
+            - containerPort: 8443
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: rhiannonwalker-config
+      imagePullSecrets:
+        - name: 'cluster-regcred'
+      restartPolicy: Always
+      volumes:
+        - name: rhiannonwalker-config
+          persistentVolumeClaim:
+            claimName: rhiannonwalker-config
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  labels:
+    service: admin
+  name: admin
+  namespace: rhiannonwalker
+spec:
+  rules:
+    - host: admin.rhiannonwalker.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: admin
+                port:
+                  number: 8443
+            path: /
+            pathType: Prefix
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
