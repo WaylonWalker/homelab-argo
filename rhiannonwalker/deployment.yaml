@@ -121,7 +121,8 @@ spec:
     - name: watch
       image: registry.wayl.one/rhiannonwalker-com:50
       imagePullPolicy: Always
-      command: ["sleep", "3600"]
+      workingDir: /config/workspace/rhiannonwalker.com/
+      # command: ["sleep", "3600"]
       volumeMounts:
         - mountPath: /config
           name: rhiannonwalker-config
