@@ -47,15 +47,21 @@ spec:
             - name: DEFAULT_WORKSPACE
               value: /config/workspace
             - name: PASSWORD
-              value: password
+              valueFrom:
+                secretKeyRef:
+                  name: rhiannonwalker-secret
+                  key: PASSWORD
             - name: PGID
               value: "1000"
             - name: PROXY_DOMAIN
               value: rhiannonwalker.wayl.one
             - name: PUID
               value: "1000"
-            # - name: SUDO_PASSWORD
-            #   value: password
+            - name: SUDO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rhiannonwalker-secret
+                  key: PASSWORD
             - name: TZ
               value: Etc/UTC
           image: lscr.io/linuxserver/code-server:latest
