@@ -1,15 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: code-rhiannonwalker-com
+  name: rhiannonwalker
   namespace: argocd
 spec:
   project: default
   destination:
-    namespace: code-rhiannonwalker-com
+    namespace: rhiannonwalker
     server: 'https://kubernetes.default.svc'
   source:
-    path: code-rhiannonwalker-com
+    path: rhiannonwalker
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

@@ -2,9 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   creationTimestamp: null
-  name: rwcode
-spec: {}
-status: {}
+  name: rhiannonwalker
 ---
 apiVersion: v1
 kind: Service
@@ -13,7 +11,7 @@ metadata:
   labels:
     service: code-server
   name: code-server
-  namespace: rwcode
+  namespace: rhiannonwalker
 spec:
   ports:
     - name: "8443"
@@ -21,8 +19,6 @@ spec:
       targetPort: 8443
   selector:
     service: code-server
-status:
-  loadBalancer: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,7 +27,7 @@ metadata:
   labels:
     service: code-server
   name: code-server
-  namespace: rwcode
+  namespace: rhiannonwalker
 spec:
   replicas: 1
   selector:
@@ -55,7 +51,7 @@ spec:
             - name: PGID
               value: "1000"
             - name: PROXY_DOMAIN
-              value: rwcode.wayl.one
+              value: rhiannonwalker.wayl.one
             - name: PUID
               value: "1000"
             # - name: SUDO_PASSWORD
@@ -67,16 +63,14 @@ spec:
           ports:
             - containerPort: 8443
               protocol: TCP
-          resources: {}
           volumeMounts:
             - mountPath: /config
-              name: code-server-data
+              name: rhiannonwalker-config
       restartPolicy: Always
       volumes:
-        - name: code-server-data
+        - name: rhiannonwalker-config
           persistentVolumeClaim:
-            claimName: code-server-data
-status: {}
+            claimName: rhiannonwalker-config
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -85,10 +79,10 @@ metadata:
   labels:
     service: code-server
   name: code-server
-  namespace: rwcode
+  namespace: rhiannonwalker
 spec:
   rules:
-    - host: rwcode.wayl.one
+    - host: rhiannonwalker.wayl.one
       http:
         paths:
           - backend:
@@ -98,8 +92,16 @@ spec:
                   number: 8443
             path: /
             pathType: Prefix
-status:
-  loadBalancer: {}
+    - host: edit.rhiannonwalker.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: code-server
+                port:
+                  number: 8443
+            path: /
+            pathType: Prefix
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -108,32 +110,88 @@ metadata:
   labels:
     service: code-server-data
   name: code-server-data
-  namespace: rwcode
+  namespace: rhiannonwalker
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 100Mi
-status: {}
 ---
 apiVersion: v1
 kind: Pod
 metadata:
   name: watch
-  namespace: rwcode
+  namespace: rhiannonwalker
 spec:
   containers:
     - name: cleanup
       image: registry.wayl.one/rhiannonwalker-com:50
+      imagePullPolicy: Always
       command: ["sleep", "3600"]
       volumeMounts:
         - mountPath: /config
-          name: code-server-data
+          name: rhiannonwalker-config
+      env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: rhiannonwalker-minio-secret
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rhiannonwalker-minio-secret
+              key: AWS_SECRET_ACCESS_KEY
+        - name: AWS_BUCKET_NAME
+          valueFrom:
+            secretKeyRef:
+              name: rhiannonwalker-minio-secret
+              key: AWS_BUCKET_NAME
+        - name: AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: rhiannonwalker-minio-secret
+              key: AWS_REGION
+        - name: AWS_ENDPOINT_URL
+          valueFrom:
+            secretKeyRef:
+              name: rhiannonwalker-minio-secret
+              key: AWS_ENDPOINT_URL
   imagePullSecrets:
-    - name: cluster-regcred
+    - name: 'cluster-regcred'
   restartPolicy: Always
   volumes:
-    - name: code-server-data
+    - name: rhiannonwalker-config
       persistentVolumeClaim:
-        claimName: code-server-data
+        claimName: rhiannonwalker-config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rhiannonwalker-config
+  namespace: rhiannonwalker
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: pv-hostpath-config
+  storageClassName: hostpath
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath-config
+  namespace: rhiannonwalker
+spec:
+  capacity:
+    storage: 1000Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/rhiannonwalker/config
+    type: DirectoryOrCreate
