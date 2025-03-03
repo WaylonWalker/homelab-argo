@@ -172,7 +172,7 @@ metadata:
   namespace: rhiannonwalker
 spec:
   capacity:
-    storage: 1000Mi
+    storage: 10Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
