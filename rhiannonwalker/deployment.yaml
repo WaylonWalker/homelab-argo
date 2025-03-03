@@ -104,21 +104,6 @@ spec:
             pathType: Prefix
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  creationTimestamp: null
-  labels:
-    service: code-server-data
-  name: code-server-data
-  namespace: rhiannonwalker
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Mi
----
-apiVersion: v1
 kind: Pod
 metadata:
   name: watch
