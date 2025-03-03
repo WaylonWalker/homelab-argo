@@ -7,7 +7,8 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/waylonwalker/k8s-pages.git'
-    targetRevision: v2.0.0 # Adjust if you need a specific branch, tag, or commit.
+    # targetRevision: v2.0.0 # Adjust if you need a specific branch, tag, or commit.
+    targetRevision: HEAD # Adjust if you need a specific branch, tag, or commit.
     path: helm-chart # For example, if the chart root is at the repository’s root, use '.'
     helm:
       # Instead of valueFiles, paste the contents of your values file inline here.
@@ -53,15 +54,17 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
-          - name: rwdev
-            host: wayl.one
+          - name: rhiannonwalker-dev
+            subdomain: dev
+            host: rhiannonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
             minioURL: "https://minio.wayl.one"
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
-          - name: rw
-            host: wayl.one
+          - name: rhiannonwalker
+            apex: true
+            host: rhiannonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
             minioURL: "https://minio.wayl.one"
             # The host header to set when proxying.
