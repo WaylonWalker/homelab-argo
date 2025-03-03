@@ -218,7 +218,7 @@ spec:
                   name: rhiannonwalker-minio-secret
                   key: AWS_ENDPOINT_URL
           ports:
-            - containerPort: 8443
+            - containerPort: 8000
               protocol: TCP
           volumeMounts:
             - mountPath: /config
@@ -248,7 +248,7 @@ spec:
               service:
                 name: admin
                 port:
-                  number: 8443
+                  number: 8000
             path: /
             pathType: Prefix
 ---
