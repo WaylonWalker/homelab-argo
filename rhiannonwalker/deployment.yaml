@@ -201,7 +201,7 @@ spec:
         - name: admin
           image: registry.wayl.one/rhiannonwalker-com:50
           imagePullPolicy: Always
-          workingDir: /app/admin
+          workingDir: /config/workspace/rhiannonwalker.com/admin/
           command: ["/app/admin/just-server"]
           volumeMounts:
             - mountPath: /config
