@@ -16,16 +16,20 @@ from ruamel.yaml import YAML
 from rich import print as rprint
 from rich.table import Table
 from rich.console import Console
+from rich.syntax import Syntax
 import json
-
+from io import StringIO
+import difflib
 import typer
 
 app = typer.Typer()
 console = Console()
 
-# Use ruamel.yaml for safer YAML parsing
-yaml = YAML(typ='safe')
+# Use ruamel.yaml for safer YAML parsing and round-trip
+yaml = YAML(typ='rt')
 yaml.default_flow_style = False
+yaml.preserve_quotes = True
+yaml.width = 4096  # Prevent line wrapping
 
 APPS_DIRS = [
     "argo-apps/core-apps",
@@ -38,6 +42,7 @@ class ArgoApp:
     """Simple class to hold Argo CD application info"""
     def __init__(self, file: Path, data: dict):
         self.file = file
+        self.data = data
         spec = data.get('spec', {})
         
         # Basic app info
@@ -76,6 +81,68 @@ class ArgoApp:
             and self.latest_version 
             and self.latest_version != self.target_revision
         )
+    
+    def update_version(self, new_version: str) -> None:
+        """Update the version in the data"""
+        if 'spec' not in self.data:
+            self.data['spec'] = {}
+        if 'source' not in self.data['spec']:
+            self.data['spec']['source'] = {}
+        self.data['spec']['source']['targetRevision'] = new_version
+        self.target_revision = new_version
+
+
+def show_yaml_diff(old_yaml: str, new_yaml: str, title: str) -> None:
+    """Show a diff between two YAML strings"""
+    console.print(f"\n[bold]{title}[/bold]")
+    
+    diff = difflib.unified_diff(
+        old_yaml.splitlines(keepends=True),
+        new_yaml.splitlines(keepends=True),
+        fromfile='current',
+        tofile='updated',
+    )
+    
+    for line in diff:
+        if line.startswith('+'):
+            rprint(f"[green]{line}[/green]", end='')
+        elif line.startswith('-'):
+            rprint(f"[red]{line}[/red]", end='')
+        else:
+            rprint(line, end='')
+
+
+def update_app_version(app: ArgoApp, dry_run: bool = True) -> bool:
+    """Update an app's version, showing diff in dry run mode"""
+    if not app.needs_update:
+        return False
+    
+    # Get the current YAML content
+    with open(app.file) as f:
+        current_content = f.read()
+    
+    # Create updated YAML
+    app.update_version(app.latest_version)
+    
+    # Convert to string while preserving formatting
+    stream = StringIO()
+    yaml.dump(app.data, stream)
+    new_content = stream.getvalue()
+    
+    # Show diff
+    show_yaml_diff(
+        current_content,
+        new_content,
+        f"Update {app.name} from {app.target_revision} to {app.latest_version}"
+    )
+    
+    if not dry_run:
+        # Write the changes
+        with open(app.file, 'w') as f:
+            f.write(new_content)
+        return True
+    
+    return False
 
 
 def run_helm_command(cmd: list[str]) -> tuple[int, str]:
@@ -225,6 +292,54 @@ def list_all_helm_apps() -> list[ArgoApp]:
     return [app for app in apps if app.is_helm]
 
 
+def run_git_command(cmd: list[str]) -> tuple[int, str]:
+    """Run a git command and return exit code and output"""
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return result.returncode, result.stdout or result.stderr
+    except Exception as e:
+        return 1, str(e)
+
+
+def check_git_status(files: list[Path]) -> tuple[bool, list[Path]]:
+    """Check if any files have uncommitted changes
+    
+    Returns:
+        tuple: (clean, modified_files)
+    """
+    # Get status of specific files
+    code, output = run_git_command(['git', 'status', '--porcelain'] + [str(f) for f in files])
+    if code != 0:
+        rprint(f"[red]Error checking git status: {output}[/red]")
+        return False, []
+    
+    # Parse status output
+    modified = []
+    for line in output.splitlines():
+        if not line.strip():
+            continue
+        status = line[:2]
+        file_path = line[3:].strip()
+        if status != '  ':  # Any status other than unmodified
+            modified.append(Path(file_path))
+    
+    return len(modified) == 0, modified
+
+
+def stage_files(files: list[Path]) -> bool:
+    """Stage files for commit"""
+    code, output = run_git_command(['git', 'add'] + [str(f) for f in files])
+    if code != 0:
+        rprint(f"[red]Error staging files: {output}[/red]")
+        return False
+    return True
+
+
 @app.command()
 def list(helm: bool = False):
     """List all Argo CD applications"""
@@ -272,12 +387,87 @@ def list(helm: bool = False):
 
 
 @app.command()
-def update(dry_run: bool = False, helm: bool = False):
-    """Update helm chart versions"""
-    apps = list_all_helm_apps()
-    for app in apps:
-        if app.needs_update:
-            rprint(f"Would update {app.name} from {app.target_revision} to {app.latest_version}")
+def update(
+    dry_run: bool = True,
+    helm: bool = True,
+    all: bool = False,
+    app_name: str = None,
+):
+    """Update helm chart versions
+    
+    Args:
+        dry_run: Show what would change without making changes
+        helm: Only update helm charts
+        all: Update all apps that need updates
+        app_name: Update a specific app by name
+    """
+    apps = list_all_helm_apps() if helm else list_all_apps()
+    
+    # Filter to specific app if requested
+    if app_name:
+        apps = [app for app in apps if app.name == app_name]
+        if not apps:
+            rprint(f"[red]Error: No app found with name {app_name}[/red]")
+            return
+    
+    # Find apps that need updates
+    updates_needed = [app for app in apps if app.needs_update]
+    if not updates_needed:
+        rprint("[green]All apps are up to date![/green]")
+        return
+    
+    # Check git status first
+    files_to_update = [app.file for app in updates_needed]
+    is_clean, modified = check_git_status(files_to_update)
+    if not is_clean:
+        rprint("[red]Error: The following files have uncommitted changes:[/red]")
+        for f in modified:
+            rprint(f"  - {f}")
+        rprint("\nPlease commit or stash changes before updating.")
+        return
+    
+    # Show summary of updates
+    table = Table(title="Updates Available")
+    table.add_column("Name")
+    table.add_column("Current")
+    table.add_column("Latest")
+    
+    for app in updates_needed:
+        table.add_row(
+            app.name,
+            app.target_revision,
+            app.latest_version,
+        )
+    
+    console.print(table)
+    console.print()
+    
+    # Confirm and update
+    if not all and not app_name:
+        rprint("[yellow]Use --all to update all apps or specify an app with --app-name[/yellow]")
+        return
+    
+    # Show diffs and update
+    updated = []
+    for app in updates_needed:
+        if update_app_version(app, dry_run=dry_run):
+            updated.append(app)
+    
+    # Stage files if we made changes
+    if not dry_run and updated:
+        files_updated = [app.file for app in updated]
+        if stage_files(files_updated):
+            rprint("\n[green]Files staged for commit:[/green]")
+            for f in files_updated:
+                rprint(f"  - {f}")
+        else:
+            rprint("\n[yellow]Warning: Failed to stage files[/yellow]")
+    
+    # Show summary
+    if dry_run:
+        rprint("\n[yellow]Dry run - no changes made[/yellow]")
+    else:
+        rprint(f"\n[green]Updated {len(updated)} apps[/green]")
 
 
 if __name__ == "__main__":
