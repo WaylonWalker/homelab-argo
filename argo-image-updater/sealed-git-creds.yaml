@@ -1,0 +1,15 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: git-creds
+  namespace: argocd
+spec:
+  encryptedData:
+    token: AgC8DC7Ue16NDRYQlXd9UWH6+g405pAngOILm0p/Jhoneocll3DC6qlmY3WFiPx5XsTN+VZDyw2EmfhjPWnt9J7CO+Yy38EAyesW3NRkNd+zVpMKTnSsZvZy1cqKlC0IgutVp0/4rVZdTwwOIr4UiYLypbVJRRbfJNDr+qBMJp1xq2wslAQB4eJTWTn0WPa8CGfu1tT12Ek3ZwdFaYxhIx89RAuahlgdYbsKputEQjCf1qpw2YrYhc+8+8JCGULuUrL07fpaYVsv6Yxk2quOSk+CFE1chavFzyooHNIMF5POgEAJnzQEhhZg/yu/BDlJ3JChJ3LVzRcDfP62354VbqhiFwTwNaoR26ep70sacxyVEVvoBC0zFpctilwv6Q0Pk7EnIcYEPUEKa2XXzsqrzNljCjrFdqq+uW6V+PLkB113vmONuxiHIrp7K7w1kMYRZ/h9bJ8j9jN9yjYzRxnbZ3+ZzweE7q8Y8o74Jy+a9IGdiRtNigIMQ5qO9XYsvnq0TnzwjyYluw283XaGCp9YQSs2/gzxno4UF7dRZWMbpHiJ936nbjS2yCtp9V22dnGhCvEGNXaXpHplyC7tk0i98VlAjbPMoCmRJytkF1OXPj4dauCGkERi05SAAGyMoh9yO0FS9LMU41zhfB5DwAH8SStzZh+lZf3iI1GLIglYIyrk6BGlOG7Sl4rIauKg4oFiPsDLwku4+iy0fujPIDqfG5AeBhi3zO4sYcPno5pUWUrIaL4fRCbMk9P+Qg==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: git-creds
+      namespace: argocd
