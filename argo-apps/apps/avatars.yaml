@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: avatars
-  namespace: argocd # Namespace where Argo CD is installed
+  namespace: argocd
 spec:
   project: default
   source:
@@ -10,9 +10,6 @@ spec:
     targetRevision: HEAD
     path: helm-chart
     helm:
-      # valueFiles:
-      #   - values.yaml
-      # Optional: Override values with parameters
       values: |
         name: avatars
         image:
@@ -20,7 +17,7 @@ spec:
           tag: "0.3.5"
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: avatars # Target namespace for deployment
+    namespace: avatars
   syncPolicy:
     automated:
       prune: true
