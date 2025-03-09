@@ -58,6 +58,11 @@ spec:
         io.kompose.network/excalidraw-default: "true"
         io.kompose.service: excalidraw
     spec:
+      tolerations:
+        - key: "performance"
+          operator: "Equal"
+          effect: "NoSchedule"
+          value: "low"
       containers:
         - env:
             - name: NODE_ENV
