@@ -46,6 +46,11 @@ spec:
       labels:
         service: play-outside-wayl-one
     spec:
+      tolerations:
+        - key: "performance"
+          operator: "Equal"
+          effect: "NoSchedule"
+          value: "low"
       containers:
         - env:
             - name: PLAY_OUTSIDE_API_SERVER__RELOAD
