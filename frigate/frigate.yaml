@@ -73,6 +73,9 @@ spec:
               protocol: UDP
           securityContext:
             privileged: true
+          resources:
+            limits:
+              gpu.intel.com/i915: 1
           volumeMounts:
             - mountPath: /config
               name: config
@@ -84,6 +87,9 @@ spec:
               name: cache-volume
             - name: coral-device
               mountPath: /dev/apex_0
+              readOnly: true
+            - name: qsv-device
+              mountPath: /dev/dri
               readOnly: true
       restartPolicy: Always
       volumes:
@@ -104,6 +110,10 @@ spec:
           hostPath:
             type: CharDevice
             path: /dev/apex_0
+        - name: qsv-device
+          hostPath:
+            type: Directory
+            path: /dev/dri
 status: {}
 ---
 apiVersion: v1
