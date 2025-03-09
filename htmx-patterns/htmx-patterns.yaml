@@ -58,6 +58,11 @@ spec:
         io.kompose.network/htmx-patterns-default: "true"
         io.kompose.service: htmx-patterns
     spec:
+      tolerations:
+        - key: "performance"
+          operator: "Equal"
+          effect: "NoSchedule"
+          value: "low"
       containers:
         - image: docker.io/waylonwalker/htmx-patterns-waylonwalker-com:0.1.3
           name: htmx-patterns
