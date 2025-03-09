@@ -20,6 +20,11 @@ spec:
       labels:
         app: whoami
     spec:
+      tolerations:
+        - key: "performance"
+          operator: "Equal"
+          effect: "NoSchedule"
+          value: "low"
       containers:
         - name: whoami
           imagePullPolicy: Always
