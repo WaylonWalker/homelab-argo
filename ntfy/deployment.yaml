@@ -59,6 +59,11 @@ spec:
         io.kompose.network/ntfy-default: "true"
         io.kompose.service: ntfy
     spec:
+      tolerations:
+        - key: "performance"
+          operator: "Equal"
+          value: "low"
+          effect: "NoSchedule"
       containers:
         - args:
             - serve
