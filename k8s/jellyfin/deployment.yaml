@@ -34,8 +34,8 @@ spec:
               hostPort: 8096
               protocol: TCP
           resources:
-          # requests:
-          #   gpu.intel.com/i915: 1
+            limits:
+              gpu.intel.com/i915: 1
           volumeMounts:
             - mountPath: /config
               name: jellyfin-config
@@ -43,6 +43,9 @@ spec:
               name: jellyfin-cache
             - mountPath: /media
               name: jellyfin-media
+            - name: qsv-device
+              mountPath: /dev/dri
+              readOnly: true
       restartPolicy: Always
       volumes:
         - name: jellyfin-config
@@ -54,6 +57,10 @@ spec:
         - name: jellyfin-media
           persistentVolumeClaim:
             claimName: jellyfin-media
+        - name: qsv-device
+          hostPath:
+            type: Directory
+            path: /dev/dri
 status: {}
 ---
 apiVersion: v1
