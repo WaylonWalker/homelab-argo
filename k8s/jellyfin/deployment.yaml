@@ -33,9 +33,9 @@ spec:
             - containerPort: 8096
               hostPort: 8096
               protocol: TCP
-          resources:
-            limits:
-              gpu.intel.com/i915: 1
+          # resources:
+          #   limits:
+          #     gpu.intel.com/i915: 1
           volumeMounts:
             - mountPath: /config
               name: jellyfin-config
