@@ -61,6 +61,11 @@ spec:
         io.kompose.network/home-default: "true"
         io.kompose.service: wayl-one
     spec:
+      tolerations:
+        - key: "performance"
+          operator: "Equal"
+          effect: "NoSchedule"
+          value: "low"
       containers:
         - image: docker.io/waylonwalker/wayl-one:v2
           name: wayl-one
