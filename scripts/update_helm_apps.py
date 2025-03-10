@@ -6,6 +6,7 @@
 #     "typer",
 #     "rich",
 #     "ruamel.yaml",
+#     "packaging",
 # ]
 # ///
 
@@ -17,16 +18,28 @@ from rich import print as rprint
 from rich.table import Table
 from rich.console import Console
 from rich.syntax import Syntax
+from rich.live import Live
+from rich.spinner import Spinner
+from rich.panel import Panel
+from rich.align import Align
 import json
-from io import StringIO
 import difflib
 import typer
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
+from functools import partial
+import threading
+from contextlib import nullcontext
+import re
+import requests
+from packaging import version
+from urllib.parse import urlparse
 
 app = typer.Typer()
 console = Console()
 
 # Use ruamel.yaml for safer YAML parsing and round-trip
-yaml = YAML(typ='rt')
+yaml = YAML(typ='safe')
 yaml.default_flow_style = False
 yaml.preserve_quotes = True
 yaml.width = 4096  # Prevent line wrapping
@@ -40,9 +53,10 @@ APPS_DIRS = [
 
 class ArgoApp:
     """Simple class to hold Argo CD application info"""
-    def __init__(self, file: Path, data: dict):
+    def __init__(self, file: Path, data: dict, verbose: bool = False):
         self.file = file
         self.data = data
+        self.verbose = verbose
         spec = data.get('spec', {})
         
         # Basic app info
@@ -70,7 +84,11 @@ class ArgoApp:
     def latest_version(self) -> Optional[str]:
         """Get latest version, fetching it if not already cached"""
         if self._latest_version is None and self.is_helm:
-            self._latest_version = get_latest_chart_version(self.repo_url, self.chart)
+            self._latest_version = get_latest_chart_version(
+                self.repo_url,
+                self.chart,
+                verbose=self.verbose
+            )
         return self._latest_version
     
     @property
@@ -90,6 +108,17 @@ class ArgoApp:
             self.data['spec']['source'] = {}
         self.data['spec']['source']['targetRevision'] = new_version
         self.target_revision = new_version
+
+
+def parse_version(ver: str) -> version.Version:
+    """Parse a version string into a Version object for comparison"""
+    # Remove 'v' prefix if present
+    ver = ver.lstrip('v')
+    try:
+        return version.parse(ver)
+    except version.InvalidVersion:
+        # If parsing fails, return a very old version
+        return version.parse('0.0.0')
 
 
 def show_yaml_diff(old_yaml: str, new_yaml: str, title: str) -> None:
@@ -145,18 +174,18 @@ def update_app_version(app: ArgoApp, dry_run: bool = True) -> bool:
     return False
 
 
-def run_helm_command(cmd: list[str]) -> tuple[int, str]:
-    """Run a helm command and return output"""
+def run_helm_command(cmd: list[str], verbose: bool = False) -> tuple[int, str]:
+    """Run a helm command and return exit code and output"""
     try:
         result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
-            check=True,
+            check=False,
         )
-        return 0, result.stdout
-    except subprocess.CalledProcessError as e:
-        return e.returncode, e.stderr
+        if verbose and result.stdout:
+            rprint(result.stdout.strip())
+        return result.returncode, result.stdout or result.stderr
     except Exception as e:
         return 1, str(e)
 
@@ -183,23 +212,90 @@ def add_helm_repo(repo_url: str, repo_name: str) -> bool:
     return True
 
 
-def get_latest_chart_version(repo_url: str, chart_name: str) -> Optional[str]:
+def get_repo_name_from_url(repo_url: str) -> str:
+    """Generate a consistent, unique repo name from a URL"""
+    # Normalize the URL
+    url = repo_url.rstrip('/').lower()
+    
+    # Parse URL into components
+    parsed = urlparse(url)
+    path_parts = [p for p in parsed.path.split('/') if p]
+    
+    if 'github.io' in parsed.netloc:
+        # For GitHub Pages URLs (e.g. https://org.github.io/repo)
+        # Use the org name as it's typically more stable and unique
+        org = parsed.netloc.split('.')[0]
+        return org
+    elif len(path_parts) >= 2 and any(domain in parsed.netloc for domain in ['github.com', 'gitlab.com', 'bitbucket.org']):
+        # For direct repo URLs (e.g. https://github.com/org/repo)
+        # Use the org name as it's typically more stable and unique
+        return path_parts[0]
+    elif 'raw.githubusercontent.com' in parsed.netloc:
+        # For raw GitHub URLs (e.g. https://raw.githubusercontent.com/org/repo/...)
+        # Use the org name
+        return path_parts[0]
+    else:
+        # For other URLs, use the hostname without common prefixes/suffixes
+        name = parsed.netloc.split('.')[0]
+        if name in ['www', 'charts']:
+            name = parsed.netloc.split('.')[1]
+        return name
+
+
+def get_index_url(repo_url: str) -> str:
+    """Get the URL for the index.yaml file"""
+    # Normalize the URL
+    url = repo_url.rstrip('/')
+    
+    # Special case for raw GitHub URLs
+    if 'raw.githubusercontent.com' in url:
+        # Convert /master/charts to /refs/heads/master/charts
+        if '/master/charts' in url:
+            url = url.replace('/master/charts', '/refs/heads/master/charts')
+        # Add index.yaml if not present
+        if not url.endswith('index.yaml'):
+            url = f"{url}/index.yaml"
+    else:
+        # For normal Helm repos, just append index.yaml
+        url = f"{url}/index.yaml"
+    
+    return url
+
+
+def get_latest_chart_version(repo_url: str, chart_name: str, verbose: bool = False) -> Optional[str]:
     """Get the latest version for a chart"""
-    # Extract repo name from URL - handle common formats
-    repo_name = repo_url.rstrip('/').split('/')[-1]
-    if '.' in repo_name:
-        repo_name = repo_name.split('.')[0]
-    if repo_name == 'helm':  # Special case for URLs ending in /helm
-        repo_name = repo_url.rstrip('/').split('/')[-2]
+    # Generate repo name from URL
+    repo_name = get_repo_name_from_url(repo_url)
     
-    # Special cases for known repos
-    if repo_url == 'https://argoproj.github.io/argo-helm':
-        repo_name = 'argo'
+    # Clean up the name to be valid and simple
+    repo_name = re.sub(r'[^a-zA-Z0-9-]', '-', repo_name).lower()
+    repo_name = re.sub(r'-+', '-', repo_name)  # Replace multiple hyphens with single
+    repo_name = repo_name.strip('-')  # Remove leading/trailing hyphens
     
-    # Debug output
-    rprint(f"[dim]Looking up {chart_name} in {repo_name} ({repo_url})[/dim]")
+    if verbose:
+        rprint(f"Looking up {chart_name} in {repo_name} ({repo_url})")
     
-    # Add repo if needed
+    # For GitHub release-based charts, try to get the index file directly
+    if any(url in repo_url for url in ['github.io', 'clustersecret.com']) or 'raw.githubusercontent.com' in repo_url:
+        try:
+            # Get the index file
+            index_url = get_index_url(repo_url)
+            response = requests.get(index_url)
+            if response.status_code == 200:
+                index = yaml.load(response.text)
+                if chart_name in index.get('entries', {}):
+                    versions = sorted(
+                        [entry['version'] for entry in index['entries'][chart_name]],
+                        key=lambda x: parse_version(x),
+                        reverse=True
+                    )
+                    if versions:
+                        return versions[0]
+        except Exception as e:
+            if verbose:
+                rprint(f"[yellow]Warning: Failed to fetch index directly: {e}[/yellow]")
+    
+    # Add repo if needed (fallback to standard helm commands)
     if not add_helm_repo(repo_url, repo_name):
         return None
     
@@ -211,7 +307,8 @@ def get_latest_chart_version(repo_url: str, chart_name: str) -> Optional[str]:
     
     # Search for chart
     search_name = f"{repo_name}/{chart_name}"
-    rprint(f"[dim]Searching for {search_name}[/dim]")
+    if verbose:
+        rprint(f"Searching for {search_name}")
     
     code, output = run_helm_command([
         'helm', 'search', 'repo',
@@ -221,7 +318,8 @@ def get_latest_chart_version(repo_url: str, chart_name: str) -> Optional[str]:
     ])
     
     if code != 0:
-        rprint(f"[yellow]Warning: Failed to search for {search_name}: {output}[/yellow]")
+        if verbose:
+            rprint(f"[yellow]Warning: Failed to search for {search_name}: {output}[/yellow]")
         return None
     
     try:
@@ -230,14 +328,16 @@ def get_latest_chart_version(repo_url: str, chart_name: str) -> Optional[str]:
             # Sort versions and get the latest
             versions = sorted(
                 results,
-                key=lambda x: x['version'].lstrip('v'),
+                key=lambda x: parse_version(x['version']),
                 reverse=True
             )
             return versions[0]['version']
         else:
-            rprint(f"[yellow]Warning: No versions found for {search_name}[/yellow]")
+            if verbose:
+                rprint(f"[yellow]Warning: No versions found for {search_name}[/yellow]")
     except Exception as e:
-        rprint(f"[yellow]Warning: Failed to parse helm search output: {e}[/yellow]")
+        if verbose:
+            rprint(f"[yellow]Warning: Failed to parse helm search output: {e}[/yellow]")
     
     return None
 
@@ -265,7 +365,7 @@ def load_yaml_file(file_path: Path) -> list[dict]:
         return []
 
 
-def list_all_apps() -> list[ArgoApp]:
+def list_all_apps(verbose: bool = False) -> list[ArgoApp]:
     """List all ArgoApps from the APPS_DIRS"""
     apps = []
     for apps_dir in APPS_DIRS:
@@ -278,7 +378,7 @@ def list_all_apps() -> list[ArgoApp]:
                 if not isinstance(doc, dict):
                     continue
                 try:
-                    app = ArgoApp(yaml_file, doc)
+                    app = ArgoApp(yaml_file, doc, verbose=verbose)
                     apps.append(app)
                 except Exception as e:
                     rprint(f"[yellow]Warning: Failed to parse {yaml_file}: {e}[/yellow]")
@@ -286,9 +386,9 @@ def list_all_apps() -> list[ArgoApp]:
     return apps
 
 
-def list_all_helm_apps() -> list[ArgoApp]:
+def list_all_helm_apps(verbose: bool = False) -> list[ArgoApp]:
     """Filter all ArgoApps to only those that use helm"""
-    apps = list_all_apps()
+    apps = list_all_apps(verbose=verbose)
     return [app for app in apps if app.is_helm]
 
 
@@ -340,68 +440,388 @@ def stage_files(files: list[Path]) -> bool:
     return True
 
 
-@app.command()
-def list(helm: bool = False):
-    """List all Argo CD applications"""
-    if helm:
-        apps = list_all_helm_apps()
-        title = "Helm-based Argo CD Applications"
-    else:
-        apps = list_all_apps()
-        title = "All Argo CD Applications"
+@dataclass
+class VersionCheck:
+    """Result of a version check"""
+    app: ArgoApp
+    success: bool
+    error: Optional[str] = None
 
-    table = Table(title=title)
+
+def check_version(app: ArgoApp) -> VersionCheck:
+    """Check version for a single app"""
+    try:
+        if not app.is_helm:
+            return VersionCheck(app, True)
+        
+        # This will trigger the version check
+        _ = app.latest_version
+        return VersionCheck(app, True)
+    except Exception as e:
+        return VersionCheck(app, False, str(e))
+
+
+class VersionChecker:
+    """Manages parallel version checking with progress display"""
+    def __init__(self, verbose: bool = False, show_progress: bool = True):
+        self.verbose = verbose
+        self.show_progress = show_progress
+        self.completed = 0
+        self.total = 0
+        self._lock = threading.Lock()
+    
+    def increment(self) -> None:
+        """Increment completed count"""
+        with self._lock:
+            self.completed += 1
+    
+    def check_version(self, app: ArgoApp) -> VersionCheck:
+        """Check version for a single app"""
+        try:
+            if not app.is_helm:
+                return VersionCheck(app, True)
+            
+            # This will trigger the version check
+            _ = app.latest_version
+            result = VersionCheck(app, True)
+        except Exception as e:
+            result = VersionCheck(app, False, str(e))
+        
+        self.increment()
+        return result
+    
+    def check_versions_parallel(self, apps: list[ArgoApp], max_workers: int = 4) -> list[VersionCheck]:
+        """Check versions for multiple apps in parallel with progress display"""
+        self.total = len(apps)
+        self.completed = 0
+        results = []
+        
+        # Create progress display if enabled
+        if self.show_progress:
+            progress = Panel(
+                Align.center(
+                    f"Checking versions [0/{self.total}]",
+                    vertical="middle"
+                ),
+                title="[bold blue]Progress",
+            )
+            live_context = Live(progress, console=console, refresh_per_second=10)
+        else:
+            live_context = nullcontext()
+            progress = None
+        
+        with live_context:
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                future_to_app = {
+                    executor.submit(self.check_version, app): app 
+                    for app in apps
+                }
+                
+                for future in as_completed(future_to_app):
+                    result = future.result()
+                    if not result.success and self.verbose:
+                        app = future.result().app
+                        rprint(f"[yellow]Warning: Failed to check version for {app.name}: {result.error}[/yellow]")
+                    results.append(result)
+                    
+                    # Update progress if enabled
+                    if self.show_progress and progress:
+                        progress.renderable = Align.center(
+                            f"Checking versions [{self.completed}/{self.total}]",
+                            vertical="middle"
+                        )
+        
+        return results
+
+
+@app.command()
+def list(
+    helm: bool = typer.Option(
+        False,
+        "--helm",
+        help="Only show Helm-based applications",
+    ),
+    parallel: bool = typer.Option(
+        True,
+        "--parallel/--no-parallel",
+        help="Check versions in parallel",
+    ),
+    workers: int = typer.Option(
+        4,
+        "--workers",
+        help="Number of parallel workers",
+        min=1,
+        max=8,
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        help="Show detailed progress",
+    ),
+    progress: bool = typer.Option(
+        True,
+        "--progress/--no-progress",
+        help="Show progress bars",
+    ),
+):
+    """List all ArgoCD applications with their current versions and update status.
+    
+    This command will:
+    1. Find all ArgoCD application files in the configured directories
+    2. Parse their current versions and source information
+    3. For Helm charts, check if newer versions are available
+    4. Display a table with app details and update status
+    
+    The status column shows:
+    - : Up to date
+    - : Update available
+    - ? : Version check failed
+    
+    Args:
+        helm: Only show Helm-based applications
+        parallel: Check versions in parallel
+        workers: Number of parallel workers (1-8)
+        verbose: Show detailed progress
+        progress: Show progress bars
+    """
+    apps = list_all_helm_apps(verbose=verbose) if helm else list_all_apps(verbose=verbose)
+    
+    # Check versions
+    if parallel and apps:
+        checker = VersionChecker(verbose=verbose, show_progress=progress)
+        results = checker.check_versions_parallel(apps, workers)
+    
+    # Create table
+    table = Table(title="Helm-based Argo CD Applications" if helm else "Argo CD Applications")
     table.add_column("Name")
     table.add_column("Namespace")
     table.add_column("Type")
     table.add_column("Chart")
     table.add_column("Current")
     table.add_column("Latest")
-    table.add_column("Status")
-
+    table.add_column("Status", justify="center")
+    
     for app in apps:
+        # Determine status
+        status = "[yellow]?[/yellow]"
         if app.is_helm:
-            type_ = "Helm"
-            chart = app.chart
-            current = app.target_revision
-            latest = app.latest_version or "Unknown"
-            status = "[yellow]⟳[/yellow]" if app.needs_update else "[green]✓[/green]"
+            if app.latest_version:
+                status = "[yellow]![/yellow]" if app.needs_update else "[green]✓[/green]"
+            current_ver = app.target_revision
+            latest_ver = app.latest_version or "Unknown"
         else:
-            type_ = "Path"
-            chart = app.path or "N/A"
-            current = "N/A"
-            latest = "N/A"
-            status = ""
-
+            current_ver = app.target_revision if app.path else "N/A"
+            latest_ver = "N/A"
+            status = " "
+        
         table.add_row(
             app.name,
             app.namespace,
-            type_,
-            chart,
-            current,
-            latest,
+            "Helm" if app.is_helm else "Git",
+            app.chart or app.path or "",
+            current_ver or "",
+            latest_ver,
             status,
         )
-
+    
     console.print(table)
 
 
 @app.command()
-def update(
-    dry_run: bool = True,
-    helm: bool = True,
-    all: bool = False,
-    app_name: str = None,
+def check(
+    helm: bool = typer.Option(
+        True,
+        "--helm/--no-helm",
+        help="Only check Helm charts",
+    ),
+    parallel: bool = typer.Option(
+        True,
+        "--parallel/--no-parallel",
+        help="Check versions in parallel",
+    ),
+    workers: int = typer.Option(
+        4,
+        "--workers",
+        help="Number of parallel workers",
+        min=1,
+        max=8,
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        help="Show detailed progress",
+    ),
+    progress: bool = typer.Option(
+        True,
+        "--progress/--no-progress",
+        help="Show progress bars",
+    ),
 ):
-    """Update helm chart versions
+    """Check if any ArgoCD applications need updates.
+    
+    This command will:
+    1. Find all ArgoCD application files in the configured directories
+    2. Check for available updates
+    3. Show a table of current and latest versions
+    4. Return exit code 1 if any updates are needed
+    
+    Examples:
+        # Check all Helm apps for updates
+        update_helm_apps.py check
+        
+        # Check all apps (including Git sources)
+        update_helm_apps.py check --no-helm
+        
+        # Check with verbose output
+        update_helm_apps.py check --verbose
+    
+    Args:
+        helm: Only check Helm charts
+        parallel: Check versions in parallel
+        workers: Number of parallel workers (1-8)
+        verbose: Show detailed progress
+        progress: Show progress bars
+    """
+    apps = list_all_helm_apps(verbose=verbose) if helm else list_all_apps(verbose=verbose)
+    
+    # Check versions
+    if parallel and apps:
+        checker = VersionChecker(verbose=verbose, show_progress=progress)
+        results = checker.check_versions_parallel(apps, workers)
+    
+    # Create table
+    table = Table(title="Helm-based Argo CD Applications" if helm else "Argo CD Applications")
+    table.add_column("Name")
+    table.add_column("Namespace")
+    table.add_column("Type")
+    table.add_column("Chart")
+    table.add_column("Current")
+    table.add_column("Latest")
+    table.add_column("Status", justify="center")
+    
+    updates_needed = []
+    for app in apps:
+        # Determine status
+        status = "[yellow]?[/yellow]"
+        if app.is_helm:
+            if app.latest_version:
+                needs_update = app.needs_update
+                status = "[yellow]![/yellow]" if needs_update else "[green]✓[/green]"
+                if needs_update:
+                    updates_needed.append(app)
+            current_ver = app.target_revision
+            latest_ver = app.latest_version or "Unknown"
+        else:
+            current_ver = app.target_revision if app.path else "N/A"
+            latest_ver = "N/A"
+            status = " "
+        
+        table.add_row(
+            app.name,
+            app.namespace,
+            "Helm" if app.is_helm else "Git",
+            app.chart or app.path or "",
+            current_ver or "",
+            latest_ver,
+            status,
+        )
+    
+    console.print(table)
+    console.print()
+    
+    if updates_needed:
+        rprint("[yellow]Updates are available for the following apps:[/yellow]")
+        for app in updates_needed:
+            rprint(f"  - {app.name}: {app.target_revision} -> {app.latest_version}")
+        rprint("\nTo apply updates, run:")
+        rprint("  [blue]update_helm_apps.py update --no-dry-run --all[/blue]")
+        raise typer.Exit(code=1)
+    else:
+        rprint("[green]All apps are up to date![/green]")
+        raise typer.Exit(code=0)
+
+
+@app.command()
+def update(
+    dry_run: bool = typer.Option(
+        True,
+        "--dry-run/--no-dry-run",
+        help="Show what would change without making changes",
+    ),
+    helm: bool = typer.Option(
+        True,
+        "--helm/--no-helm",
+        help="Only update Helm charts",
+    ),
+    all: bool = typer.Option(
+        False,
+        "--all",
+        help="Update all apps that need updates",
+    ),
+    app_name: str = typer.Option(
+        None,
+        "--app-name",
+        help="Update a specific app by name",
+    ),
+    parallel: bool = typer.Option(
+        True,
+        "--parallel/--no-parallel",
+        help="Check versions in parallel",
+    ),
+    workers: int = typer.Option(
+        4,
+        "--workers",
+        help="Number of parallel workers",
+        min=1,
+        max=8,
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        help="Show detailed progress",
+    ),
+    progress: bool = typer.Option(
+        True,
+        "--progress/--no-progress",
+        help="Show progress bars",
+    ),
+):
+    """Update ArgoCD application versions to their latest available versions.
+    
+    This command will:
+    1. Check for available updates for your applications
+    2. Verify that target files have no uncommitted changes
+    3. Show a preview of all changes that will be made
+    4. Update the version numbers in the YAML files
+    5. Stage the modified files for commit
+    
+    The update process:
+    1. First checks git status to prevent overwriting uncommitted changes
+    2. Shows a table of all available updates
+    3. In dry-run mode, shows exact file changes that would be made
+    4. Without dry-run, applies changes and stages modified files
+    
+    Examples:
+        # Show available updates
+        update_helm_apps.py update
+        
+        # Update all apps that have updates available
+        update_helm_apps.py update --no-dry-run --all
+        
+        # Update a specific app
+        update_helm_apps.py update --no-dry-run --app-name sealed-secrets
     
     Args:
         dry_run: Show what would change without making changes
-        helm: Only update helm charts
+        helm: Only update Helm charts
         all: Update all apps that need updates
         app_name: Update a specific app by name
+        parallel: Check versions in parallel
+        workers: Number of parallel workers (1-8)
+        verbose: Show detailed progress
+        progress: Show progress bars
     """
-    apps = list_all_helm_apps() if helm else list_all_apps()
+    apps = list_all_helm_apps(verbose=verbose) if helm else list_all_apps(verbose=verbose)
     
     # Filter to specific app if requested
     if app_name:
@@ -409,6 +829,11 @@ def update(
         if not apps:
             rprint(f"[red]Error: No app found with name {app_name}[/red]")
             return
+    
+    # Check versions in parallel
+    if parallel and apps:
+        checker = VersionChecker(verbose=verbose, show_progress=progress)
+        results = checker.check_versions_parallel(apps, workers)
     
     # Find apps that need updates
     updates_needed = [app for app in apps if app.needs_update]
