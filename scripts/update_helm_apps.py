@@ -5,7 +5,7 @@
 #     "requests",
 #     "typer",
 #     "rich",
-#     "ruamel.yaml",
+#     "pyyaml",
 #     "packaging",
 # ]
 # ///
@@ -13,7 +13,8 @@
 from pathlib import Path
 import subprocess
 from typing import Any, Optional
-from ruamel.yaml import YAML
+from io import StringIO
+import yaml
 from rich import print as rprint
 from rich.table import Table
 from rich.console import Console
@@ -38,12 +39,6 @@ from urllib.parse import urlparse
 app = typer.Typer()
 console = Console()
 
-# Use ruamel.yaml for safer YAML parsing and round-trip
-yaml = YAML(typ='safe')
-yaml.default_flow_style = False
-yaml.preserve_quotes = True
-yaml.width = 4096  # Prevent line wrapping
-
 APPS_DIRS = [
     "argo-apps/core-apps",
     "argo-apps/apps",
@@ -60,7 +55,7 @@ class ArgoApp:
         spec = data.get('spec', {})
         
         # Basic app info
-        self.name = spec.get('name', file.stem)
+        self.name = data.get('metadata', {}).get('name', file.stem)
         destination = spec.get('destination', {})
         self.namespace = destination.get('namespace', 'default')
         self.project = spec.get('project', 'default')
@@ -154,9 +149,21 @@ def update_app_version(app: ArgoApp, dry_run: bool = True) -> bool:
     app.update_version(app.latest_version)
     
     # Convert to string while preserving formatting
-    stream = StringIO()
-    yaml.dump(app.data, stream)
-    new_content = stream.getvalue()
+    lines = []
+    
+    # Dump main application
+    lines.append('---\n')
+    main_yaml = yaml.safe_dump(app.data, default_flow_style=False, sort_keys=False)
+    lines.append(main_yaml)
+    
+    # Dump additional resources if present
+    if '__additional_resources' in app.data:
+        additional = app.data.pop('__additional_resources')  # Remove from main doc
+        for doc in additional:
+            lines.append('---\n')
+            lines.append(doc)  # Use original document text
+            
+    new_content = ''.join(lines)
     
     # Show diff
     show_yaml_diff(
@@ -282,7 +289,7 @@ def get_latest_chart_version(repo_url: str, chart_name: str, verbose: bool = Fal
             index_url = get_index_url(repo_url)
             response = requests.get(index_url)
             if response.status_code == 200:
-                index = yaml.load(response.text)
+                index = yaml.safe_load(response.text)
                 if chart_name in index.get('entries', {}):
                     versions = sorted(
                         [entry['version'] for entry in index['entries'][chart_name]],
@@ -342,27 +349,71 @@ def get_latest_chart_version(repo_url: str, chart_name: str, verbose: bool = Fal
     return None
 
 
-def load_yaml_file(file_path: Path) -> list[dict]:
+def load_yaml_file(file_path: Path) -> dict:
     """Load a YAML file safely"""
     try:
         with open(file_path) as f:
             content = f.read()
             
-        # Split documents and parse each one
+        # Split into documents while preserving empty lines and indentation
         docs = []
-        for doc in content.split('---'):
+        current_doc = []
+        
+        for line in content.splitlines(True):  # Keep line endings
+            if line.rstrip() == '---':
+                if current_doc:
+                    docs.append(''.join(current_doc))
+                current_doc = []
+            else:
+                current_doc.append(line)
+                
+        if current_doc:
+            docs.append(''.join(current_doc))
+            
+        if not docs:
+            # If no document markers found, treat entire file as one document
+            docs = [content]
+            
+        # Find first non-empty document that parses as an ArgoCD Application
+        data = None
+        remaining_docs = []
+        app_index = -1
+        
+        for i, doc in enumerate(docs):
             if not doc.strip():
                 continue
-            try:
-                data = yaml.load(doc)
-                if isinstance(data, dict):
-                    docs.append(data)
-            except Exception:
+                
+            parsed = yaml.safe_load(doc)
+            if not parsed:
                 continue
-        return docs
+                
+            if (
+                isinstance(parsed, dict) 
+                and parsed.get('kind') == 'Application'
+                and parsed.get('apiVersion', '').startswith('argoproj.io/')
+            ):
+                data = parsed
+                app_index = i
+                break
+            
+        if not data:
+            return None
+            
+        # Store all other documents in their original order
+        remaining_docs = []
+        for i, doc in enumerate(docs):
+            if i == app_index:
+                continue
+            if doc.strip():  # Skip empty documents
+                remaining_docs.append(doc)
+            
+        if remaining_docs:
+            data['__additional_resources'] = remaining_docs
+            
+        return data
     except Exception as e:
-        rprint(f"[yellow]Warning: Error reading {file_path}: {e}[/yellow]")
-        return []
+        rprint(f"[red]Error loading {file_path}: {e}[/red]")
+        return None
 
 
 def list_all_apps(verbose: bool = False) -> list[ArgoApp]:
@@ -374,11 +425,10 @@ def list_all_apps(verbose: bool = False) -> list[ArgoApp]:
             continue
         
         for yaml_file in app_dir.glob("*.yaml"):
-            for doc in load_yaml_file(yaml_file):
-                if not isinstance(doc, dict):
-                    continue
+            data = load_yaml_file(yaml_file)
+            if data is not None:
                 try:
-                    app = ArgoApp(yaml_file, doc, verbose=verbose)
+                    app = ArgoApp(yaml_file, data, verbose=verbose)
                     apps.append(app)
                 except Exception as e:
                     rprint(f"[yellow]Warning: Failed to parse {yaml_file}: {e}[/yellow]")
