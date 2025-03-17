@@ -8,7 +8,7 @@ spec:
   source:
     chart: argo-events
     repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: 2.4.13
+    targetRevision: 2.4.14
     helm:
       values: |
         configs:
@@ -22,4 +22,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+    - CreateNamespace=true
