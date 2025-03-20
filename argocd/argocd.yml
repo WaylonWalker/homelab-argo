@@ -22,7 +22,7 @@ spec:
           server:
             ingress:
               enabled: true
-          redisSecretInit: # failing to init
+          redisSecretInit: # failing to init https://github.com/argoproj/argo-helm/issues/2887
             enabled: false
       targetRevision: HEAD
   syncPolicy:
