@@ -22,6 +22,8 @@ spec:
           server:
             ingress:
               enabled: true
+          redisSecretInit: # failing to init
+            enabled: false
       targetRevision: HEAD
   syncPolicy:
     automated:
