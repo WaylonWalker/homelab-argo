@@ -1,0 +1,380 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: redis
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+      annotations:
+        config-version: "2"
+    spec:
+      initContainers:
+        - name: restore-backup
+          image: amazon/aws-cli
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Check if data already exists
+              if [ -d "/var/lib/redis/appendonlydir" ] && [ "$(ls -A /var/lib/redis/appendonlydir)" ]; then
+                echo "Data already exists, skipping restore"
+                exit 0
+              fi
+
+              # Create appendonlydir
+              mkdir -p /var/lib/redis/appendonlydir
+
+              # Get latest backup directory
+              echo "Getting latest backup..."
+              LATEST=$(aws s3 ls s3://${AWS_BUCKET_NAME}/redis-backups/ | grep -v '\.rdb$' | sort -r | head -n1 | awk '{print $2}' | sed 's#/$##')
+              echo "Latest backup directory: $LATEST"
+
+              if [ -n "$LATEST" ]; then
+                echo "Restoring backup..."
+                aws s3 sync s3://${AWS_BUCKET_NAME}/redis-backups/$LATEST/appendonlydir/ /var/lib/redis/appendonlydir/
+                chown -R 999:999 /var/lib/redis/appendonlydir  # Redis user ownership
+              else
+                echo "No backup found, starting fresh"
+                chown 999:999 /var/lib/redis/appendonlydir
+              fi
+          volumeMounts:
+            - name: redis-data
+              mountPath: /var/lib/redis
+          envFrom:
+            - secretRef:
+                name: redis-minio-secret
+        - name: redis-config
+          image: python:3
+          command:
+            - bash
+            - "-c"
+            - |
+              python /scripts/env_fill.py /config/redis.conf -o /etc/redis/redis.conf
+              python /scripts/env_fill.py /config/users.acl -o /etc/redis/users.acl
+          volumeMounts:
+            - name: redis-config-template
+              mountPath: /config
+            - name: scripts
+              mountPath: /scripts
+            - name: redis-config
+              mountPath: /etc/redis
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-acl-secret
+                  key: REDIS_PASSWORD
+            - name: REDIS_PASSWORD_WS_PLAYGROUND
+              valueFrom:
+                secretKeyRef:
+                  name: redis-acl-secret
+                  key: REDIS_PASSWORD_WS_PLAYGROUND
+      containers:
+        - name: redis
+          image: redis:alpine
+          command:
+            - /bin/sh
+            - -c
+            - |
+              redis-server /etc/redis/redis.conf &
+              sleep 5
+              redis-cli -a "${REDIS_PASSWORD}" CONFIG SET appendonly yes
+              wait
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: redis-config
+              mountPath: /etc/redis
+            - name: redis-data
+              mountPath: /var/lib/redis
+            - name: redis-logs
+              mountPath: /var/log/redis
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 10Gi
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: redis-config-template
+          configMap:
+            name: redis-config
+        - name: scripts
+          configMap:
+            name: scripts
+        - name: redis-config
+          emptyDir: {}
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data
+        - name: redis-logs
+          emptyDir: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: redis
+data:
+  redis.conf: |
+    ###################################
+    # General Settings
+    ###################################
+    bind 0.0.0.0
+    protected-mode yes
+    port 6379
+    tcp-backlog 511
+    timeout 300
+    tcp-keepalive 60
+
+    ###################################
+    # Security (Enable ACLs)
+    ###################################
+    requirepass ${REDIS_PASSWORD}
+    aclfile /etc/redis/users.acl
+
+    ###################################
+    # Persistence: AOF for User Sessions
+    ###################################
+    appendonly yes
+    appendfsync everysec
+    aof-use-rdb-preamble yes
+    dir /var/lib/redis/
+    dbfilename dump.rdb
+
+    ###################################
+    # Memory Management: Optimize for Caching
+    ###################################
+    maxmemory 9gb
+    maxmemory-policy allkeys-lru
+    lazyfree-lazy-eviction yes
+    lazyfree-lazy-expire yes
+    lazyfree-lazy-server-del yes
+
+    ###################################
+    # Snapshot Persistence (RDB for Backup)
+    ###################################
+    save 900 1
+    save 300 10
+    save 60 10000
+    rdbcompression yes
+    rdbchecksum yes
+
+    ###################################
+    # Performance Tweaks
+    ###################################
+    stop-writes-on-bgsave-error no
+    dynamic-hz yes
+    hz 10
+    activedefrag yes
+
+    ###################################
+    # Logging & Monitoring
+    ###################################
+
+    ###################################
+    # Replication (For Future Scaling)
+    ###################################
+    # masterauth YourSuperSecurePassword
+    # replicaof <master-ip> 6379
+    # replica-read-only yes
+
+    ###################################
+    # Append-Only File Trimming
+    ###################################
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+  users.acl: |
+    user default off
+    user admin on >${REDIS_PASSWORD} allkeys allcommands
+    user ws-playground on >${REDIS_PASSWORD_WS_PLAYGROUND} ~ws-playground:* &ws-playground:* +@read +@write +@pubsub -@admin -@dangerous
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scripts
+  namespace: redis
+data:
+  env_fill.py: |
+    import argparse
+    import os
+    from string import Template
+
+
+    def fill_template(template_path: str, output_path: str = None):
+        with open(template_path, "r") as file:
+            template_content = file.read()
+
+        template = Template(template_content)
+        filled_template = template.safe_substitute(os.environ)
+
+        if output_path:
+            with open(output_path, "w") as file:
+                file.write(filled_template)
+        print(filled_template)
+
+
+    if __name__ == "__main__":
+        parser = argparse.ArgumentParser(
+            description="Fill in environment variables in a template file."
+        )
+        parser.add_argument("template", help="Path to the template file")
+        parser.add_argument(
+            "-o", "--output", help="Output file path (prints to stdout if omitted)"
+        )
+        args = parser.parse_args()
+
+        fill_template(args.template, args.output)
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: redis-backup
+  namespace: redis
+spec:
+  schedule: "0 0 * * *" # Run at midnight every day
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid # Ensure only one backup runs at a time
+  startingDeadlineSeconds: 600 # Allow job to start within 10 minutes of scheduled time
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 3600 # Kill job if it runs longer than 1 hour
+      backoffLimit: 3 # Retry up to 3 times
+      template:
+        spec:
+          initContainers:
+            - name: redis-backup
+              image: redis:alpine
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e  # Exit on error
+                  trap 'echo "Redis backup failed"; exit 1' ERR
+
+                  # Trigger a SAVE operation with authentication
+                  echo "Starting Redis backup..."
+                  redis-cli -h redis -u "redis://admin:${REDIS_PASSWORD}@redis:6379" --no-auth-warning SAVE
+
+                  # Copy the dump file to shared volume
+                  echo "Copying dump file..."
+                  cp -r /var/lib/redis/appendonlydir/ /backup
+                  echo "Backup completed successfully"
+              volumeMounts:
+                - name: redis-data
+                  mountPath: /var/lib/redis
+                  readOnly: true
+                - name: backup-tmp
+                  mountPath: /backup
+              env:
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: redis-acl-secret
+                      key: REDIS_PASSWORD
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+          containers:
+            - name: s3-upload
+              image: amazon/aws-cli
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e  # Exit on error
+                  trap 'echo "S3 upload failed"; exit 1' ERR
+
+                  echo "Starting S3 upload..."
+                  backup_date=$(date +%Y%m%d)
+                  backup_path="s3://${AWS_BUCKET_NAME}/redis-backups/${backup_date}"
+
+                  # Upload appendonlydir contents to S3
+                  echo "Uploading to S3..."
+                  aws s3 sync /backup "${backup_path}/"
+
+                  # Verify upload has files
+                  echo "Verifying upload..."
+                  aws s3 ls "${backup_path}/" || {
+                    echo "Error: Upload verification failed"
+                    exit 1
+                  }
+
+                  echo "Cleaning up old backups..."
+                  # Keep only last 7 days of backups
+                  aws s3 ls "s3://${AWS_BUCKET_NAME}/redis-backups/" | grep -v '\.rdb$' | sort -r | tail -n +8 | awk '{print $2}' | xargs -I {} aws s3 rm --recursive "s3://${AWS_BUCKET_NAME}/redis-backups/{}"
+
+                  echo "Backup completed successfully"
+              volumeMounts:
+                - name: backup-tmp
+                  mountPath: /backup
+              envFrom:
+                - secretRef:
+                    name: redis-minio-secret
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+          volumes:
+            - name: redis-data
+              persistentVolumeClaim:
+                claimName: redis-data
+            - name: backup-tmp
+              emptyDir: {}
+          restartPolicy: OnFailure
