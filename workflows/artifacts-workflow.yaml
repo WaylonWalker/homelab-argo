@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: build-htmx-patterns-
+spec:
+  entrypoint: build-htmx-patterns
+  serviceAccountName: waylon
+  volumeClaimTemplates:
+    - metadata:
+        name: buildah-cache
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi # Adjust based on your cache size requirements
+  templates:
+    - name: build-htmx-patterns
+      inputs:
+        artifacts:
+          - name: devtainer-source
+            path: /src
+            git:
+              repo: https://github.com/waylonwalker/htmx-patterns.git
+              revision: "main"
+      container:
+        image: quay.io/buildah/stable
+        securityContext:
+          runAsUser: 0
+          privileged: true
+        env:
+          - name: STORAGE_DRIVER
+            value: vfs
+          - name: STORAGE_ROOT
+            value: /cache/buildah
+        command: [sh, -c]
+        args:
+          - |
+            mkdir -p $STORAGE_ROOT
+            buildah --storage-driver=$STORAGE_DRIVER --root=$STORAGE_ROOT bud -f /src/Dockerfile -t waylonwalker/htmx-patterns /src
+      volumeMounts:
+        - name: buildah-cache
+          mountPath: /cache

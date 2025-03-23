@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS53YXlsLm9uZSI6eyJ1c2VybmFtZSI6IndheWxvbiIsInBhc3N3b3JkIjoid2Fsa2VycyIsImF1dGgiOiJkMkY1Ykc5dU9uZGhiR3RsY25NPSJ9fX0=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: argo-workflows
+type: kubernetes.io/dockerconfigjson
