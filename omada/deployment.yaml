@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: omada
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: omada-data-pvc
+  namespace: omada
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: omada-logs-pvc
+  namespace: omada
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omada-controller
+  namespace: omada
+  labels:
+    app.kubernetes.io/name: omada-controller
+    app.kubernetes.io/instance: omada-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: omada-controller
+      app.kubernetes.io/instance: omada-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: omada-controller
+        app.kubernetes.io/instance: omada-controller
+    spec:
+      hostNetwork: true # Use host network for discovery
+      containers:
+        - name: omada
+          image: mbentley/omada-controller:latest
+          ports:
+            - containerPort: 8043
+              protocol: TCP
+            - containerPort: 8088
+              protocol: TCP
+            - containerPort: 8843
+              protocol: TCP
+            - containerPort: 27001
+              protocol: UDP
+            - containerPort: 19810
+              protocol: UDP
+            - containerPort: 29810
+              protocol: UDP
+            - containerPort: 29811
+              protocol: TCP
+            - containerPort: 29812
+              protocol: TCP
+            - containerPort: 29813
+              protocol: TCP
+            - containerPort: 29814
+              protocol: TCP
+            - containerPort: 29815
+              protocol: TCP
+            - containerPort: 29816
+              protocol: TCP
+          env:
+            - name: TZ
+              value: America/Chicago
+            - name: MANAGE_HTTP_PORT
+              value: "8088"
+            - name: MANAGE_HTTPS_PORT
+              value: "8043"
+            - name: PORT_ADOPT_V1
+              value: "29812"
+            - name: PORT_APP_DISCOVERY
+              value: "27001"
+            - name: PORT_DISCOVERY
+              value: "29810"
+            - name: PORT_MANAGER_V1
+              value: "29811"
+            - name: PORT_MANAGER_V2
+              value: "29814"
+            - name: PORT_TRANSFER_V2
+              value: "29815"
+            - name: PORT_RTTY
+              value: "29816"
+            - name: PORT_UPGRADE_V1
+              value: "29813"
+            - name: SHOW_SERVER_LOGS
+              value: "true"
+            - name: SHOW_MONGODB_LOGS
+              value: "false"
+          volumeMounts:
+            - mountPath: /opt/tplink/EAPController/data
+              name: omada-data
+            - mountPath: /opt/tplink/EAPController/logs
+              name: omada-logs
+      volumes:
+        - name: omada-data
+          persistentVolumeClaim:
+            claimName: omada-data-pvc
+        - name: omada-logs
+          persistentVolumeClaim:
+            claimName: omada-logs-pvc
