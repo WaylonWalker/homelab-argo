@@ -6,7 +6,7 @@ metadata:
   name: cloudflared-deployment
   namespace: cloudflared
 spec:
-  replicas: 2
+  replicas: 6
   selector:
     matchLabels:
       pod: cloudflared
@@ -16,6 +16,20 @@ spec:
       labels:
         pod: cloudflared
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: pod
+                      operator: In
+                      values:
+                        - cloudflared
+                topologyKey: kubernetes.io/hostname
+      tolerations:
+        - operator: "Exists"
       containers:
         - command:
             - cloudflared
