@@ -25,7 +25,6 @@ metadata:
   name: site-pvc-longhorn
   namespace: waylonwalker-com
 spec:
-  volumeName: site-pv
   storageClassName: longhorn
   accessModes:
     - ReadWriteOnce
