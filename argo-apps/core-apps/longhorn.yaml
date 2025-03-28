@@ -19,3 +19,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
