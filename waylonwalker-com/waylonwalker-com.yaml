@@ -22,11 +22,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: site-pvc
+  name: site-pvc-longhorn
   namespace: waylonwalker-com
 spec:
   volumeName: site-pv
-  storageClassName: hostpath
+  storageClassName: longhorn
   accessModes:
     - ReadWriteMany
   resources:
@@ -56,7 +56,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc
+                claimName: site-pvc-longhorn
           containers:
             - name: waylonwalker-com-container
               image: registry.wayl.one/waylonwalker-com:50
@@ -92,7 +92,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc
+                claimName: site-pvc-longhorn
           containers:
             - name: markata-clean-container
               image: registry.wayl.one/waylonwalker-com:50
