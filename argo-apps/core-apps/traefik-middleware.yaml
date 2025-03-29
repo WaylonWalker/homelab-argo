@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/waylongwalker/homelab-argo
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
     path: k8s/crds
   destination:
     server: https://kubernetes.default.svc
