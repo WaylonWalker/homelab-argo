@@ -1,0 +1,15 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: longhorn-system-basic-auth
+  namespace: longhorn-system
+spec:
+  encryptedData:
+    htpasswd: AgAmFKss/M2pAzAIYT5j9IHcLXBjY05++QeqU/EV2IsRO8RQiRY1z7jxVM0SZLYYuwfM3EMOX8lPJLp2c83f4fBW6UHidhRQYowHaeEKe3TMFDUPHK1qe/Odhkhfv9HMwXtY/ziUKXZAuyM3HogGAKIwWNjMuQJIgmaG6q4IH2fcyqKdsD6WloZURLnKGy58EQl2sd1koUeANqQd7qFOThluVC4K4eFRd0LnhO7L6Xqd5bTluZNBnsopW43jHSGJ4X+QBW/T2IVlQcwsgSpLtJZ3HbELbKU8Mq2mecRIJgfvMaB5xPhunJ7EihXWo7JV8qIUHmGc7fo2K3ycmwERlP7BjfzxrG9T1dUMURPp05ECG6iUuDL+1vHs7kHmlIfwpMLXDq91lIDFsmcPfv5RTYqcv6tNN60k1wu3Uomdrxp3c6BJc971EdznyTTEs4nGZbxa5x9+BM6hmKhAdN+ERMg48oiZ79r+SmMI57QWt4xagK8aNIJBFvRt3jvvJreuqEb5EiM0nUw4Io8Q/3dS1aggwFj0yxWl8hBOAvA32XCEfla3FZTv4oN08Tl8pcQxSJaE7yL91jpMULuppVEHuVYvlNYSgwzApBsxTecboWP6Sx0KXzIB75l7s5Opnbn7ACiVocJCtuq5Ki6XflgAR3wfk342oQ9JO1FrdLguGZH8bsMzGpD5nsnih/9dHOTBDOxCoD7aaeK+9HPJdAlDu/wLq8WIRaerb/SBQDncS4172sdTcLk82gjrEepEMPeRKRAw/L5XlpY4y7AhwipJb/3rhMYdLDUq9+ZDOkCrAGmVig==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: longhorn-system-basic-auth
+      namespace: longhorn-system
