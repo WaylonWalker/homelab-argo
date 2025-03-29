@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik-crds
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/traefik/traefik
+    path: docs/content/reference/dynamic-configuration
+    targetRevision: v2.10
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
