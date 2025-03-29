@@ -6,9 +6,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/traefik/traefik
-    path: docs/content/reference/dynamic-configuration
-    targetRevision: v2.10
+    repoURL: https://github.com/waylongwalker/homelab-argo
+    path: k8s/crds
     directory:
       recurse: true
   destination:
