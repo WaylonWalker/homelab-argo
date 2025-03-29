@@ -24,6 +24,7 @@ spec:
               traefik.ingress.kubernetes.io/router.middlewares: longhorn-system-basic-auth@kubernetescrd
             host: longhorn.wayl.one
             tls: true
+            servicePort: 8000
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
