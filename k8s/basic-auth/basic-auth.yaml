@@ -20,4 +20,4 @@ metadata:
   namespace: longhorn-system
 spec:
   basicAuth:
-    secret: longhorn-system-basic-auth-secret
+    secret: longhorn-system-basic-auth
