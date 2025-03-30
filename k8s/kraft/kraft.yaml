@@ -73,7 +73,7 @@ spec:
             - name: VERSION
               value: "1.21.1"
             - name: FABRIC_LOADER
-              value: "0.15.7"
+              value: "0.16.9"
             - name: MODRINTH_DOWNLOAD_ALL_DEPENDENCIES
               value: "true"
             - name: MODRINTH_PROJECTS
