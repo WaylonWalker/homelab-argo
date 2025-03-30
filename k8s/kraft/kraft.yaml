@@ -76,10 +76,10 @@ spec:
               value: "0.100.1+1.21"
             - name: MODS
               value: |
-                https://mediafilez.forgecdn.net/files/5671/704/ftb-ultimine-fabric-2101.1.1.jar
-                https://mediafilez.forgecdn.net/files/5671/700/ftb-library-fabric-2101.1.1.jar
-                https://mediafilez.forgecdn.net/files/5671/696/architectury-13.0.8-fabric.jar
-                https://mediafilez.forgecdn.net/files/5671/698/fabric-api-0.91.1+1.21.1.jar
+                https://cdn.modrinth.com/data/ftbultimine/versions/jBkpIHZy/ftb-ultimine-fabric-2101.1.1.jar
+                https://cdn.modrinth.com/data/ftblib/versions/Ey5uVTFN/ftb-library-fabric-2101.1.1.jar
+                https://cdn.modrinth.com/data/architectury-api/versions/KsjWBzXw/architectury-13.0.8-fabric.jar
+                https://cdn.modrinth.com/data/P7dR8mSH/versions/dVRxVjGP/fabric-api-0.91.1%2B1.21.1.jar
             - name: RCON_PASSWORD
               valueFrom:
                 secretKeyRef:
