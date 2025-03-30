@@ -28,7 +28,8 @@ spec:
     - name: minecraft
       port: 25565
       targetPort: 25565
-  type: ClusterIP
+      nodePort: 25565
+  type: NodePort
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
