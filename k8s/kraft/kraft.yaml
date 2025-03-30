@@ -1,0 +1,172 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kraft
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kraft-data
+  namespace: kraft
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kraft
+  namespace: kraft
+spec:
+  selector:
+    app: kraft
+  ports:
+    - name: minecraft
+      port: 25565
+      targetPort: 25565
+  type: ClusterIP
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: kraft-pdb
+  namespace: craft
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: kraft
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kraft
+  namespace: kraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kraft
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: kraft
+    spec:
+      containers:
+        - env:
+            - name: SEED
+              value: '-4338028305538428199'
+            - name: EULA
+              value: "true"
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                gamerule keepInventory true
+                pregen start 200
+            - name: VERSION
+              value: "1.21.1"
+            - name: TYPE
+              value: "FABRIC"
+            - name: FABRIC_VERSION
+              value: "0.16.9"
+            - name: MODS
+              value: "https://mediafilez.forgecdn.net/files/5671/704/ftb-ultimine-fabric-2101.1.1.jar"
+            - name: RCON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minecraft-secrets
+                  key: rcon-password
+            - name: ENABLE_RCON
+              value: "true"
+            - name: MEMORY
+              value: "3G"
+            - name: JVM_XX_OPTS
+              value: "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
+            - name: BACKUP_ENABLED
+              value: "true"
+            - name: BACKUP_INTERVAL
+              value: "2h"
+            - name: BACKUP_RETENTION
+              value: "24"
+            - name: ONLINE_MODE
+              value: "true"
+            - name: ENFORCE_WHITELIST
+              value: "true"
+            - name: WHITELIST
+              value: "quadmx08,WyattBubbyLee,AylaWalker"
+            - name: OPS
+              value: "quadmx08"
+            - name: OVERRIDE_SERVER_PROPERTIES
+              value: "true"
+            - name: DIFFICULTY
+              value: "normal"
+            - name: ALLOW_NETHER
+              value: "true"
+            - name: MAX_PLAYERS
+              value: "10"
+            - name: ENABLE_COMMAND_BLOCK
+              value: "true"
+          image: itzg/minecraft-server
+          name: kraft
+          ports:
+            - containerPort: 25565
+              protocol: TCP
+            - containerPort: 25575
+              protocol: TCP
+              name: rcon
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "mc-send-to-console save-all && mc-send-to-console say Server is shutting down in 10 seconds && sleep 10 && mc-send-to-console save-all && mc-send-to-console stop"]
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: 25565
+            periodSeconds: 10
+            initialDelaySeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: 25565
+            periodSeconds: 20
+            initialDelaySeconds: 30
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /data
+              name: minecraft-data
+      restartPolicy: Always
+      volumes:
+        - name: minecraft-data
+          persistentVolumeClaim:
+            claimName: kraft-data
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: kraft-tcp
+  namespace: kraft
+spec:
+  entryPoints:
+    - minecraft
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: kraft
+          port: 25565
