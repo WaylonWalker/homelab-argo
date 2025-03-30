@@ -74,10 +74,12 @@ spec:
               value: "1.21.1"
             - name: FABRIC_LOADER
               value: "0.16.9"
-            - name: MODRINTH_DOWNLOAD_ALL_DEPENDENCIES
-              value: "true"
-            - name: MODRINTH_PROJECTS
-              value: "ftbultimine,ftb-library-fabric,architectury-api,fabric-api"
+            - name: MODS
+              value: |
+                https://mediafilez.forgecdn.net/files/5671/704/ftb-ultimine-fabric-2101.1.1.jar
+                https://mediafilez.forgecdn.net/files/6304/124/ftb-library-fabric-2101.1.12.jar
+                https://mediafilez.forgecdn.net/files/5786/326/architectury-13.0.8-fabric.jar
+                https://mediafilez.forgecdn.net/files/6360/522/fabric-api-0.115.4%2B1.21.1.jar
             - name: RCON_PASSWORD
               valueFrom:
                 secretKeyRef:
