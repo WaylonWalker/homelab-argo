@@ -28,7 +28,7 @@ spec:
     - name: minecraft
       port: 25565
       targetPort: 25565
-      nodePort: 25565
+      nodePort: 35565
   type: NodePort
 ---
 apiVersion: policy/v1
