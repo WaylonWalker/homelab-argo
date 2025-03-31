@@ -16,6 +16,10 @@ spec:
         values: |
           preUpgradeChecker:
             jobEnabled: false
+          defaultBackupStore:
+            backupTarget: s3://longhorn-system@us-east-1/
+            backupTargetCredentialSecret: minio-longhorn-backup-secret
+            pollInterval: 300
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
