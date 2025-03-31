@@ -4,28 +4,12 @@ metadata:
   name: waylonwalker-com
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: site-pv
-spec:
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteMany # Ensure your use case allows this, as hostPath is node-specific
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: hostpath
-  hostPath:
-    path: /mnt/vault/nfs/general/pv/waylonwalker-com/site
-    # path: /var/home/core/waylonwalker-com
-    type: DirectoryOrCreate
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: site-pvc-longhorn2
+  name: site-pvc-longhorn-production
   namespace: waylonwalker-com
 spec:
-  storageClassName: longhorn
+  storageClassName: longhorn-production
   accessModes:
     - ReadWriteOnce
   resources:
@@ -55,7 +39,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc-longhorn2
+                claimName: site-pvc-longhorn-production
           containers:
             - name: waylonwalker-com-container
               image: registry.wayl.one/waylonwalker-com:50
