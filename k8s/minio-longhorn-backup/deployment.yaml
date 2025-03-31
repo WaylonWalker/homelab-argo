@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio-longhorn-backup
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: minio-longhorn-backup
+  name: minio-longhorn-backup
+  namespace: minio-longhorn-backup
+spec:
+  ports:
+    - name: "9000"
+      port: 9000
+      targetPort: 9000
+    - name: "9001"
+      port: 9001
+      targetPort: 9001
+  selector:
+    service: minio-longhorn-backup
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: minio-longhorn-backup
+  name: minio-longhorn-backup
+  namespace: minio-longhorn-backup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: minio-longhorn-backup
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: minio-longhorn-backup
+    spec:
+      initContainers:
+        - name: create-bucket
+          image: minio/mc
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mc alias set local http://localhost:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" && \
+              mc mb -p local/longhorn || true
+          envFrom:
+            - secretRef:
+                name: minio-longhorn-backup-secret
+      containers:
+        - image: minio/minio
+          name: minio-longhorn-backup
+          args:
+            - server
+            - --console-address
+            - :9001
+            - /data
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 9001
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: minio-storage-longhorn-backup
+          envFrom:
+            - secretRef:
+                name: minio-longhorn-backup-secret
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+      restartPolicy: Always
+      volumes:
+        - name: minio-storage-longhorn-backup
+          persistentVolumeClaim:
+            claimName: minio-storage-longhorn-backup
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-storage-longhorn-backup
+  namespace: minio-longhorn-backup
+spec:
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1000Gi
+  volumeName: minio-pv-longhorn-backup
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-pv-longhorn-backup
+spec:
+  capacity:
+    storage: 1000Gi
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/main/minio-longhorn-backup
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    service: minio-longhorn-backup
+  name: minio-longhorn-backup
+  namespace: minio-longhorn-backup
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: minio-longhorn-backup.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: minio-longhorn-backup
+                port:
+                  number: 9000
+            path: /
+            pathType: Prefix
+    - host: minio-ui-longhorn-backup.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: minio-longhorn-backup
+                port:
+                  number: 9001
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - minio-longhorn-backup.wayl.one
+        - minio-ui-longhorn-backup.wayl.one
+      secretName: minio-cert-tls
