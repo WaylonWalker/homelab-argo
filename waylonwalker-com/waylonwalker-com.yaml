@@ -32,10 +32,6 @@ spec:
       template:
         spec:
           tolerations:
-          # - key: "performance"
-          #   operator: "Equal"
-          #   value: "low"
-          #   effect: "NoSchedule"
           volumes:
             - name: site
               persistentVolumeClaim:
@@ -75,7 +71,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc-longhorn2
+                claimName: site-pvc-longhorn-production
           containers:
             - name: markata-clean-container
               image: registry.wayl.one/waylonwalker-com:50
