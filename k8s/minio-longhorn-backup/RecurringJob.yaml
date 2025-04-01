@@ -4,13 +4,10 @@ metadata:
   name: snapshot-hourly
   namespace: longhorn-system
 spec:
-  # Add them to a logical group, so volumes can reference "production"
-  # groups:
-  #   - production
-  task: snapshot # Snapshot only (no backup)
-  cron: "0 * * * *" # Every hour on the hour
-  retain: 24 # Keep 24 snapshots
-  concurrency: 1 # Run 1 at a time for this job
+  task: snapshot
+  cron: "0 * * * *"
+  retain: 24
+  concurrency: 1
 ---
 apiVersion: longhorn.io/v1beta1
 kind: RecurringJob
@@ -18,11 +15,9 @@ metadata:
   name: backup-daily
   namespace: longhorn-system
 spec:
-  # groups:
-  #   - production
-  task: backup # Create snapshot, then backup to offsite
-  cron: "0 2 * * *" # Every day at 02:00
-  retain: 7 # Keep 7 daily backups
+  task: backup
+  cron: "0 2 * * *"
+  retain: 7
   concurrency: 1
 ---
 apiVersion: longhorn.io/v1beta1
@@ -31,9 +26,21 @@ metadata:
   name: backup-weekly
   namespace: longhorn-system
 spec:
-  # groups:
-  #   - production
   task: backup
-  cron: "0 3 * * 0" # Every Sunday at 03:00
-  retain: 4 # Keep 4 weekly backups
+  cron: "0 3 * * 0"
+  retain: 4
   concurrency: 1
+---
+apiVersion: longhorn.io/v1beta1
+kind: RecurringJob
+metadata:
+  name: snapshot-5min
+  namespace: longhorn-system
+spec:
+  task: snapshot
+  cron: "*/5 * * * *"  # Every 5 minutes
+  retain: 12  # Keep last 1 hour worth of snapshots
+  concurrency: 1
+  selector:
+    # Match volumes with this label
+    recurring-job.longhorn.io/snapshot-5min: enabled
