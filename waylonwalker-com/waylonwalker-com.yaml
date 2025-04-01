@@ -6,10 +6,10 @@ metadata:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: site-pvc-longhorn-new
+  name: site-pvc-longhorn-backup
   namespace: waylonwalker-com
 spec:
-  storageClassName: longhorn-production
+  storageClassName: longhorn-backup
   accessModes:
     - ReadWriteOnce
   resources:
@@ -35,7 +35,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc-longhorn-new
+                claimName: site-pvc-longhorn-backup
           containers:
             - name: waylonwalker-com-container
               image: registry.wayl.one/waylonwalker-com:50
@@ -71,7 +71,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc-longhorn-new
+                claimName: site-pvc-longhorn-backup
           containers:
             - name: markata-clean-container
               image: registry.wayl.one/waylonwalker-com:50
@@ -80,7 +80,5 @@ spec:
               volumeMounts:
                 - name: site
                   mountPath: /site
-          imagePullSecrets:
-            - name: regcred
           restartPolicy: OnFailure
           activeDeadlineSeconds: 60
