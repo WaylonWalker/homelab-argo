@@ -16,6 +16,8 @@ spec:
         values: |
           preUpgradeChecker:
             jobEnabled: false
+          defaultSettings:
+            allow-recurring-job-while-volume-detached: true
           defaultBackupStore:
             backupTarget: s3://longhorn-system@us-east-1/
             backupTargetCredentialSecret: minio-longhorn-backup-secret
