@@ -6,6 +6,19 @@ metadata:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: kraft-data-backup
+  namespace: kraft
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: kraft-data
   namespace: kraft
 spec:
@@ -15,6 +28,39 @@ spec:
   resources:
     requests:
       storage: 10Gi
+
+# ---
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: pvc-migration
+#   namespace: kraft
+# spec:
+#   template:
+#     spec:
+#       containers:
+#         - name: pvc-migration
+#           image: ubuntu:22.04
+#           command: ["/bin/bash", "-c"]
+#           args:
+#             - |
+#               echo "Starting migration..."
+#               cd /data
+#               cp -av source/. destination/
+#               echo "Migration complete!"
+#           volumeMounts:
+#             - name: source-vol
+#               mountPath: /data/source
+#             - name: dest-vol
+#               mountPath: /data/destination
+#       restartPolicy: Never
+#       volumes:
+#         - name: source-vol
+#           persistentVolumeClaim:
+#             claimName: kraft-data
+#         - name: dest-vol
+#           persistentVolumeClaim:
+#             claimName: kraft-data-backup
 ---
 apiVersion: v1
 kind: Service
@@ -60,7 +106,9 @@ spec:
         app: kraft
     spec:
       containers:
-        - env:
+        - name: kraft
+          image: itzg/minecraft-server
+          env:
             - name: SEED
               value: '-4338028305538428199'
             - name: EULA
@@ -116,8 +164,6 @@ spec:
               value: "10"
             - name: ENABLE_COMMAND_BLOCK
               value: "true"
-          image: itzg/minecraft-server
-          name: kraft
           ports:
             - containerPort: 25565
               protocol: TCP
@@ -154,24 +200,10 @@ spec:
           stdin: true
           tty: true
           volumeMounts:
-            - mountPath: /data
-              name: minecraft-data
+            - name: minecraft-data
+              mountPath: /data
       restartPolicy: Always
       volumes:
         - name: minecraft-data
           persistentVolumeClaim:
-            claimName: kraft-data
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRouteTCP
-metadata:
-  name: kraft-tcp
-  namespace: kraft
-spec:
-  entryPoints:
-    - minecraft
-  routes:
-    - match: HostSNI(`*`)
-      services:
-        - name: kraft
-          port: 25565
+            claimName: kraft-data-backup
