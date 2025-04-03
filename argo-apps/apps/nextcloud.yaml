@@ -83,8 +83,8 @@ spec:
           existingSecret:
             enabled: true
             secretName: nextcloud-extra-secret
-            usernameKey: db-user
-            passwordKey: db-password
+            usernameKey: username
+            passwordKey: password
   destination:
     server: https://kubernetes.default.svc
     namespace: nextcloud
