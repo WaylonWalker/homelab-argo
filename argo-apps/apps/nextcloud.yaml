@@ -84,6 +84,7 @@ spec:
                     'writable' => true,
                   ),
                 ),
+                'config_is_read_only' => true,
                 'default_phone_region' => 'US',
                 'enable_previews' => true,
                 'enabledPreviewProviders' => array(
@@ -168,14 +169,9 @@ spec:
         postgresql:
           enabled: false
         nginx:
+          enabled: false
+        apache:
           enabled: true
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
         ingress:
           enabled: true
           annotations:
