@@ -61,6 +61,13 @@ spec:
           persistence:
             enabled: true
             existingClaim: "nextcloud-data"
+          podSecurityContext:
+            runAsUser: 33
+            runAsGroup: 33
+            fsGroup: 33
+          containerSecurityContext:
+            runAsUser: 33
+            runAsGroup: 33
           phpConfigs:
             memory-limit.ini: |
               memory_limit = 1G
@@ -163,7 +170,17 @@ spec:
           enabled: true
           type: postgresql
           host: nextcloud-db-rw.nextcloud.svc.cluster.local
-          port: 5432
+          database: nextcloud
+          user:
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-extra-secret
+                key: db-user
+          password:
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-extra-secret
+                key: db-password
         redis:
           enabled: false
         postgresql:
@@ -172,6 +189,8 @@ spec:
           enabled: false
         apache:
           enabled: true
+        internalDatabase:
+          enabled: false
         ingress:
           enabled: true
           annotations:
