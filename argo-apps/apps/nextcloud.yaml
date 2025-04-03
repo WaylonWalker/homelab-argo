@@ -5,90 +5,91 @@
 #
 # metadata refresh with cron
 # redis 
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: nextcloud
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://nextcloud.github.io/helm/
-    chart: nextcloud
-    targetRevision: 6.6.6
-    helm:
-      values: |
-        cronjob:
-          enabled: true
-        nextcloud:
-          host: nextcloud.wayl.one
-          username: admin
-          password: changeme
-          extraEnv:
-            - name: OVERWRITECLIURL
-              value: "https://nextcloud.wayl.one"
-            - name: OVERWRITEPROTOCOL
-              value: "https"
-            - name: OVERWRITEHOST
-              value: "nextcloud.wayl.one"
-            - name: TRUSTED_PROXIES
-              value: "10.0.0.77"
-          ## Use an existing secret
-          existingSecret:
-            enabled: false
-            # secretName: nameofsecret
-            usernameKey: nextcloud-username
-            passwordKey: nextcloud-password
-            tokenKey: ""
-            smtpUsernameKey: smtp-username
-            smtpPasswordKey: smtp-password
-            smtpHostKey: smtp-host
-        ingress:
-          enabled: true
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-prod
 
-          # -- Ingress class name. replacement for the deprecated "kubernetes.io/ingress.class" annotation
-          ingressClassName: ""
-
-          # -- Hostname(s) for the Ingress resource
-          # Please refer to https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/#IngressSpec for more information.
-          hosts:
-            - host: nextcloud.wayl.one
-              paths:
-              - path: /
-                type: ImplementationSpecific
-        persistence:
-          enabled: true
-          existingClaim: nextcloud-html
-          nextcloudData:
-            enabled: true
-            existingClaim: nextcloud-data
-        nodeSelector:
-          nextcloud-storage: "true"
-        ingress:
-          enabled: true
-          ingressClassName: traefik
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-prod
-            nginx.ingress.kubernetes.io/ssl-redirect: "true"
-          hosts:
-            - host: nextcloud.wayl.one
-              paths:
-                - path: /
-                  type: Prefix
-          tls:
-            - secretName: nextcloud-cert-tls
-              hosts:
-                - nextcloud.wayl.one
-        nodeSelector:
-          nextcloud-storage: "true"
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: nextcloud
-  syncPolicy:
-    automated:
-      selfHeal: true
-      prune: true
-    syncOptions:
-      - CreateNamespace=true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: nextcloud
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://nextcloud.github.io/helm/
+#     chart: nextcloud
+#     targetRevision: 6.6.6
+#     helm:
+#       values: |
+#         cronjob:
+#           enabled: true
+#         nextcloud:
+#           host: nextcloud.wayl.one
+#           username: admin
+#           password: changeme
+#           extraEnv:
+#             - name: OVERWRITECLIURL
+#               value: "https://nextcloud.wayl.one"
+#             - name: OVERWRITEPROTOCOL
+#               value: "https"
+#             - name: OVERWRITEHOST
+#               value: "nextcloud.wayl.one"
+#             - name: TRUSTED_PROXIES
+#               value: "10.0.0.77"
+#           ## Use an existing secret
+#           existingSecret:
+#             enabled: false
+#             # secretName: nameofsecret
+#             usernameKey: nextcloud-username
+#             passwordKey: nextcloud-password
+#             tokenKey: ""
+#             smtpUsernameKey: smtp-username
+#             smtpPasswordKey: smtp-password
+#             smtpHostKey: smtp-host
+#         ingress:
+#           enabled: true
+#           annotations:
+#             cert-manager.io/cluster-issuer: letsencrypt-prod
+#
+#           # -- Ingress class name. replacement for the deprecated "kubernetes.io/ingress.class" annotation
+#           ingressClassName: ""
+#
+#           # -- Hostname(s) for the Ingress resource
+#           # Please refer to https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/#IngressSpec for more information.
+#           hosts:
+#             - host: nextcloud.wayl.one
+#               paths:
+#               - path: /
+#                 type: ImplementationSpecific
+#         persistence:
+#           enabled: true
+#           existingClaim: nextcloud-html
+#           nextcloudData:
+#             enabled: true
+#             existingClaim: nextcloud-data
+#         nodeSelector:
+#           nextcloud-storage: "true"
+#         ingress:
+#           enabled: true
+#           ingressClassName: traefik
+#           annotations:
+#             cert-manager.io/cluster-issuer: letsencrypt-prod
+#             nginx.ingress.kubernetes.io/ssl-redirect: "true"
+#           hosts:
+#             - host: nextcloud.wayl.one
+#               paths:
+#                 - path: /
+#                   type: Prefix
+#           tls:
+#             - secretName: nextcloud-cert-tls
+#               hosts:
+#                 - nextcloud.wayl.one
+#         nodeSelector:
+#           nextcloud-storage: "true"
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: nextcloud
+#   syncPolicy:
+#     automated:
+#       selfHeal: true
+#       prune: true
+#     syncOptions:
+#       - CreateNamespace=true
