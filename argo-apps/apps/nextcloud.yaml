@@ -76,6 +76,16 @@ spec:
               max_execution_time = 3600
               max_input_time = 3600
           configs:
+            apache-pretty-urls.config.php: |
+              <?php
+              $CONFIG = array (
+                'htaccess.RewriteBase' => '/',
+              );
+            apcu.config.php: |
+              <?php
+              $CONFIG = array (
+                'memcache.local' => '\OC\Memcache\APCu',
+              );
             config.php: |
               <?php
               $CONFIG = array (
@@ -128,6 +138,44 @@ spec:
                   'dbindex' => 0,
                   'timeout' => 1.5,
                 ),
+                'trusted_proxies' => ['10.0.0.0/8'],
+                'overwritehost' => 'nextcloud.wayl.one',
+                'overwriteprotocol' => 'https',
+                'overwrite.cli.url' => 'https://nextcloud.wayl.one',
+              );
+            redis.config.php: |
+              <?php
+              $CONFIG = array (
+                'memcache.distributed' => '\OC\Memcache\Redis',
+                'memcache.locking' => '\OC\Memcache\Redis',
+                'redis' => array(
+                  'host' => 'nextcloud-redis',
+                  'port' => 6379,
+                  'dbindex' => 0,
+                  'timeout' => 1.5,
+                ),
+              );
+            reverse-proxy.config.php: |
+              <?php
+              $CONFIG = array (
+                'trusted_proxies' => ['10.0.0.0/8'],
+                'overwritehost' => 'nextcloud.wayl.one',
+                'overwriteprotocol' => 'https',
+                'overwrite.cli.url' => 'https://nextcloud.wayl.one',
+              );
+            s3.config.php: |
+              <?php
+              $CONFIG = array();
+            smtp.config.php: |
+              <?php
+              $CONFIG = array();
+            swift.config.php: |
+              <?php
+              $CONFIG = array();
+            upgrade-disable-web.config.php: |
+              <?php
+              $CONFIG = array (
+                'upgrade.disable-web' => true,
               );
           extraEnv:
             - name: OVERWRITECLIURL
@@ -175,6 +223,8 @@ spec:
           enabled: false
         apache:
           enabled: true
+          extraVolumeMounts: []
+          serverName: nextcloud.wayl.one
         internalDatabase:
           enabled: false
         ingress:
