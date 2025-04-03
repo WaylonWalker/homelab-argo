@@ -100,7 +100,7 @@ spec:
       data:
         compression: gzip
       endpointURL: "https://minio.wayl.one"
-      destinationPath: "s3://nextcloud-backup/"
+      destinationPath: "s3://nextcloud/db"
       s3Credentials:
         accessKeyId:
           name: nextcloud-minio-secret
