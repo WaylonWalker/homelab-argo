@@ -69,19 +69,7 @@ spec:
               max_execution_time = 3600
               max_input_time = 3600
           configs:
-            redis.config.php: |
-              <?php
-              $CONFIG = array (
-                'memcache.distributed' => '\OC\Memcache\Redis',
-                'memcache.locking' => '\OC\Memcache\Redis',
-                'redis' => array(
-                  'host' => 'nextcloud-redis',
-                  'port' => 6379,
-                  'dbindex' => 0,
-                  'timeout' => 1.5,
-                ),
-              );
-            apps.config.php: |
+            config.php: |
               <?php
               $CONFIG = array (
                 'apps_paths' => array(
@@ -124,6 +112,14 @@ spec:
                 'enforce_theme' => 'dark',
                 'trashbin_retention_obligation' => 'auto, 30',
                 'upgrade.disable-web' => true,
+                'memcache.distributed' => '\OC\Memcache\Redis',
+                'memcache.locking' => '\OC\Memcache\Redis',
+                'redis' => array(
+                  'host' => 'nextcloud-redis',
+                  'port' => 6379,
+                  'dbindex' => 0,
+                  'timeout' => 1.5,
+                ),
               );
           extraEnv:
             - name: OVERWRITECLIURL
