@@ -33,6 +33,20 @@ spec:
               value: "nextcloud.wayl.one"
             - name: TRUSTED_PROXIES
               value: "10.0.0.77"
+            - name: POSTGRES_DB
+              value: nextcloud
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-extra-secret
+                  key: db-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-extra-secret
+                  key: db-password
+            - name: POSTGRES_HOST
+      value: nextcloud-db-rw.nextcloud.svc
           ## Use an existing secret
           existingSecret:
             enabled: false
