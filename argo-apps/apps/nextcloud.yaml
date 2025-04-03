@@ -144,16 +144,6 @@ spec:
               value: "5432"
             - name: POSTGRES_DB
               value: nextcloud
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: nextcloud-extra-secret
-                  key: db-user
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: nextcloud-extra-secret
-                  key: db-password
             - name: PHP_MEMORY_LIMIT
               value: "1G"
             - name: PHP_UPLOAD_LIMIT
@@ -170,17 +160,13 @@ spec:
           enabled: true
           type: postgresql
           host: nextcloud-db-rw.nextcloud.svc.cluster.local
+          port: 5432
           database: nextcloud
-          user:
-            valueFrom:
-              secretKeyRef:
-                name: nextcloud-extra-secret
-                key: db-user
-          password:
-            valueFrom:
-              secretKeyRef:
-                name: nextcloud-extra-secret
-                key: db-password
+          existingSecret:
+            enabled: true
+            secretName: nextcloud-extra-secret
+            usernameKey: db-user
+            passwordKey: db-password
         redis:
           enabled: false
         postgresql:
