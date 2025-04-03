@@ -1,0 +1,79 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: nextcloud-db
+  namespace: nextcloud
+spec:
+  instances: 3
+  storage:
+    storageClass: local-path
+    size: 20Gi
+  nodeSelector:
+    nextcloud-storage: "true"
+  bootstrap:
+    initdb:
+      database: nextcloud
+      owner: nextcloud
+      secret:
+        name: nextcloud-extra-secret
+  monitoring:
+    enablePodMonitor: true
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore:
+      data:
+        compression: bzip2
+      wal:
+        compression: bzip2
+      endpointURL:
+        name: nextcloud-minio-secret
+        key: AWS_ENDPOINT_URL
+      destinationPath:
+        name: nextcloud-minio-secret
+        key: AWS_BUCKET
+      s3Credentials:
+        accessKeyId:
+          name: nextcloud-minio-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: nextcloud-minio-secret
+          key: AWS_SECRET_ACCESS_KEY
+        region:
+          name: nextcloud-minio-secret
+          key: AWS_REGION
+---
+apiVersion: redis.redis.opstreelabs.in/v1beta1
+kind: Redis
+metadata:
+  name: nextcloud-redis
+  namespace: nextcloud
+spec:
+  kubernetesConfig:
+    image: redis:7.2-alpine
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    nodeSelector:
+      nextcloud-storage: "true"
+    securityContext:
+      runAsUser: 999
+      fsGroup: 999
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: local-path
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+  redisConfig:
+    additionalRedisConfig:
+      maxmemory: 200mb
+      maxmemory-policy: allkeys-lru
+      appendonly: "yes"
+      appendfsync: everysec
+      save: "900 1 300 10 60 10000"

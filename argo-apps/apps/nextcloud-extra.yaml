@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nextcloud-extra
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: nextcloud
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: k8s/nextcloud-extra
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true

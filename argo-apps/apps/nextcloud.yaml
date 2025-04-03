@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://nextcloud.github.io/helm/
     chart: nextcloud
-    targetRevision: 6.6.6
+    targetRevision: 6.6.9
     helm:
       values: |
         cronjob:
@@ -24,6 +24,102 @@ spec:
           host: nextcloud.wayl.one
           username: admin
           password: changeme
+          nodeSelector:
+            nextcloud-storage: "true"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+          startupProbe:
+            enabled: true
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+            successThreshold: 1
+          livenessProbe:
+            enabled: true
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe:
+            enabled: true
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          persistence:
+            enabled: true
+            existingClaim: ""
+            hostPath: /mnt/main/nextcloud
+          phpConfigs:
+            memory-limit.ini: |
+              memory_limit = 1G
+              upload_max_filesize = 16G
+              post_max_size = 16G
+              max_execution_time = 3600
+              max_input_time = 3600
+          configs:
+            redis.config.php: |
+              <?php
+              $CONFIG = array (
+                'memcache.distributed' => '\OC\Memcache\Redis',
+                'memcache.locking' => '\OC\Memcache\Redis',
+                'redis' => array(
+                  'host' => 'nextcloud-redis',
+                  'port' => 6379,
+                  'dbindex' => 0,
+                  'timeout' => 1.5,
+                ),
+              );
+            apps.config.php: |
+              <?php
+              $CONFIG = array (
+                'apps_paths' => array(
+                  array(
+                    'path'=> '/var/www/html/apps',
+                    'url' => '/apps',
+                    'writable' => false,
+                  ),
+                  array(
+                    'path'=> '/var/www/html/custom_apps',
+                    'url' => '/custom_apps',
+                    'writable' => true,
+                  ),
+                ),
+                'default_phone_region' => 'US',
+                'enable_previews' => true,
+                'enabledPreviewProviders' => array(
+                  'OC\Preview\Movie',
+                  'OC\Preview\Image',
+                  'OC\Preview\TXT',
+                  'OC\Preview\MarkDown',
+                  'OC\Preview\PDF',
+                  'OC\Preview\MP3',
+                ),
+                'preview_max_x' => 2048,
+                'preview_max_y' => 2048,
+                'preview_max_filesize_image' => 50,
+                'preview_max_filesize_movie' => 1024,
+                'preview_max_scale_factor' => 8,
+                'filelocking.enabled' => true,
+                'htaccess.RewriteBase' => '/',
+                'integrity.check.disabled' => false,
+                'knowledgebaseenabled' => false,
+                'logfile' => '/var/www/html/data/nextcloud.log',
+                'loglevel' => 2,
+                'log_rotate_size' => 104857600,
+                'maintenance' => false,
+                'theme' => '',
+                'trashbin_retention_obligation' => 'auto, 30',
+                'upgrade.disable-web' => true,
+              );
           extraEnv:
             - name: OVERWRITECLIURL
               value: "https://nextcloud.wayl.one"
@@ -33,34 +129,97 @@ spec:
               value: "nextcloud.wayl.one"
             - name: TRUSTED_PROXIES
               value: "10.0.0.77"
-          ## Use an existing secret
+            - name: POSTGRES_HOST
+              value: nextcloud-db-rw.nextcloud.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: nextcloud
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-extra-secret
+                  key: db-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-extra-secret
+                  key: db-password
+            - name: PHP_MEMORY_LIMIT
+              value: "1G"
+            - name: PHP_UPLOAD_LIMIT
+              value: "16G"
           existingSecret:
             enabled: false
-            # secretName: nameofsecret
             usernameKey: nextcloud-username
             passwordKey: nextcloud-password
             tokenKey: ""
             smtpUsernameKey: smtp-username
             smtpPasswordKey: smtp-password
             smtpHostKey: smtp-host
+        externalDatabase:
+          enabled: true
+          type: postgresql
+          host: nextcloud-db-rw.nextcloud.svc.cluster.local
+          port: 5432
+        redis:
+          enabled: false
+        postgresql:
+          enabled: false
+        nginx:
+          enabled: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+        cronjob:
+          enabled: true
+          schedule: "*/5 * * * *"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          annotations:
+            helm.sh/hook: post-install,post-upgrade
+            helm.sh/hook-weight: "1"
         ingress:
           enabled: true
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-prod
-
-          # -- Ingress class name. replacement for the deprecated "kubernetes.io/ingress.class" annotation
-          ingressClassName: ""
-
-          # -- Hostname(s) for the Ingress resource
-          # Please refer to https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/#IngressSpec for more information.
+            nginx.ingress.kubernetes.io/proxy-body-size: 16G
+          ingressClassName: "nginx"
+          tls:
+            - secretName: nextcloud-tls
+              hosts:
+                - nextcloud.wayl.one
           hosts:
             - host: nextcloud.wayl.one
               paths:
               - path: /
                 type: ImplementationSpecific
+          initScripts:
+            preview-generator.sh: |
+              #!/bin/bash
+              echo "Installing previewgenerator app..."
+              su -s /bin/bash -c 'php occ app:install previewgenerator' "www-data"
+              echo "Installing facerecognition app..."
+              sudo -u www-data php occ app:install facerecognition || true
+              echo "Installing recognize app..."
+              sudo -u www-data php occ app:install recognize || true
+              echo "Installing workflow_script app..."
+              sudo -u www-data php occ app:install workflow_script || true
+
+              echo "Listing all installed apps..."
+              su -s /bin/bash -c 'php occ app:list --shipped false' "www-data"
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: nextcloud
   syncPolicy:
     automated:
       selfHeal: true
