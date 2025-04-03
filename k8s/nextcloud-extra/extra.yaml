@@ -80,8 +80,6 @@ spec:
   storage:
     storageClass: local-path
     size: 20Gi
-  nodeSelector:
-    nextcloud-storage: "true"
   bootstrap:
     initdb:
       database: nextcloud
