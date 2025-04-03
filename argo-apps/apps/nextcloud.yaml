@@ -58,6 +58,13 @@ spec:
               paths:
               - path: /
                 type: ImplementationSpecific
+        primary:
+          persistence:
+            enabled: true
+            existingClaim: nextcloud-data
+            storageClassName: local-path
+            accessMode: ReadWriteOnce
+            size: 100Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
