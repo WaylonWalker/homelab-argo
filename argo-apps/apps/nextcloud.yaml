@@ -27,6 +27,8 @@ spec:
           username: admin
           password: changeme
           extraEnv:
+            - name: PGSSLMODE
+              value: disable
             - name: OVERWRITECLIURL
               value: "https://nextcloud.wayl.one"
             - name: OVERWRITEPROTOCOL
