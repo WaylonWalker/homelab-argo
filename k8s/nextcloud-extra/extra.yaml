@@ -57,16 +57,12 @@ spec:
   backup:
     retentionPolicy: 30d
     barmanObjectStore:
-      data:
-        compression: bzip2
       wal:
-        compression: bzip2
-      endpointURL:
-        name: nextcloud-minio-secret
-        key: AWS_ENDPOINT_URL
-      destinationPath:
-        name: nextcloud-minio-secret
-        key: AWS_BUCKET
+        compression: gzip
+      data:
+        compression: gzip
+      endpointURL: "https://minio.wayl.one"
+      destinationPath: "s3://nextcloud-backup/"
       s3Credentials:
         accessKeyId:
           name: nextcloud-minio-secret
@@ -97,42 +93,42 @@ spec:
       nodeSelector:
         nextcloud-storage: "true"
       containers:
-      - name: redis
-        image: redis:7.2-alpine
-        command:
-          - redis-server
-          - "/etc/redis/redis.conf"
+        - name: redis
+          image: redis:7.2-alpine
+          command:
+            - redis-server
+            - "/etc/redis/redis.conf"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+            - name: redis-config
+              mountPath: /etc/redis
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+      volumes:
+        - name: redis-config
+          configMap:
+            name: nextcloud-redis-config
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
         resources:
           requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 200m
-            memory: 256Mi
-        ports:
-        - containerPort: 6379
-          name: redis
-        volumeMounts:
-        - name: redis-data
-          mountPath: /data
-        - name: redis-config
-          mountPath: /etc/redis
-        securityContext:
-          runAsUser: 999
-          runAsGroup: 999
-      volumes:
-      - name: redis-config
-        configMap:
-          name: nextcloud-redis-config
-  volumeClaimTemplates:
-  - metadata:
-      name: redis-data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: local-path
-      resources:
-        requests:
-          storage: 20Gi
+            storage: 20Gi
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -159,6 +155,6 @@ spec:
   selector:
     app: nextcloud-redis
   ports:
-  - port: 6379
-    targetPort: redis
-    name: redis
+    - port: 6379
+      targetPort: redis
+      name: redis
