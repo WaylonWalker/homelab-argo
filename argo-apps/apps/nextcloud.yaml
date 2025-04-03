@@ -22,6 +22,8 @@ spec:
           enabled: true
         nextcloud:
           host: nextcloud.wayl.one
+          trustedDomains:
+            - nextcloud.wayl.one
           username: admin
           password: changeme
           extraEnv:
@@ -33,20 +35,6 @@ spec:
               value: "nextcloud.wayl.one"
             - name: TRUSTED_PROXIES
               value: "10.0.0.77"
-            - name: POSTGRES_DB
-              value: nextcloud
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: nextcloud-extra-secret
-                  key: db-user
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: nextcloud-extra-secret
-                  key: db-password
-            - name: POSTGRES_HOST
-              value: nextcloud-db-rw.nextcloud.svc
           ## Use an existing secret
           existingSecret:
             enabled: false
@@ -57,21 +45,6 @@ spec:
             smtpUsernameKey: smtp-username
             smtpPasswordKey: smtp-password
             smtpHostKey: smtp-host
-        ingress:
-          enabled: true
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-prod
-
-          # -- Ingress class name. replacement for the deprecated "kubernetes.io/ingress.class" annotation
-          ingressClassName: ""
-
-          # -- Hostname(s) for the Ingress resource
-          # Please refer to https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/#IngressSpec for more information.
-          hosts:
-            - host: nextcloud.wayl.one
-              paths:
-              - path: /
-                type: ImplementationSpecific
         persistence:
           enabled: true
           existingClaim: nextcloud-html
@@ -95,8 +68,21 @@ spec:
             - secretName: nextcloud-cert-tls
               hosts:
                 - nextcloud.wayl.one
-        nodeSelector:
-          nextcloud-storage: "true"
+        internalDatabase:
+          enabled: false
+
+        externalDatabase:
+          enabled: true
+          type: postgresql
+          host: nextcloud-db-rw.nextcloud.svc
+          user: nextcloud
+          password: ""
+          database: nextcloud
+          existingSecret:
+            enabled: true
+            secretName: nextcloud-extra-secret
+            usernameKey: db-user
+            passwordKey: db-password
   destination:
     server: https://kubernetes.default.svc
     namespace: nextcloud
