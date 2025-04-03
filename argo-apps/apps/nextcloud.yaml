@@ -46,7 +46,7 @@ spec:
                   name: nextcloud-extra-secret
                   key: db-password
             - name: POSTGRES_HOST
-      value: nextcloud-db-rw.nextcloud.svc
+              value: nextcloud-db-rw.nextcloud.svc
           ## Use an existing secret
           existingSecret:
             enabled: false
