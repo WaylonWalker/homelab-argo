@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nextcloud-html
+  name: pv-nextcloud-html
   namespace: nextcloud
 spec:
   capacity:
@@ -9,9 +9,10 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-path
-  local:
+  storageClassName: hostpath
+  hostPath:
     path: /mnt/main/nextcloud/html
+    type: DirectoryOrCreate
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -29,7 +30,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: hostpath
+  volumeName: pv-nextcloud-html
   resources:
     requests:
       storage: 2Gi
@@ -37,7 +39,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nextcloud-data
+  name: pv-nextcloud-data
   namespace: nextcloud
 spec:
   capacity:
@@ -45,9 +47,10 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-path
-  local:
+  storageClassName: hostpath
+  hostPath:
     path: /mnt/main/nextcloud/data
+    type: DirectoryOrCreate
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -66,6 +69,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path
+  volumeName: pv-nextcloud-data
   resources:
     requests:
       storage: 2Ti
