@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://nextcloud.github.io/helm/
     chart: nextcloud
-    targetRevision: 6.6.6
+    targetRevision: 6.6.9
     helm:
       values: |
         cronjob:
@@ -36,7 +36,7 @@ spec:
             - name: OVERWRITEHOST
               value: "nextcloud.wayl.one"
             - name: TRUSTED_PROXIES
-              value: "10.0.0.77"
+              value: "10.0.0.0/8,10.42.0.0/16"
           ## Use an existing secret
           existingSecret:
             enabled: false
