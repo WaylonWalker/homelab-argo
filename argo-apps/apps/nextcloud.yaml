@@ -20,6 +20,17 @@ spec:
       values: |
         cronjob:
           enabled: true
+          schedule: "*/5 * * * *"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          annotations:
+            helm.sh/hook: post-install,post-upgrade
+            helm.sh/hook-weight: "1"
         nextcloud:
           host: nextcloud.wayl.one
           username: admin
@@ -65,61 +76,13 @@ spec:
               post_max_size = 16G
               max_execution_time = 3600
               max_input_time = 3600
-          configs:
-            redis.config.php: |
-              <?php
-              $CONFIG = array (
-                'memcache.distributed' => '\OC\Memcache\Redis',
-                'memcache.locking' => '\OC\Memcache\Redis',
-                'redis' => array(
-                  'host' => 'nextcloud-redis',
-                  'port' => 6379,
-                  'dbindex' => 0,
-                  'timeout' => 1.5,
-                ),
-              );
-            apps.config.php: |
-              <?php
-              $CONFIG = array (
-                'apps_paths' => array(
-                  array(
-                    'path'=> '/var/www/html/apps',
-                    'url' => '/apps',
-                    'writable' => false,
-                  ),
-                  array(
-                    'path'=> '/var/www/html/custom_apps',
-                    'url' => '/custom_apps',
-                    'writable' => true,
-                  ),
-                ),
-                'default_phone_region' => 'US',
-                'enable_previews' => true,
-                'enabledPreviewProviders' => array(
-                  'OC\Preview\Movie',
-                  'OC\Preview\Image',
-                  'OC\Preview\TXT',
-                  'OC\Preview\MarkDown',
-                  'OC\Preview\PDF',
-                  'OC\Preview\MP3',
-                ),
-                'preview_max_x' => 2048,
-                'preview_max_y' => 2048,
-                'preview_max_filesize_image' => 50,
-                'preview_max_filesize_movie' => 1024,
-                'preview_max_scale_factor' => 8,
-                'filelocking.enabled' => true,
-                'htaccess.RewriteBase' => '/',
-                'integrity.check.disabled' => false,
-                'knowledgebaseenabled' => false,
-                'logfile' => '/var/www/html/data/nextcloud.log',
-                'loglevel' => 2,
-                'log_rotate_size' => 104857600,
-                'maintenance' => false,
-                'theme' => '',
-                'trashbin_retention_obligation' => 'auto, 30',
-                'upgrade.disable-web' => true,
-              );
+          extraVolumeMounts:
+            - name: nextcloud-config
+              mountPath: /var/www/html/config
+          extraVolumes:
+            - name: nextcloud-config
+              configMap:
+                name: nextcloud-config
           extraEnv:
             - name: OVERWRITECLIURL
               value: "https://nextcloud.wayl.one"
@@ -175,19 +138,6 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-        cronjob:
-          enabled: true
-          schedule: "*/5 * * * *"
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
-          annotations:
-            helm.sh/hook: post-install,post-upgrade
-            helm.sh/hook-weight: "1"
         ingress:
           enabled: true
           annotations:
@@ -226,3 +176,66 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-config
+  namespace: nextcloud
+data:
+  redis.config.php: |
+    <?php
+    $CONFIG = array (
+      'memcache.distributed' => '\OC\Memcache\Redis',
+      'memcache.locking' => '\OC\Memcache\Redis',
+      'redis' => array(
+        'host' => 'nextcloud-redis',
+        'port' => 6379,
+        'dbindex' => 0,
+        'timeout' => 1.5,
+      ),
+    );
+  apps.config.php: |
+    <?php
+    $CONFIG = array (
+      'apps_paths' => array(
+        array(
+          'path'=> '/var/www/html/apps',
+          'url' => '/apps',
+          'writable' => false,
+        ),
+        array(
+          'path'=> '/var/www/html/custom_apps',
+          'url' => '/custom_apps',
+          'writable' => true,
+        ),
+      ),
+      'default_phone_region' => 'US',
+      'enable_previews' => true,
+      'enabledPreviewProviders' => array(
+        'OC\Preview\Movie',
+        'OC\Preview\Image',
+        'OC\Preview\TXT',
+        'OC\Preview\MarkDown',
+        'OC\Preview\PDF',
+        'OC\Preview\MP3',
+      ),
+      'preview_max_x' => 2048,
+      'preview_max_y' => 2048,
+      'preview_max_filesize_image' => 50,
+      'preview_max_filesize_movie' => 1024,
+      'preview_max_scale_factor' => 8,
+      'filelocking.enabled' => true,
+      'htaccess.RewriteBase' => '/',
+      'integrity.check.disabled' => false,
+      'knowledgebaseenabled' => false,
+      'logfile' => '/var/www/html/data/nextcloud.log',
+      'loglevel' => 2,
+      'log_rotate_size' => 104857600,
+      'maintenance' => false,
+      'theme' => '',
+      'default_theme' => 'dark',
+      'enforce_theme' => 'dark',
+      'trashbin_retention_obligation' => 'auto, 30',
+      'upgrade.disable-web' => true,
+    );

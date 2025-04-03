@@ -42,38 +42,87 @@ spec:
           name: nextcloud-minio-secret
           key: AWS_REGION
 ---
-apiVersion: redis.redis.opstreelabs.in/v1beta1
-kind: Redis
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: nextcloud-redis
   namespace: nextcloud
 spec:
-  kubernetesConfig:
-    image: redis:7.2-alpine
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 200m
-        memory: 256Mi
-    nodeSelector:
-      nextcloud-storage: "true"
-    securityContext:
-      runAsUser: 999
-      fsGroup: 999
-  storage:
-    volumeClaimTemplate:
-      spec:
-        storageClassName: local-path
-        accessModes: ["ReadWriteOnce"]
+  serviceName: nextcloud-redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud-redis
+  template:
+    metadata:
+      labels:
+        app: nextcloud-redis
+    spec:
+      nodeSelector:
+        nextcloud-storage: "true"
+      containers:
+      - name: redis
+        image: redis:7.2-alpine
+        command:
+          - redis-server
+          - "/etc/redis/redis.conf"
         resources:
           requests:
-            storage: 20Gi
-  redisConfig:
-    additionalRedisConfig:
-      maxmemory: 200mb
-      maxmemory-policy: allkeys-lru
-      appendonly: "yes"
-      appendfsync: everysec
-      save: "900 1 300 10 60 10000"
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        - name: redis-config
+          mountPath: /etc/redis
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
+      volumes:
+      - name: redis-config
+        configMap:
+          name: nextcloud-redis-config
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 20Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-redis-config
+  namespace: nextcloud
+data:
+  redis.conf: |
+    dir /data
+    appendonly yes
+    appendfsync everysec
+    save 900 1
+    save 300 10
+    save 60 10000
+    maxmemory 200mb
+    maxmemory-policy allkeys-lru
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-redis
+  namespace: nextcloud
+spec:
+  selector:
+    app: nextcloud-redis
+  ports:
+  - port: 6379
+    targetPort: redis
+    name: redis
