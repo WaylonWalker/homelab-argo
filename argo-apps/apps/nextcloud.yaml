@@ -66,6 +66,23 @@ spec:
             existingClaim: nextcloud-data
         nodeSelector:
           nextcloud-storage: "true"
+        ingress:
+          enabled: true
+          ingressClassName: traefik
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+            nginx.ingress.kubernetes.io/ssl-redirect: "true"
+          hosts:
+            - host: nextcloud.wayl.one
+              paths:
+                - path: /
+                  type: Prefix
+          tls:
+            - secretName: nextcloud-cert-tls
+              hosts:
+                - nextcloud.wayl.one
+        nodeSelector:
+          nextcloud-storage: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: nextcloud
