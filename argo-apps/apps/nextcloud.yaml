@@ -58,16 +58,17 @@ spec:
               paths:
               - path: /
                 type: ImplementationSpecific
-        primary:
-          persistence:
+        persistence:
+          enabled: true
+          existingClaim: nextcloud-html
+          nextcloudData:
             enabled: true
             existingClaim: nextcloud-data
-            storageClassName: local-path
-            accessMode: ReadWriteOnce
-            size: 100Gi
+        nodeSelector:
+          nextcloud-storage: "true"
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: nextcloud
   syncPolicy:
     automated:
       selfHeal: true
