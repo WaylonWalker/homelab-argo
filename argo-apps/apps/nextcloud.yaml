@@ -51,8 +51,6 @@ spec:
               value: "nextcloud.wayl.one"
             - name: TRUSTED_PROXIES
               value: "10.0.0.0/8,10.42.0.0/16"
-            - name: PATH
-              value: "/var/www/html/bin:$PATH"
           ## Use an existing secret
           existingSecret:
             enabled: false
