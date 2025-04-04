@@ -18,8 +18,22 @@ spec:
     targetRevision: 6.6.9
     helm:
       values: |
+        extraInitContainers:
+          - name: install-ffmpeg
+            image: debian:bullseye-slim
+            command: ["/bin/sh", "-c"]
+            args:
+              - apt-get update && apt-get install -y ffmpeg && mkdir -p /var/www/html/bin && cp $(which ffmpeg) /var/www/html/bin/ffmpeg
+            volumeMounts:
+              - mountPath: /var/www/html
+                name: nextcloud-data
         cronjob:
           enabled: true
+        hpa:
+          enabled: false
+          cputhreshold: 60
+          minPods: 1
+          maxPods: 4
         nextcloud:
           host: nextcloud.wayl.one
           trustedDomains:
@@ -37,6 +51,8 @@ spec:
               value: "nextcloud.wayl.one"
             - name: TRUSTED_PROXIES
               value: "10.0.0.0/8,10.42.0.0/16"
+            - name: PATH
+              value: "/var/www/html/bin:$PATH"
           ## Use an existing secret
           existingSecret:
             enabled: false
