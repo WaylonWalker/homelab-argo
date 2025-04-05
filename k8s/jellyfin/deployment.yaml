@@ -23,6 +23,8 @@ spec:
       labels:
         service: jellyfin
     spec:
+      nodeSelector:
+        jellyfin-storage: "true"
       containers:
         - env:
             - name: JELLYFIN_PublishedServerUrl
@@ -112,6 +114,8 @@ metadata:
   name: jellyfin-config
   namespace: jellyfin
 spec:
+  storageClassName: manual
+  volumeName: jellyfin-config-falcon3
   accessModes:
     - ReadWriteOnce
   resources:
@@ -126,6 +130,8 @@ metadata:
   name: jellyfin-cache
   namespace: jellyfin
 spec:
+  storageClassName: manual
+  volumeName: jellyfin-cache-falcon3
   accessModes:
     - ReadWriteOnce
   resources:
@@ -141,7 +147,7 @@ metadata:
   namespace: jellyfin
 spec:
   storageClassName: manual
-  volumeName: jellyfin-media
+  volumeName: jellyfin-media-falcon3
   accessModes:
     - ReadWriteOnce
   resources:
@@ -151,44 +157,44 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: jellyfin-media
+  name: jellyfin-media-falcon3
   labels:
     type: local
 spec:
   storageClassName: manual
   capacity:
-    storage: 3000Gi
+    storage: 6Ti
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/vault/nfs/general/pv/jellyfin/media
+    path: /mnt/main/media/media
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: jellyfin-cache
+  name: jellyfin-cache-falcon3
   labels:
     type: local
 spec:
   storageClassName: manual
   capacity:
-    storage: 100Gi
+    storage: 10Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/vault/nfs/general/pv/jellyfin/cache
+    path: /mnt/main/media/cache
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: jellyfin-config
+  name: jellyfin-config-falcon3
   labels:
     type: local
 spec:
   storageClassName: manual
   capacity:
-    storage: 100Mi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/vault/nfs/general/pv/jellyfin/config
+    path: /mnt/main/media/config
