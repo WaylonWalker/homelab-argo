@@ -30,17 +30,3 @@ spec:
   cron: "0 3 * * 0"
   retain: 4
   concurrency: 1
----
-apiVersion: longhorn.io/v1beta1
-kind: RecurringJob
-metadata:
-  name: snapshot-5min
-  namespace: longhorn-system
-spec:
-  task: snapshot
-  cron: "*/5 * * * *"  # Every 5 minutes
-  retain: 12  # Keep last 1 hour worth of snapshots
-  concurrency: 1
-  selector:
-    # Match volumes with this label
-    recurring-job.longhorn.io/snapshot-5min: enabled
