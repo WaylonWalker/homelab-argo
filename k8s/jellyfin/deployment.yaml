@@ -27,6 +27,12 @@ spec:
         jellyfin-storage: "true"
       containers:
         - env:
+            - name: PUID
+              value: "1000" # host user ID
+            - name: PGID
+              value: "1000" # host group ID
+            - name: TZ
+              value: "America/Chicago"
             - name: JELLYFIN_PublishedServerUrl
               value: https://jellyfin.wayl.one
           # image: docker.io/jellyfin/jellyfin
