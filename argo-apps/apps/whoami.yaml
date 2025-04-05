@@ -18,8 +18,8 @@ spec:
     path: whoami
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
-    plugin:
-      name: kustomize
+    # plugin:
+    #   name: kustomize
   syncPolicy:
     automated:
       selfHeal: true
