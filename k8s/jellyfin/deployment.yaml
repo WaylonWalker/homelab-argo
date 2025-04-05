@@ -53,6 +53,8 @@ spec:
               name: jellyfin-cache-falcon3
             - mountPath: /media
               name: jellyfin-media-falcon3
+            - mountPath: /transcoded
+              name: jellyfin-transcoded-falcon3
             - name: qsv-device
               mountPath: /dev/dri
               readOnly: true
@@ -67,6 +69,9 @@ spec:
         - name: jellyfin-media-falcon3
           persistentVolumeClaim:
             claimName: jellyfin-media-falcon3
+        - name: jellyfin-transcoded-falcon3
+          persistentVolumeClaim:
+            claimName: jellyfin-transcoded-falcon3
         - name: qsv-device
           hostPath:
             type: Directory
@@ -176,6 +181,37 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: /mnt/main/media/media
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: jellyfin-transcoded-falcon3
+  name: jellyfin-transcoded-falcon3
+  namespace: jellyfin
+spec:
+  storageClassName: manual
+  volumeName: jellyfin-transcoded-falcon3
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3000Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-transcoded-falcon3
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 6Ti
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/main/media/transcoded
 ---
 apiVersion: v1
 kind: PersistentVolume
