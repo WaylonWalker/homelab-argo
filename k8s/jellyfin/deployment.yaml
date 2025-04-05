@@ -29,7 +29,9 @@ spec:
         - env:
             - name: JELLYFIN_PublishedServerUrl
               value: https://jellyfin.wayl.one
-          image: docker.io/jellyfin/jellyfin
+          # image: docker.io/jellyfin/jellyfin
+          # linuxserver.io has VA-API libraries baked in
+          image: lscr.io/linuxserver/jellyfin:latest
           name: jellyfin
           ports:
             - containerPort: 8096
