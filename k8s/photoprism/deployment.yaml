@@ -48,7 +48,7 @@ metadata:
   namespace: photoprism
 spec:
   ports:
-    - port: 80
+    - port: 2342
       targetPort: 2342
       protocol: TCP
       name: http
@@ -172,7 +172,7 @@ spec:
               service:
                 name: photoprism
                 port:
-                  number: 80
+                  number: 2342
             path: /
             pathType: Prefix
   tls:
