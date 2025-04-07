@@ -4,20 +4,6 @@ metadata:
   name: photoprism
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nextcloud-data-originals
-  namespace: photoprism
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: hostpath
-  volumeName: pv-nextcloud-data
-  resources:
-    requests:
-      storage: 2Ti
----
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-photoprism-storage
@@ -152,8 +138,9 @@ spec:
             allowPrivilegeEscalation: false
       volumes:
         - name: originals
-          persistentVolumeClaim:
-            claimName: nextcloud-data-originals
+          hostPath:
+            path: /mnt/main/nextcloud/data/data/
+            type: Directory
         - name: storage
           persistentVolumeClaim:
             claimName: photoprism-storage
