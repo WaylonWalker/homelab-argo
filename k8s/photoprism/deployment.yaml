@@ -79,7 +79,7 @@ spec:
             - containerPort: 2342
           env:
             - name: PHOTOPRISM_EXCLUDE
-              value: "appdata_*"
+              value: "appdata_*,*."
             - name: PHOTOPRISM_ADMIN_USER
               valueFrom:
                 secretKeyRef:
