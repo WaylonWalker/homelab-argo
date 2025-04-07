@@ -129,8 +129,11 @@ spec:
             - name: PHOTOPRISM_SIDECAR_YAML
               value: "true"
           volumeMounts:
-            - name: originals
-              mountPath: /photoprism/originals
+            - name: waylon
+              mountPath: /photoprism/originals/waylon
+              readOnly: true
+            - name: rhiannon
+              mountPath: /photoprism/originals/rhiannon
               readOnly: true
             - name: storage
               mountPath: /photoprism/storage
@@ -140,9 +143,13 @@ spec:
               type: Unconfined
             allowPrivilegeEscalation: false
       volumes:
-        - name: originals
+        - name: waylon
           hostPath:
-            path: /mnt/main/nextcloud/data/data/
+            path: /mnt/main/nextcloud/data/data/waylon/files
+            type: Directory
+        - name: rhiannon
+          hostPath:
+            path: /mnt/main/nextcloud/data/data/rhiannon/files
             type: Directory
         - name: storage
           persistentVolumeClaim:
