@@ -47,7 +47,6 @@ metadata:
   name: photoprism
   namespace: photoprism
 spec:
-  type: ClusterIP
   ports:
     - port: 80
       targetPort: 2342
@@ -79,6 +78,8 @@ spec:
           ports:
             - containerPort: 2342
           env:
+            - name: PHOTOPRISM_EXCLUDE
+              value: "appdata_*"
             - name: PHOTOPRISM_ADMIN_USER
               valueFrom:
                 secretKeyRef:
@@ -151,8 +152,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   creationTimestamp: null
-  labels:
-    io.kompose.service: photoprism
   name: photoprism
   namespace: photoprism
   annotations:
