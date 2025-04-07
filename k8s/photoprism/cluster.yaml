@@ -1,0 +1,40 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: photoprism-db
+  namespace: photoprism
+spec:
+  instances: 3
+  storage:
+    storageClass: longhorn-backup
+    size: 20Gi
+  bootstrap:
+    recovery:
+      backup:
+        name: photoprism-db-backup
+        initdb:
+          database: photoprism
+          owner: photoprism
+          secret:
+            name: photoprism-secret
+  monitoring:
+    enablePodMonitor: true
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore:
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+      endpointURL: "https://minio.wayl.one"
+      destinationPath: "s3://photoprism/db"
+      s3Credentials:
+        accessKeyId:
+          name: photoprism-minio-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: photoprism-minio-secret
+          key: AWS_SECRET_ACCESS_KEY
+        region:
+          name: photoprism-minio-secret
+          key: AWS_REGION
