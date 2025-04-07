@@ -9,14 +9,14 @@ spec:
     storageClass: longhorn-backup
     size: 20Gi
   bootstrap:
-    recovery:
-      # backup:
-      #   name: photoprism-db-backup
-      initdb:
-        database: photoprism
-        owner: photoprism
-        secret:
-          name: photoprism-secret
+    # recovery:
+    #   backup:
+    #     name: photoprism-db-backup
+    initdb:
+      database: photoprism
+      owner: photoprism
+      secret:
+        name: photoprism-secret
   monitoring:
     enablePodMonitor: true
   backup:
