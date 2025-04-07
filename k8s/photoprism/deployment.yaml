@@ -98,21 +98,23 @@ spec:
             - name: PHOTOPRISM_DEFAULT_TLS
               value: "true"
             - name: PHOTOPRISM_DATABASE_DRIVER
-              value: "mysql"
-            - name: PHOTOPRISM_DATABASE_SERVER
-              value: "photoprism-db-rw.photoprism.svc"
-            - name: PHOTOPRISM_DATABASE_NAME
-              value: "photoprism"
-            - name: PHOTOPRISM_DATABASE_USER
-              valueFrom:
-                secretKeyRef:
-                  name: photoprism-db-secret
-                  key: username
-            - name: PHOTOPRISM_DATABASE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: photoprism-db-secret
-                  key: password
+              value: sqlite
+            # - name: PHOTOPRISM_DATABASE_DRIVER
+            #   value: "mysql"
+            # - name: PHOTOPRISM_DATABASE_SERVER
+            #   value: "photoprism-db-rw.photoprism.svc"
+            # - name: PHOTOPRISM_DATABASE_NAME
+            #   value: "photoprism"
+            # - name: PHOTOPRISM_DATABASE_USER
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: photoprism-db-secret
+            #       key: username
+            # - name: PHOTOPRISM_DATABASE_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: photoprism-db-secret
+            #       key: password
             - name: PHOTOPRISM_SITE_CAPTION
               value: "AI-Powered Photos App"
             - name: PHOTOPRISM_HTTP_COMPRESSION
