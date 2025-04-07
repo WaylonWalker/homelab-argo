@@ -10,13 +10,13 @@ spec:
     size: 20Gi
   bootstrap:
     recovery:
-      backup:
-        name: photoprism-db-backup
-        initdb:
-          database: photoprism
-          owner: photoprism
-          secret:
-            name: photoprism-secret
+      # backup:
+      #   name: photoprism-db-backup
+      initdb:
+        database: photoprism
+        owner: photoprism
+        secret:
+          name: photoprism-secret
   monitoring:
     enablePodMonitor: true
   backup:
