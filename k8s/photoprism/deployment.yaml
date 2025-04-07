@@ -93,11 +93,11 @@ spec:
             - name: PHOTOPRISM_AUTH_MODE
               value: "password"
             - name: PHOTOPRISM_SITE_URL
-              value: "https://photoprism.wayl.one/"
+              value: "https://photoprism.wayl.one"
             - name: PHOTOPRISM_DISABLE_TLS
-              value: "false"
-            - name: PHOTOPRISM_DEFAULT_TLS
               value: "true"
+            - name: PHOTOPRISM_DEFAULT_TLS
+              value: "false"
             - name: PHOTOPRISM_DATABASE_DRIVER
               value: sqlite
             # - name: PHOTOPRISM_DATABASE_DRIVER
