@@ -68,6 +68,7 @@ spec:
         - image: registry.wayl.one/htmx-patterns-waylonwalker-com:0.1.4
           # - image: docker.io/waylonwalker/htmx-patterns-waylonwalker-com:0.1.3
           # - image: docker.io/waylonwalker/htmx-patterns-waylonwalker-com:latest
+          imagePullPolicy: "Always"
           name: htmx-patterns
           ports:
             - containerPort: 5000
