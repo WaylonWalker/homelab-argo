@@ -88,6 +88,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+      imagePullSecrets:
+        - name: cluster-regcred
       restartPolicy: Always
 status: {}
 ---
