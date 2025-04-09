@@ -79,11 +79,11 @@ spec:
               value: "0"
             - name: API_SERVER__WORKERS
               value: "3"
-            - name: POD_NAME
+            - name: KUBERNETES_POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: POD_NAMESPACE
+            - name: KUBERNETES_POD_NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
