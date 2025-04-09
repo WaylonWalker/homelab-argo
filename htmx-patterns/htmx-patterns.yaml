@@ -143,3 +143,9 @@ roleRef:
   kind: Role
   name: htmx-patterns-reader
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: htmx-patterns-sa
+  namespace: htmx-patterns
