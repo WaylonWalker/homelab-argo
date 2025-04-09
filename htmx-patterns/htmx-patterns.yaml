@@ -42,7 +42,6 @@ metadata:
   name: htmx-patterns
   namespace: htmx-patterns
 spec:
-  serviceAccountName: htmx-patterns-sa
   replicas: 1
   selector:
     matchLabels:
@@ -59,6 +58,7 @@ spec:
         io.kompose.network/htmx-patterns-default: "true"
         io.kompose.service: htmx-patterns
     spec:
+      serviceAccountName: htmx-patterns-sa
       tolerations:
         - key: "performance"
           operator: "Equal"
