@@ -42,6 +42,7 @@ metadata:
   name: htmx-patterns
   namespace: htmx-patterns
 spec:
+  serviceAccountName: htmx-patterns-sa
   replicas: 1
   selector:
     matchLabels:
@@ -114,3 +115,31 @@ spec:
       secretName: librespeed-cert-tls
 status:
   loadBalancer: {}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: htmx-patterns
+  name: htmx-patterns-reader
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get"]
+    resourceNames: ["htmx-patterns"] # Only allow reading this Deployment
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-specific-binding
+  namespace: htmx-patterns
+subjects:
+  - kind: ServiceAccount
+    name: htmx-patterns-sa
+    namespace: htmx-patterns
+roleRef:
+  kind: Role
+  name: htmx-patterns-reader
+  apiGroup: rbac.authorization.k8s.io
