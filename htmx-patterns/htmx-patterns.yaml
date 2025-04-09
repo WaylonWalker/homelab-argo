@@ -79,6 +79,14 @@ spec:
               value: "0"
             - name: API_SERVER__WORKERS
               value: "3"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
       restartPolicy: Always
 status: {}
 ---
