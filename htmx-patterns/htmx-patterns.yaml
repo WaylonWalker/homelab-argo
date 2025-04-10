@@ -122,9 +122,8 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - librespeed.wayl.one
-        - speed.wayl.one
-      secretName: librespeed-cert-tls
+        - htmx-patterns.wayl.one
+      secretName: htmx-patterns-cert-tls
 status:
   loadBalancer: {}
 ---
