@@ -88,7 +88,7 @@ spec:
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
             - name: DIUN_NOTIF_NTFY_ENDPOINT
-              value: "http://ntfy.ntfy.svc.cluster.local:80"
+              value: "https://ntfy.wayl.one"
             - name: DIUN_NOTIF_NTFY_TOPIC
               value: "diun"
             - name: DIUN_NOTIF_NTFY_PRIORITY
