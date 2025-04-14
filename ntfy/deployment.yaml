@@ -54,6 +54,7 @@ spec:
         kompose.cmd: kompose convert -o deployment.yaml -n ntfy
         kompose.service.expose: ntfy.wayl.one,ntfy.k.waylonwalker.com
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/ntfy-default: "true"
