@@ -53,6 +53,7 @@ spec:
         kompose.cmd: kompose convert --namespace htmx-patterns -o htmx-patterns.yaml
         kompose.service.expose: htmx-patterns.wayl.one
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/htmx-patterns-default: "true"
