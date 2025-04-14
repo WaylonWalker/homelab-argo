@@ -86,9 +86,8 @@ spec:
               value: "30s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
-          ports:
-            - containerPort: 80
-              protocol: TCP
+            - name: DIUN_PROVIDERS_KUBERNETES_ANNOTATION_ONLY
+              value: "false"
           volumeMounts:
             - mountPath: "/data"
               name: "data"
@@ -104,30 +103,6 @@ spec:
         - name: "data"
           persistentVolumeClaim:
             claimName: "diun-data"
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  namespace: diun
-  name: diun
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-spec:
-  rules:
-    - host: diun.wayl.one
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: diun
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - diun.wayl.one
-      secretName: diun-cert-tls
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
