@@ -76,7 +76,7 @@ spec:
               value: password
             - name: TZ
               value: Etc/UTC
-          image: lscr.io/linuxserver/code-server:latest
+          image: lscr.io/linuxserver/code-server:4.99.2
           name: code-server
           ports:
             - containerPort: 8443
