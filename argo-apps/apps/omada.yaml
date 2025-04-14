@@ -1,15 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ntfy
+  name: omada
   namespace: argocd
 spec:
   project: default
   destination:
-    namespace: ntfy
+    namespace: omada
     server: 'https://kubernetes.default.svc'
   source:
-    path: ntfy
+    path: k8s/omada
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
