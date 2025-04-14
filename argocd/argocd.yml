@@ -1,38 +1,38 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: argocd
-  namespace: argocd
-spec:
-  project: default
-  destination:
-    namespace: argocd
-    server: 'https://kubernetes.default.svc'
-  sources:
-    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
-      chart: argocd
-      helm:
-        values: |
-          global:
-            domain: argocd.wayl.one
-          configs:
-            params:
-              server:
-                insecure: true
-            cm:
-              configManagementPlugins: |
-                - name: kustomize
-                  init:
-                    command: ["/bin/sh", "-c"]
-                    args: ["kustomize version"]
-                  generate:
-                    command: ["kustomize", "build"]
-          server:
-            ingress:
-              enabled: true
-          redisSecretInit:
-            enabled: false
-      targetRevision: HEAD
-  syncPolicy:
-    automated:
-      prune: true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: argocd
+#   namespace: argocd
+# spec:
+#   project: default
+#   destination:
+#     namespace: argocd
+#     server: 'https://kubernetes.default.svc'
+#   sources:
+#     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
+#       chart: argocd
+#       helm:
+#         values: |
+#           global:
+#             domain: argocd.wayl.one
+#           configs:
+#             params:
+#               server:
+#                 insecure: true
+#             cm:
+#               configManagementPlugins: |
+#                 - name: kustomize
+#                   init:
+#                     command: ["/bin/sh", "-c"]
+#                     args: ["kustomize version"]
+#                   generate:
+#                     command: ["kustomize", "build"]
+#           server:
+#             ingress:
+#               enabled: true
+#           redisSecretInit:
+#             enabled: false
+#   # You can set this to a specific version if neededrgo     targetRevision: HEAD
+#   syncPolicy:
+#     automated:
+#       prune: true
