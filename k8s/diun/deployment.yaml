@@ -91,6 +91,20 @@ spec:
               value: "https://ntfy.wayl.one"
             - name: DIUN_NOTIF_NTFY_TOPIC
               value: "diun"
+            - name: DIUN_REGOPTS_1_NAME
+              value: "registry.wayl.one"
+            - name: DIUN_REGOPTS_1_SELECTOR
+              value: "image"
+            - name: DIUN_REGOPTS_1_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: diun-registry-secret
+                  key: username
+            - name: DIUN_REGOPTS_1_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: diun-registry-secret
+                  key: password
           volumeMounts:
             - mountPath: "/data"
               name: "data"
