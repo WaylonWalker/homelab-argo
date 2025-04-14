@@ -6,6 +6,7 @@ metadata:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  # not a backup, but uses a longhorn storage class with backup applied
   name: kraft-data-backup
   namespace: kraft
 spec:
