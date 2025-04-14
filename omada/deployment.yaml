@@ -52,7 +52,7 @@ spec:
       hostNetwork: true # Use host network for discovery
       containers:
         - name: omada
-          image: mbentley/omada-controller:latest
+          image: mbentley/omada-controller:5.15
           ports:
             - containerPort: 8043
               protocol: TCP
