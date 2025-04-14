@@ -87,6 +87,12 @@ spec:
               value: "30s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
+            - name: DIUN_NOTIF_NTFY_ENDPOINT
+              value: "http://ntfy.ntfy.svc.cluster.local:80"
+            - name: DIUN_NOTIF_NTFY_TOPIC
+              value: "diun"
+            - name: DIUN_NOTIF_NTFY_PRIORITY
+              value: "10"
           volumeMounts:
             - mountPath: "/data"
               name: "data"
