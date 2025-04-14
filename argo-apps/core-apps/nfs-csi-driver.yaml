@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
-    targetRevision: v4.11.0
+    targetRevision: 4.11.0
     chart: csi-driver-nfs
   destination:
     server: https://kubernetes.default.svc
