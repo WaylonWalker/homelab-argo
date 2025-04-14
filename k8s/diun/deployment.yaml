@@ -86,8 +86,6 @@ spec:
               value: "30s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
-            - name: DIUN_PROVIDERS_KUBERNETES_ANNOTATION_ONLY
-              value: "false"
           volumeMounts:
             - mountPath: "/data"
               name: "data"
