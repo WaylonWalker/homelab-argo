@@ -47,7 +47,7 @@ spec:
         - env:
             - name: TZ
               value: UTC
-          image: lscr.io/linuxserver/librespeed
+          image: lscr.io/linuxserver/librespeed:5.4.1
           name: librespeed
           ports:
             - containerPort: 80
