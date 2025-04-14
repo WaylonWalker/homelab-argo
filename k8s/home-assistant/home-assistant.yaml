@@ -34,6 +34,8 @@ spec:
     metadata:
       labels:
         service: home-assistant
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - name: home-assistant

@@ -106,6 +106,8 @@ spec:
     metadata:
       labels:
         app: kraft
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - name: kraft

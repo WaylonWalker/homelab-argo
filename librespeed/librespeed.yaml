@@ -40,6 +40,8 @@ spec:
       creationTimestamp: null
       labels:
         service: librespeed
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - env:

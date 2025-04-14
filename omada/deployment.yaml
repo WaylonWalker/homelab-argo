@@ -46,6 +46,8 @@ spec:
       labels:
         app.kubernetes.io/name: omada-controller
         app.kubernetes.io/instance: omada-controller
+      annotations:
+        diun.enable: "true"
     spec:
       hostNetwork: true # Use host network for discovery
       containers:

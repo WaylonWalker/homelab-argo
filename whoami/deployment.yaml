@@ -19,6 +19,8 @@ spec:
     metadata:
       labels:
         app: whoami
+      annotations:
+        diun.enable: "true"
     spec:
       tolerations:
         - key: "performance"

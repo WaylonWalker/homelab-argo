@@ -36,6 +36,8 @@ spec:
     metadata:
       labels:
         app: mosquitto
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - name: mosquitto

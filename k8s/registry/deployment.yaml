@@ -81,6 +81,7 @@ spec:
         kompose.service.expose: registry.wayl.one
         kompose.service.type: loadbalancer
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/registry-ui-default: "true"
@@ -211,6 +212,7 @@ spec:
         kompose.image-pull-secret: regcred
         kompose.service.expose: registry-ui.wayl.one
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/registry-ui-default: "true"

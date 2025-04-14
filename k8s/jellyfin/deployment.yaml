@@ -22,6 +22,8 @@ spec:
     metadata:
       labels:
         service: jellyfin
+      annotations:
+        diun.enable: "true"
     spec:
       nodeSelector:
         jellyfin-storage: "true"

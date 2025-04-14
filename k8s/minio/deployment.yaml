@@ -54,6 +54,7 @@ spec:
       annotations:
         kompose.cmd: kompose convert -o deployment.yaml -n minio --replicas 3
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/minio-default: "true"

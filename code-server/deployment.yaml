@@ -7,7 +7,6 @@ metadata:
 spec: {}
 status: {}
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,8 +28,6 @@ spec:
     io.kompose.service: code-server
 status:
   loadBalancer: {}
-
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -57,6 +54,7 @@ spec:
         kompose.cmd: kompose convert -o deployment.yaml -n code-server
         kompose.service.expose: code-server.wayl.one
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/code-server-default: "true"
@@ -93,7 +91,6 @@ spec:
           persistentVolumeClaim:
             claimName: code-server-data
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -121,7 +118,6 @@ spec:
             pathType: Prefix
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

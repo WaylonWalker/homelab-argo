@@ -32,6 +32,7 @@ spec:
         app: redis
       annotations:
         config-version: "2"
+        diun.enable: "true"
     spec:
       initContainers:
         - name: restore-backup

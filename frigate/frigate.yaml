@@ -46,6 +46,8 @@ spec:
     metadata:
       labels:
         service: frigate
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - env:

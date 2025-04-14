@@ -31,7 +31,6 @@ spec:
     io.kompose.service: emqx
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -41,7 +40,6 @@ metadata:
   namespace: emqx
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -68,6 +66,7 @@ spec:
         kompose.cmd: kompose convert --namespace emqx -o deployment.yaml
         kompose.service.expose: emqx.wayl.one
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/emqx-default: "true"
@@ -97,7 +96,6 @@ spec:
           persistentVolumeClaim:
             claimName: emqx-data
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -125,7 +123,6 @@ spec:
             pathType: Prefix
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

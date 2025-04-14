@@ -54,6 +54,7 @@ spec:
         kompose.cmd: kompose convert -o deployment.yaml -n status
         kompose.service.expose: status.wayl.one,status.k.waylonwalker.com
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/status-default: "true"

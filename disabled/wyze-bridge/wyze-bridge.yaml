@@ -29,7 +29,6 @@ spec:
     io.kompose.service: wyze-bridge
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -39,7 +38,6 @@ metadata:
   namespace: wyze-bridge
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -66,6 +64,7 @@ spec:
         kompose.cmd: kompose convert --namespace wyze-bridge -o wyze-bridge.yaml
         kompose.service.expose: cams.wayl.one
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/wyze-bridge-default: "true"
@@ -161,7 +160,6 @@ spec:
     requests:
       storage: 100Mi
 status: {}
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

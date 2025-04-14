@@ -41,6 +41,8 @@ spec:
       labels:
         network/code-server-default: "true"
         service: code-server
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - env:
@@ -196,6 +198,8 @@ spec:
       creationTimestamp: null
       labels:
         service: admin
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - name: admin

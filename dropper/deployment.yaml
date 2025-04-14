@@ -42,6 +42,7 @@ spec:
       annotations:
         version: 0.0.8-1
         minio-last-rotated: "Sun Mar  2 04:52:37 PM CST 2025"
+        diun.enable: "true"
     spec:
       containers:
         - image: registry.wayl.one/dropper:0.0.8

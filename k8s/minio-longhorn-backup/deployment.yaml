@@ -39,6 +39,8 @@ spec:
     metadata:
       labels:
         service: minio-longhorn-backup
+      annotations:
+        diun.enable: "true"
     spec:
       initContainers:
         - name: create-bucket

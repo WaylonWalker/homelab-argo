@@ -53,6 +53,7 @@ spec:
         kompose.cmd: kompose convert --namespace excalidraw -o excalidraw.yaml
         kompose.service.expose: excalidraw.wayl.one
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/excalidraw-default: "true"

@@ -71,7 +71,7 @@ spec:
           env:
             - name: TZ
               value: UTC
-          image: binwiederhier/ntfy
+          image: binwiederhier/ntfy:v2.11.0
           livenessProbe:
             exec:
               command:

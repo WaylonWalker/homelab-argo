@@ -55,6 +55,7 @@ spec:
         kompose.image-pull-secret: regcred
         kompose.service.expose: shots.wayl.one, shots.k.waylonwalker.com
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/shot-scraper-api-default: "true"

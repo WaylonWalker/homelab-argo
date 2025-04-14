@@ -45,6 +45,8 @@ spec:
       creationTimestamp: null
       labels:
         service: play-outside-wayl-one
+      annotations:
+        diun.enable: "true"
     spec:
       tolerations:
         - key: "performance"

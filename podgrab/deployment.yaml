@@ -47,6 +47,7 @@ spec:
         kompose.cmd: kompose convert -n podgrab -o deployment.yaml
         kompose.service.expose: podgrab.wayl.one
         kompose.version: 1.35.0 (9532ceef3)
+        diun.enable: "true"
       labels:
         io.kompose.service: podgrab
     spec:

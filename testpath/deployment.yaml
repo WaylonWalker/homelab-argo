@@ -20,7 +20,6 @@ spec:
     io.kompose.service: wayl-one
 status:
   loadBalancer: {}
-
 ---
 apiVersion: v1
 kind: Namespace
@@ -30,7 +29,6 @@ metadata:
   namespace: testpath
 spec: {}
 status: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -58,6 +56,7 @@ spec:
         kompose.image-pull-secret: regcred
         kompose.service.expose: test.wayl.one/testme
         kompose.version: 1.31.2 (a92241f79)
+        diun.enable: "true"
       creationTimestamp: null
       labels:
         io.kompose.network/testpath-default: "true"
@@ -74,7 +73,6 @@ spec:
         - name: regcred
       restartPolicy: Always
 status: {}
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -114,7 +112,6 @@ spec:
             pathType: Prefix
 status:
   loadBalancer: {}
-
 ---
 # Middleware
 # Strip prefix /overview

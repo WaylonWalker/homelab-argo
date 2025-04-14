@@ -44,6 +44,8 @@ spec:
       creationTimestamp: null
       labels:
         service: installer
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - env:

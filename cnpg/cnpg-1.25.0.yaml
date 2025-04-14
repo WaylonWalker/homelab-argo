@@ -17542,6 +17542,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: cloudnative-pg
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
       - args:
