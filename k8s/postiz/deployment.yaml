@@ -25,9 +25,6 @@ kind: Ingress
 metadata:
   name: postiz-ingress
   namespace: postiz
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
   rules:
     - host: postiz.wayl.one
@@ -74,12 +71,14 @@ spec:
           env:
             - name: BACKEND_INTERNAL_URL
               value: http://localhost:3000
+            - name: MAIN_URL
+              value: https://postiz.wayl.one
             - name: FRONTEND_URL
               value: https://postiz.wayl.one
             - name: IS_GENERAL
               value: "true"
-            - name: MAIN_URL
-              value: https://postiz.wayl.one
+            - name: POSTIZ_APPS
+              value: 'frontend workers cron backend'
             - name: NEXT_PUBLIC_BACKEND_URL
               value: http://localhost:5000/api
             - name: NEXT_PUBLIC_UPLOAD_DIRECTORY
