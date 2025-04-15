@@ -80,7 +80,7 @@ spec:
             - name: POSTIZ_APPS
               value: 'frontend workers cron backend'
             - name: NEXT_PUBLIC_BACKEND_URL
-              value: http://localhost:5000/api
+              value: http://postiz.wayl.one/api
             - name: NEXT_PUBLIC_UPLOAD_DIRECTORY
               value: /uploads
             - name: REDIS_URL
