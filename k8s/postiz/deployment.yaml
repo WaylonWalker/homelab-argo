@@ -19,6 +19,25 @@ spec:
       owner: postiz-user
       secret:
         name: postiz-db-credentials
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore:
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+      endpointURL: "https://minio.wayl.one"
+      destinationPath: "s3://postiz/db"
+      s3Credentials:
+        accessKeyId:
+          name: postiz-minio-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: postiz-minio-secret
+          key: AWS_SECRET_ACCESS_KEY
+        region:
+          name: postiz-minio-secret
+          key: AWS_REGION
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
