@@ -107,11 +107,11 @@ spec:
                   key: database
             - name: DATABASE_URL
               value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postiz-postgres:5432/$(DB_NAME)"
-            volumeMounts:
-              - mountPath: /config
-                name: postiz-config
-              - mountPath: /uploads
-                name: postiz-uploads
+          volumeMounts:
+            - mountPath: /config
+              name: postiz-config
+            - mountPath: /uploads
+              name: postiz-uploads
       volumes:
         - name: postiz-config
           persistentVolumeClaim:
