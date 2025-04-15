@@ -57,10 +57,12 @@ spec:
     metadata:
       labels:
         service: postiz
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - name: postiz
-          image: ghcr.io/gitroomhq/postiz-app:latest
+          image: ghcr.io/gitroomhq/postiz-app:v1.39.1
           ports:
             - containerPort: 5000
               protocol: TCP
@@ -154,6 +156,8 @@ spec:
     metadata:
       labels:
         service: postiz-redis
+      annotations:
+        diun.enable: "true"
     spec:
       containers:
         - name: redis
