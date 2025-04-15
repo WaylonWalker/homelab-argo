@@ -106,7 +106,7 @@ spec:
                   name: postiz-db-credentials
                   key: database
             - name: DATABASE_URL
-              value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postiz-postgres:5432/$(DB_NAME)"
+              value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postiz-db-rw.postiz.svc:5432/$(DB_NAME)"
           volumeMounts:
             - mountPath: /config
               name: postiz-config
