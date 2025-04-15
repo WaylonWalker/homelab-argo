@@ -1,0 +1,190 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postiz
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postiz-db
+  namespace: postiz
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn-backup
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: postiz-db-local
+      owner: postiz-user
+      secret:
+        name: postiz-db-credentials
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: postiz-ingress
+  namespace: postiz
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  rules:
+    - host: postiz.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: postiz
+                port:
+                  number: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postiz
+  namespace: postiz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: postiz
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: postiz
+    spec:
+      containers:
+        - name: postiz
+          image: ghcr.io/gitroomhq/postiz-app:latest
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: postiz-secrets
+          env:
+            - name: BACKEND_INTERNAL_URL
+              value: http://localhost:3000
+            - name: FRONTEND_URL
+              value: https://postiz.wayl.one
+            - name: IS_GENERAL
+              value: "true"
+            - name: MAIN_URL
+              value: https://postiz.wayl.one
+            - name: NEXT_PUBLIC_BACKEND_URL
+              value: http://localhost:5000/api
+            - name: NEXT_PUBLIC_UPLOAD_DIRECTORY
+              value: /uploads
+            - name: REDIS_URL
+              value: redis://postiz-redis:6379
+            - name: STORAGE_PROVIDER
+              value: local
+            - name: UPLOAD_DIRECTORY
+              value: /uploads
+          volumeMounts:
+            - mountPath: /config
+              name: postiz-config
+            - mountPath: /uploads
+              name: postiz-uploads
+      volumes:
+        - name: postiz-config
+          persistentVolumeClaim:
+            claimName: postiz-config
+        - name: postiz-uploads
+          persistentVolumeClaim:
+            claimName: postiz-uploads
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postiz
+  namespace: postiz
+spec:
+  ports:
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+  selector:
+    service: postiz
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postiz-config
+  namespace: postiz
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postiz-uploads
+  namespace: postiz
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postiz-redis
+  namespace: postiz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: postiz-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: postiz-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.2
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli ping
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+          name: postiz-redis
+          volumeMounts:
+            - mountPath: /data
+              name: postiz-redis-data
+      restartPolicy: Always
+      volumes:
+        - name: postiz-redis-data
+          persistentVolumeClaim:
+            claimName: postiz-redis-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: postiz-redis-data
+  name: postiz-redis-data
+  namespace: postiz
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
