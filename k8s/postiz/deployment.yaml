@@ -90,11 +90,28 @@ spec:
               value: local
             - name: UPLOAD_DIRECTORY
               value: /uploads
-          volumeMounts:
-            - mountPath: /config
-              name: postiz-config
-            - mountPath: /uploads
-              name: postiz-uploads
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-db-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-db-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postiz-db-credentials
+                  key: database
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postiz-postgres:5432/$(DB_NAME)"
+            volumeMounts:
+              - mountPath: /config
+                name: postiz-config
+              - mountPath: /uploads
+                name: postiz-uploads
       volumes:
         - name: postiz-config
           persistentVolumeClaim:
