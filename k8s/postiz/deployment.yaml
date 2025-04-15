@@ -52,7 +52,9 @@ spec:
     matchLabels:
       service: postiz
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -164,7 +166,9 @@ spec:
     matchLabels:
       service: postiz-redis
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
