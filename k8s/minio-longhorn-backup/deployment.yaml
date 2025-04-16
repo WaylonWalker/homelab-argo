@@ -42,6 +42,8 @@ spec:
       annotations:
         diun.enable: "true"
     spec:
+      nodeSelector:
+        zfs-main-pool: "true"
       initContainers:
         - name: create-bucket
           image: minio/mc
