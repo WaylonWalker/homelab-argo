@@ -2,9 +2,9 @@
 # mounts
 # - /var/www/html
 # - /var/lib/mysql
-#
+#next
 # metadata refresh with cron
-# redis 
+# redis next
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://nextcloud.github.io/helm/
     chart: nextcloud
-    targetRevision: 6.6.9
+    targetRevision: 6.6.10
     helm:
       values: |
         extraInitContainers:
