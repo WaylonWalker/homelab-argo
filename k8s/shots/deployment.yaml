@@ -84,7 +84,7 @@ spec:
             - secretRef:
                 name: shot-minio-secret
             - secretRef:
-                name: shots-secret
+                name: shot-secret
           volumeMounts:
             - mountPath: /cache
               name: cache
