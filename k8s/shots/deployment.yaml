@@ -80,44 +80,16 @@ spec:
               value: "prod"
             - name: CACHE_DIR
               value: '/cache'
-            - name: MINIO_URL
-              value: 'https://minio.wayl.one'
-            - name: BUCKET_NAME
-              value: 'shots'
-            - name: ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: shots-secret
-                  key: ACCESS_KEY
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: shots-secret
-                  key: SECRET_KEY
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: shots-secret
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_BUCKET_NAME
-              value: 'shots'
-            - name: AWS_ENDPOINT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: shots-secret
-                  key: AWS_ENDPOINT_URL
-            - name: AWS_REGION
-              value: 'us-east-1'
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: shots-secret
-                  key: AWS_SECRET_ACCESS_KEY
+          envFrom:
+            - secretRef:
+                name: shots-minio-secret
+            - secretRef:
+                name: shots-secret
           volumeMounts:
             - mountPath: /cache
               name: cache
       imagePullSecrets:
-        - name: regcred
+        - name: cluster-regcred
       restartPolicy: Always
       volumes:
         - name: cache
