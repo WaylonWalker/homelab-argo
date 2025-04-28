@@ -112,7 +112,7 @@ spec:
           database: nextcloud
           existingSecret:
             enabled: true
-            secretName: nextcloud-extra-secret
+            secretName: nextcloud-db-secret
             usernameKey: username
             passwordKey: password
   destination:
