@@ -82,7 +82,7 @@ spec:
               value: '/cache'
           envFrom:
             - secretRef:
-                name: shots-minio-secret
+                name: shot-minio-secret
             - secretRef:
                 name: shots-secret
           volumeMounts:
