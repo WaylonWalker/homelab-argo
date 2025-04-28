@@ -34,6 +34,20 @@ spec:
           cputhreshold: 60
           minPods: 1
           maxPods: 4
+        redis:
+          enabled: false
+          auth:
+            enabled: true
+            existingSecret: nextcloud-db-secret
+            existingSecretPasswordKey: redis-password
+          global:
+            storageClass: ""
+          master:
+            persistence:
+              enabled: true
+          replica:
+            persistence:
+              enabled: true
         nextcloud:
           host: nextcloud.wayl.one
           trustedDomains:
