@@ -64,7 +64,7 @@ spec:
       containers:
         # - image: registry.wayl.one/shot-scraper-api:0.0.6
         # - image: registry.wayl.one/shot-scraper-api:0.0.18
-        - image: registry.wayl.one/shot-scraper-api:0.0.22
+        - image: registry.wayl.one/shot-scraper-api:0.0.23
           name: shot-wayl-one
           ports:
             - containerPort: 5000
