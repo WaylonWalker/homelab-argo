@@ -18,7 +18,7 @@ spec:
       database: social-scheduler
       owner: social-scheduler
       secret:
-        name: social-scheduler-pg-secret
+        name: social-scheduler-secret
   backup:
     retentionPolicy: 30d
     barmanObjectStore:
