@@ -1,0 +1,58 @@
+# Create a dedicated namespace for the PostgreSQL cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: social-scheduler
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-example
+  namespace: example-pg
+spec:
+  instances: 3
+  storage:
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: social-scheduler
+      owner: social-scheduler
+      secret:
+        name: social-scheduler-pg-secret
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore:
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+      endpointURL: "https://minio.wayl.one"
+      destinationPath: "s3://social-scheduler/db"
+      s3Credentials:
+        accessKeyId:
+          name: social-scheduler-minio-secret
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: social-scheduler-minio-secret
+          key: AWS_SECRET_ACCESS_KEY
+        region:
+          name: social-scheduler-minio-secret
+          key: AWS_REGION
+
+# - name: DB_USER
+#   valueFrom:
+#     secretKeyRef:
+#       name: social-scheduler-db-credentials
+#       key: username
+# - name: DB_PASSWORD
+#   valueFrom:
+#     secretKeyRef:
+#       name: social-scheduler-db-credentials
+#       key: password
+# - name: DB_NAME
+#   valueFrom:
+#     secretKeyRef:
+#       name: social-scheduler-db-credentials
+#       key: database
+# - name: DATABASE_URL
+#   value: "postgresql://$(DB_USER):$(DB_PASSWORD)@social-scheduler-db-rw.postiz.svc:5432/$(DB_NAME)"
