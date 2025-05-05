@@ -38,7 +38,7 @@ spec:
                 claimName: site-pvc-longhorn-backup
           containers:
             - name: waylonwalker-com-container
-              image: registry.wayl.one/waylonwalker-com:50
+              image: registry.wayl.one/waylonwalker-com:52
               env:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
