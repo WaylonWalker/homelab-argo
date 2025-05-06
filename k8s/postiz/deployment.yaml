@@ -89,7 +89,7 @@ spec:
                 name: postiz-secrets
           env:
             - name: API_LIMIT
-              value: 10000
+              value: '10000'
             - name: BACKEND_INTERNAL_URL
               value: http://localhost:3000
             - name: MAIN_URL
