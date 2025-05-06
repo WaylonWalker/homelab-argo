@@ -80,7 +80,7 @@ spec:
     spec:
       containers:
         - name: postiz
-          image: ghcr.io/gitroomhq/postiz-app:v1.39.1
+          image: ghcr.io/gitroomhq/postiz-app:v1.43.0
           ports:
             - containerPort: 5000
               protocol: TCP
@@ -88,6 +88,8 @@ spec:
             - secretRef:
                 name: postiz-secrets
           env:
+            - name: API_LIMIT
+              value: 10000
             - name: BACKEND_INTERNAL_URL
               value: http://localhost:3000
             - name: MAIN_URL
