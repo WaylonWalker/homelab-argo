@@ -78,6 +78,9 @@ spec:
       annotations:
         diun.enable: "true"
     spec:
+      # todo change to readwrite many volumes
+      nodeSelector:
+        kubernetes.io/hostname: falcon1
       containers:
         - name: postiz
           image: ghcr.io/gitroomhq/postiz-app:v1.43.0
