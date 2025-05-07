@@ -83,7 +83,8 @@ spec:
         kubernetes.io/hostname: falcon1
       containers:
         - name: postiz
-          image: ghcr.io/gitroomhq/postiz-app:v1.43.0
+          # image: ghcr.io/gitroomhq/postiz-app:v1.43.0
+          image: ghcr.io/gitroomhq/postiz-app:v1.39.1
           ports:
             - containerPort: 5000
               protocol: TCP
