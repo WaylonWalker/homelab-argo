@@ -21,8 +21,9 @@ spec:
         replicaCount: 1
         # List of sites to configure.
         bucket: "k8s-pages"
-        maxAge: '120960'
+        maxAge: '60'
         staleWhileRevalidate: '86400'
+        staleIfError: '604800'
         sites:
           - name: k8s-pages
             host: wayl.one
