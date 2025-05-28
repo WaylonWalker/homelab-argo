@@ -109,8 +109,8 @@ spec:
       annotations:
         diun.enable: "true"
     spec:
-      nodeSelector:
-        kraft: "true"
+      # nodeSelector:
+      #   kraft: "true"
       containers:
         - name: kraft
           image: itzg/minecraft-server
