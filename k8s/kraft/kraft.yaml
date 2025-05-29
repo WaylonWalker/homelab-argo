@@ -96,7 +96,7 @@ metadata:
   name: kraft
   namespace: kraft
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: kraft
