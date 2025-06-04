@@ -87,6 +87,9 @@ spec:
                 name: shot-minio-secret
             - secretRef:
                 name: shot-secret
+          env:
+            - name: AWS_ENDPOINT_URL
+              value: http://minio.minio.svc.cluster.local:9000
           volumeMounts:
             - mountPath: /cache
               name: cache
