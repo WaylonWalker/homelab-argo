@@ -34,7 +34,7 @@ metadata:
   creationTimestamp: null
   labels:
     service: minio
-  name: minio
+  name: minio2
   namespace: minio
 spec:
   replicas: 1
