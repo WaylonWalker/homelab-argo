@@ -91,11 +91,6 @@ spec:
                 secretKeyRef:
                   name: dropper-minio-secret
                   key: AWS_REGION
-            - name: AWS_ENDPOINT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: dropper-minio-secret
-                  key: AWS_ENDPOINT_URL
             - name: BACKEND_CORS_ORIGINS
               valueFrom:
                 secretKeyRef:
