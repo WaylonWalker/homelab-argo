@@ -56,6 +56,8 @@ spec:
             - server
             - --console-address
             - :9001
+            - --address
+            - :9000
             - /data
           image: minio/minio:RELEASE.2025-04-08T15-41-24Z
           name: minio
