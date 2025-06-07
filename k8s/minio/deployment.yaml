@@ -1,7 +1,6 @@
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
     service: minio
   name: minio
@@ -16,22 +15,16 @@ spec:
       targetPort: 9001
   selector:
     service: minio
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  creationTimestamp: null
   name: minio
   namespace: minio
-spec: {}
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     service: minio
   name: minio2
@@ -47,7 +40,6 @@ spec:
     metadata:
       annotations:
         diun.enable: "true"
-      creationTimestamp: null
       labels:
         service: minio
     spec:
@@ -66,7 +58,6 @@ spec:
               protocol: TCP
             - containerPort: 9001
               protocol: TCP
-          resources: {}
           volumeMounts:
             - mountPath: /data
               name: minio-storage
@@ -78,7 +69,6 @@ spec:
         - name: minio-storage
           persistentVolumeClaim:
             claimName: minio-storage
-status: {}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -111,7 +101,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  creationTimestamp: null
   labels:
     service: minio
   name: minio
@@ -145,5 +134,3 @@ spec:
         - minio.wayl.one
         - minio-ui.wayl.one
       secretName: minio-cert-tls
-status:
-  loadBalancer: {}
