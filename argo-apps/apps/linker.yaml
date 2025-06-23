@@ -14,7 +14,7 @@ spec:
         name: linker
         image:
           name: linker
-          tag: "0.0.1"
+          tag: "0.0.2"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: linker
