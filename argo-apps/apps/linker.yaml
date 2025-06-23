@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: linker
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/waylonwalker/k8s-basic.git'
+    targetRevision: HEAD
+    path: helm-chart
+    helm:
+      values: |
+        name: linker
+        image:
+          name: linker
+          tag: "0.0.1"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: linker
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
