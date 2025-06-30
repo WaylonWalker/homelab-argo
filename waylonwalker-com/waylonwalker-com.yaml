@@ -38,13 +38,16 @@ spec:
                 claimName: site-pvc-longhorn-backup
           containers:
             - name: waylonwalker-com-container
-              image: registry.wayl.one/waylonwalker-com:52
+              image: registry.wayl.one/waylonwalker-com:53
               env:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
                     secretKeyRef:
                       name: waylonwalker-com-secret
                       key: cloudflare-secret
+              envFrom:
+                - secretRef:
+                    name: waylonwalker-com-minio-secret
               volumeMounts:
                 - name: site
                   mountPath: /site
