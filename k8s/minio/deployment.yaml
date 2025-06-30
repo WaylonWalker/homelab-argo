@@ -108,6 +108,14 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: /mnt/vault/nfs/general/pv/minio/minio-storage
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: minio-storage
+              operator: In
+              values:
+                - "true"
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
