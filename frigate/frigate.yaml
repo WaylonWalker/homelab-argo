@@ -75,9 +75,9 @@ spec:
               protocol: UDP
           securityContext:
             privileged: true
-          resources:
-            limits:
-              gpu.intel.com/i915: 1
+          # resources:
+          #   limits:
+          #     gpu.intel.com/i915: 1
           volumeMounts:
             - mountPath: /config
               name: config
