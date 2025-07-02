@@ -49,14 +49,15 @@ spec:
       annotations:
         diun.enable: "true"
     spec:
-      nodeAffinity:
-        required:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: frigate-storage
-                  operator: In
-                  values:
-                    - "true"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: frigate-storage
+                    operator: In
+                    values:
+                      - "true"
       containers:
         - env:
             - name: FRIGATE_RTSP_PASSWORD
@@ -153,7 +154,7 @@ spec:
             path: /dev/dri
 status: {}
 ---
-apiVersion: v1
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: frigate
