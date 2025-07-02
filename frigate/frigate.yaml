@@ -154,6 +154,17 @@ spec:
 status: {}
 ---
 apiVersion: v1
+kind: PodDisruptionBudget
+metadata:
+  name: frigate
+  namespace: frigate
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      service: frigate
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: config
