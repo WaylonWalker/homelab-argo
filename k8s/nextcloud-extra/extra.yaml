@@ -79,17 +79,22 @@ kind: Cluster
 metadata:
   name: nextcloud-db
   namespace: nextcloud
+  annotations:
+    rebalance.cnpg.io/trigger: "2025-04-16"
 spec:
   instances: 3
   storage:
     storageClass: longhorn-backup
-    size: 20Gi
+    size: 40Gi
   bootstrap:
-    initdb:
-      database: nextcloud
-      owner: nextcloud
-      secret:
-        name: nextcloud-extra-secret
+    recovery:
+      backup:
+        name: nextcloud-db-backup
+        # initdb:
+        #   database: nextcloud
+        #   owner: nextcloud
+        #   secret:
+        #     name: nextcloud-extra-secret
   monitoring:
     enablePodMonitor: true
   backup:
