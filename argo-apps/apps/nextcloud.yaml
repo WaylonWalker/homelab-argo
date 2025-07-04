@@ -18,6 +18,10 @@ spec:
     targetRevision: 6.6.10
     helm:
       values: |
+        image:
+          flavor: fpm
+        nginx
+          enabled: true
         extraInitContainers:
           - name: install-ffmpeg
             image: debian:bullseye-slim
