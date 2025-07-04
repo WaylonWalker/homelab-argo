@@ -104,7 +104,7 @@ spec:
         compression: gzip
       data:
         compression: gzip
-      endpointURL: "https://minio.wayl.one"
+      endpointURL: "http://minio.minio.svc.cluster.local:9000"
       destinationPath: "s3://nextcloud/db"
       s3Credentials:
         accessKeyId:
