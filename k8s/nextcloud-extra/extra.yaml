@@ -87,14 +87,31 @@ spec:
     storageClass: longhorn-backup
     size: 40Gi
   bootstrap:
-    recovery:
-      backup:
-        name: nextcloud-db-backup
-        # initdb:
-        #   database: nextcloud
-        #   owner: nextcloud
-        #   secret:
-        #     name: nextcloud-extra-secret
+    # recovery:
+    #   barmanObjectStore:
+    #     destinationPath: "s3://nextcloud/db"
+    #     endpointURL: "http://minio.minio.svc.cluster.local:9000"
+    #     s3Credentials:
+    #       accessKeyId:
+    #         name: nextcloud-minio-secret
+    #         key: AWS_ACCESS_KEY_ID
+    #       secretAccessKey:
+    #         name: nextcloud-minio-secret
+    #         key: AWS_SECRET_ACCESS_KEY
+    #       region:
+    #         name: nextcloud-minio-secret
+    #         key: AWS_REGION
+    #     wal:
+    #       compression: gzip
+    #     data:
+    #       compression: gzip
+    #   target:
+    #     backupID: "20250703T023000"  # replace with your actual backup folder name
+    initdb:
+      database: nextcloud
+      owner: nextcloud
+      secret:
+        name: nextcloud-extra-secret
   monitoring:
     enablePodMonitor: true
   backup:
@@ -116,6 +133,16 @@ spec:
         region:
           name: nextcloud-minio-secret
           key: AWS_REGION
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: nextcloud-db-backup
+  namespace: nextcloud
+spec:
+  cluster:
+    name: nextcloud-db
+  method: barmanObjectStore
 
 # ---
 # apiVersion: apps/v1
