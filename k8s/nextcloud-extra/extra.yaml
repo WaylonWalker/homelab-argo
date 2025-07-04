@@ -85,7 +85,7 @@ spec:
   instances: 3
   storage:
     storageClass: longhorn-backup
-    size: 40Gi
+    size: 5Gi
   bootstrap:
     # recovery:
     #   barmanObjectStore:
