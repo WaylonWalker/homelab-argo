@@ -68,6 +68,11 @@ spec:
         # - image: registry.wayl.one/shot-scraper-api:0.0.23
         # - image: registry.wayl.one/shot-scraper-api:0.0.24
         - image: registry.wayl.one/shot-scraper-api:0.0.25
+          command:
+            - '/bin/bash'
+            - '-c'
+          args:
+            - 'uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 5'
           name: shot-wayl-one
           ports:
             - containerPort: 5000
