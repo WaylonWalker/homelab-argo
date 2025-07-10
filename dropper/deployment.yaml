@@ -102,7 +102,7 @@ spec:
                   name: dropper-secret
                   key: BACKEND_CORS_ORIGINS
             - name: AWS_ENDPOINT_URL
-              value: "http://minio.minio.svc.cluster.local:9000"
+              value: "http://minio.wayl.one"
       imagePullSecrets:
         - name: cluster-regcred
       restartPolicy: Always
