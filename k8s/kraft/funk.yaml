@@ -102,11 +102,11 @@ spec:
               value: |
                 https://cdn.modrinth.com/data/N6n5dqoA/versions/CRjwbqnJ/Axiom-4.9.1-for-MC1.21.6.jar
                 https://cdn.modrinth.com/data/1u6JkXh5/versions/3HceS8fQ/worldedit-mod-7.3.15-beta-02.jar
-            - name: RCON_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: funk-secret
-                  key: rcon-password
+            # - name: RCON_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: funk-secret
+            #       key: rcon-password
             - name: ENABLE_RCON
               value: "true"
             - name: MEMORY
