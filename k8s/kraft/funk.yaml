@@ -1,0 +1,182 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: funk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # not a backup, but uses a longhorn storage class with backup applied
+  name: funk-data-backup
+  namespace: funk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: funk-data
+  namespace: funk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: funk
+  namespace: funk
+spec:
+  selector:
+    app: funk
+  ports:
+    - name: minecraft
+      port: 25565
+      targetPort: 25565
+      nodePort: 30566
+  type: NodePort
+  # type: ClusterIP
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: funk-pdb
+  namespace: funk
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: funk
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: funk
+  namespace: funk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: funk
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: funk
+      annotations:
+        diun.enable: "true"
+    spec:
+      # nodeSelector:
+      #   funk: "true"
+      containers:
+        - name: funk
+          image: itzg/minecraft-server
+          env:
+            - name: SEED
+              value: '-4338028305538428199'
+            - name: EULA
+              value: "true"
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                gamerule keepInventory true
+                pregen start 200
+            - name: TYPE
+              value: "FABRIC"
+            - name: VERSION
+              value: "1.21.7"
+            - name: MODE
+              value: "creative"
+            - name: FABRIC_LOADER
+              value: "0.16.14"
+            - name: MODS
+              value: |
+                https://cdn.modrinth.com/data/N6n5dqoA/versions/CRjwbqnJ/Axiom-4.9.1-for-MC1.21.6.jar
+                https://cdn.modrinth.com/data/1u6JkXh5/versions/3HceS8fQ/worldedit-mod-7.3.15-beta-02.jar
+            - name: RCON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: funk-secret
+                  key: rcon-password
+            - name: ENABLE_RCON
+              value: "true"
+            - name: MEMORY
+              value: "3G"
+            - name: JVM_XX_OPTS
+              value: "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
+            - name: BACKUP_ENABLED
+              value: "true"
+            - name: BACKUP_INTERVAL
+              value: "2h"
+            - name: BACKUP_RETENTION
+              value: "24"
+            - name: ONLINE_MODE
+              value: "true"
+            - name: ENFORCE_WHITELIST
+              value: "true"
+            - name: WHITELIST
+              value: "quadmx08,WyattBubbyLee,AylaWalker"
+            - name: OPS
+              value: "quadmx08"
+            - name: OVERRIDE_SERVER_PROPERTIES
+              value: "true"
+            - name: DIFFICULTY
+              value: "normal"
+            - name: ALLOW_NETHER
+              value: "true"
+            - name: MAX_PLAYERS
+              value: "10"
+            - name: ENABLE_COMMAND_BLOCK
+              value: "true"
+          ports:
+            - containerPort: 25565
+              protocol: TCP
+            - containerPort: 25575
+              protocol: TCP
+              name: rcon
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "mc-send-to-console save-all && mc-send-to-console say Server is shutting down in 10 seconds && sleep 10 && mc-send-to-console save-all && mc-send-to-console stop"]
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: 25565
+            periodSeconds: 10
+            initialDelaySeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: 25565
+            periodSeconds: 20
+            initialDelaySeconds: 30
+          resources:
+            requests:
+              memory: "3Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "3"
+          stdin: true
+          tty: true
+          volumeMounts:
+            - name: minecraft-data
+              mountPath: /data
+      restartPolicy: Always
+      volumes:
+        - name: minecraft-data
+          persistentVolumeClaim:
+            claimName: funk-data-backup
