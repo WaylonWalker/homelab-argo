@@ -105,7 +105,7 @@ spec:
             - name: RCON_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: funk-secret
+                  name: kraft-secret
                   key: rcon-password
             - name: ENABLE_RCON
               value: "true"
