@@ -102,6 +102,7 @@ spec:
               value: |
                 https://cdn.modrinth.com/data/N6n5dqoA/versions/CRjwbqnJ/Axiom-4.9.1-for-MC1.21.6.jar
                 https://cdn.modrinth.com/data/1u6JkXh5/versions/3HceS8fQ/worldedit-mod-7.3.15-beta-02.jar
+                https://cdn.modrinth.com/data/P7dR8mSH/versions/F5TVHWcE/fabric-api-0.128.2%2B1.21.6.jar
             # - name: RCON_PASSWORD
             #   valueFrom:
             #     secretKeyRef:
