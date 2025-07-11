@@ -126,7 +126,7 @@ spec:
             - name: WHITELIST
               value: "quadmx08,WyattBubbyLee,AylaWalker"
             - name: OPS
-              value: "quadmx08"
+              value: "quadmx08,WyattBubbyLee,AylaWalker"
             - name: OVERRIDE_SERVER_PROPERTIES
               value: "true"
             - name: DIFFICULTY
