@@ -79,7 +79,7 @@ spec:
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
-            claimName: minio-storage-longhorn
+            claimName: minio-storage
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
