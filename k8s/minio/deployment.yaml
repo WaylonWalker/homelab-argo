@@ -79,7 +79,7 @@ spec:
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
-            claimName: minio-storage
+            claimName: minio-storage-longhorn
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -116,6 +116,19 @@ spec:
               operator: In
               values:
                 - "true"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-storage-longhorn
+  namespace: minio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 50Gi
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
