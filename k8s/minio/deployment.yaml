@@ -42,6 +42,7 @@ spec:
       labels:
         service: minio
     spec:
+      terminationGracePeriodSeconds: 60
       containers:
         - args:
             - server
@@ -75,11 +76,34 @@ spec:
           envFrom:
             - secretRef:
                 name: minio-secret
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            initialDelaySeconds: 20
+            periodSeconds: 20
       restartPolicy: Always
       volumes:
         - name: minio-storage
           persistentVolumeClaim:
             claimName: minio-storage-longhorn
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: minio-pdb
+  namespace: minio
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      service: minio
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
