@@ -45,7 +45,7 @@ spec:
         diun.enable: "true"
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.10
+        - image: registry.wayl.one/dropper:0.0.11
           name: dropper-wayl-one
           command:
             - '/bin/bash'
