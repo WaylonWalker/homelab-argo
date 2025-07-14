@@ -191,6 +191,7 @@ spec:
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
           - name: fluffed-up
+            apex: true
             host: fluffed-up.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
             minioURL: "https://minio.wayl.one"
