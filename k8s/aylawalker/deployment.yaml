@@ -42,6 +42,17 @@ spec:
         network/code-server-default: "true"
         service: code-server
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /config"]
+          volumeMounts:
+            - mountPath: /config
+              name: aylawalker-config
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - env:
             - name: DEFAULT_WORKSPACE
@@ -197,6 +208,17 @@ spec:
       labels:
         service: admin
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /config"]
+          volumeMounts:
+            - mountPath: /config
+              name: aylawalker-config
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: admin
           image: registry.wayl.one/rhiannonwalker-com:50
