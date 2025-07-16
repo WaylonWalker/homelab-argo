@@ -9,7 +9,7 @@ spec:
     namespace: aylawalker
     server: 'https://kubernetes.default.svc'
   source:
-    path: aylawalker
+    path: k8s/aylawalker
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
