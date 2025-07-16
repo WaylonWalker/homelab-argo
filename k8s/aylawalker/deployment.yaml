@@ -132,7 +132,7 @@ metadata:
 spec:
   containers:
     - name: watch
-      image: registry.wayl.one/aylawalker-com:50
+      image: registry.wayl.one/rhiannonwalker-com:50
       imagePullPolicy: Always
       workingDir: /config/workspace/aylawalker.com/
       # command: ["sleep", "3600"]
