@@ -274,9 +274,8 @@ metadata:
   namespace: aylawalker
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
-  volumeName: pv-hostpath-config
   storageClassName: longhorn-backup
