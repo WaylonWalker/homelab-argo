@@ -1,0 +1,282 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: aylawalker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    service: code-server
+  name: code-server
+  namespace: aylawalker
+spec:
+  ports:
+    - name: "8443"
+      port: 8443
+      targetPort: 8443
+  selector:
+    service: code-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: code-server
+  name: code-server
+  namespace: aylawalker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: code-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        network/code-server-default: "true"
+        service: code-server
+    spec:
+      containers:
+        - env:
+            - name: DEFAULT_WORKSPACE
+              value: /config/workspace
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: aylawalker-secret
+                  key: PASSWORD
+            - name: PGID
+              value: "1000"
+            - name: PROXY_DOMAIN
+              value: edit.aylawalker.com
+            - name: PUID
+              value: "1000"
+            - name: SUDO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: aylawalker-secret
+                  key: PASSWORD
+            - name: TZ
+              value: Etc/UTC
+          image: lscr.io/linuxserver/code-server:latest
+          name: code-server
+          ports:
+            - containerPort: 8443
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: aylawalker-config
+      restartPolicy: Always
+      volumes:
+        - name: aylawalker-config
+          persistentVolumeClaim:
+            claimName: aylawalker-config
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  labels:
+    service: code-server
+  name: code-server
+  namespace: aylawalker
+spec:
+  rules:
+    - host: aylawalker.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: code-server
+                port:
+                  number: 8443
+            path: /
+            pathType: Prefix
+    - host: edit.aylawalker.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: code-server
+                port:
+                  number: 8443
+            path: /
+            pathType: Prefix
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: watch
+  namespace: aylawalker
+  annotations:
+    minio-last-rotated: "2025-07-16 08:41:58"
+spec:
+  containers:
+    - name: watch
+      image: registry.wayl.one/aylawalker-com:50
+      imagePullPolicy: Always
+      workingDir: /config/workspace/aylawalker.com/
+      # command: ["sleep", "3600"]
+      volumeMounts:
+        - mountPath: /config
+          name: aylawalker-config
+      env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aylawalker-minio-secret
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aylawalker-minio-secret
+              key: AWS_SECRET_ACCESS_KEY
+        - name: AWS_BUCKET_NAME
+          valueFrom:
+            secretKeyRef:
+              name: aylawalker-minio-secret
+              key: AWS_BUCKET_NAME
+        - name: AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: aylawalker-minio-secret
+              key: AWS_REGION
+        - name: AWS_ENDPOINT_URL
+          valueFrom:
+            secretKeyRef:
+              name: aylawalker-minio-secret
+              key: AWS_ENDPOINT_URL
+  imagePullSecrets:
+    - name: 'cluster-regcred'
+  restartPolicy: Always
+  volumes:
+    - name: aylawalker-config
+      persistentVolumeClaim:
+        claimName: aylawalker-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    service: admin
+  name: admin
+  namespace: aylawalker
+spec:
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+  selector:
+    service: admin
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: admin
+  name: admin
+  namespace: aylawalker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: admin
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: admin
+    spec:
+      containers:
+        - name: admin
+          image: registry.wayl.one/aylawalker-com:50
+          imagePullPolicy: Always
+          workingDir: /config/workspace/aylawalker.com/admin/
+          command: ["/app/admin/just-server"]
+          volumeMounts:
+            - mountPath: /config
+              name: aylawalker-config
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aylawalker-minio-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aylawalker-minio-secret
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: aylawalker-minio-secret
+                  key: AWS_BUCKET_NAME
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aylawalker-minio-secret
+                  key: AWS_REGION
+            - name: AWS_ENDPOINT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: aylawalker-minio-secret
+                  key: AWS_ENDPOINT_URL
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: aylawalker-config
+      imagePullSecrets:
+        - name: 'cluster-regcred'
+      restartPolicy: Always
+      volumes:
+        - name: aylawalker-config
+          persistentVolumeClaim:
+            claimName: aylawalker-config
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  labels:
+    service: admin
+  name: admin
+  namespace: aylawalker
+spec:
+  rules:
+    - host: admin.aylawalker.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: admin
+                port:
+                  number: 8000
+            path: /
+            pathType: Prefix
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aylawalker-config
+  namespace: aylawalker
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: pv-hostpath-config
+  storageClassName: longhorn-backup
