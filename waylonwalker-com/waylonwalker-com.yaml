@@ -77,7 +77,7 @@ spec:
                 claimName: site-pvc-longhorn-backup
           containers:
             - name: markata-clean-container
-              image: registry.wayl.one/waylonwalker-com:50
+              image: registry.wayl.one/waylonwalker-com:54
               command: ["markata", "clean"]
               workingDir: /site/waylonwalker.com
               volumeMounts:
