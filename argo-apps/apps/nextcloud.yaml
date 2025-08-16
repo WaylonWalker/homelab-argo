@@ -1,130 +1,119 @@
-# todo 
-# mounts
-# - /var/www/html
-# - /var/lib/mysql
-#next
-# metadata refresh with cron
-# redis next
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: nextcloud
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://nextcloud.github.io/helm/
-    chart: nextcloud
-    targetRevision: 6.6.10
-    helm:
-      values: |
-        image:
-          flavor: fpm
-        nginx
-          enabled: true
-        extraInitContainers:
-          - name: install-ffmpeg
-            image: debian:bullseye-slim
-            command: ["/bin/sh", "-c"]
-            args:
-              - apt-get update && apt-get install -y ffmpeg && mkdir -p /var/www/html/bin && cp $(which ffmpeg) /var/www/html/bin/ffmpeg
-            volumeMounts:
-              - mountPath: /var/www/html
-                name: nextcloud-data
-        cronjob:
-          enabled: true
-        hpa:
-          enabled: false
-          cputhreshold: 60
-          minPods: 1
-          maxPods: 4
-        redis:
-          enabled: true
-          auth:
-            enabled: true
-            existingSecret: nextcloud-db-secret
-            existingSecretPasswordKey: redis-password
-          global:
-            storageClass: ""
-          master:
-            persistence:
-              enabled: true
-          replica:
-            persistence:
-              enabled: true
-        nextcloud:
-          host: nextcloud.wayl.one
-          trustedDomains:
-            - nextcloud.wayl.one
-          username: admin
-          password: changeme
-          extraEnv:
-            - name: PGSSLMODE
-              value: disable
-            - name: OVERWRITECLIURL
-              value: "https://nextcloud.wayl.one"
-            - name: OVERWRITEPROTOCOL
-              value: "https"
-            - name: OVERWRITEHOST
-              value: "nextcloud.wayl.one"
-            - name: TRUSTED_PROXIES
-              value: "10.0.0.0/8,10.42.0.0/16"
-            - name: PATH
-              value: "/var/www/html/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-          ## Use an existing secret
-          existingSecret:
-            enabled: false
-            # secretName: nameofsecret
-            usernameKey: nextcloud-username
-            passwordKey: nextcloud-password
-            tokenKey: ""
-            smtpUsernameKey: smtp-username
-            smtpPasswordKey: smtp-password
-            smtpHostKey: smtp-host
-        persistence:
-          enabled: true
-          existingClaim: nextcloud-html
-          nextcloudData:
-            enabled: true
-            existingClaim: nextcloud-data
-        nodeSelector:
-          nextcloud-storage: "true"
-        ingress:
-          enabled: true
-          ingressClassName: traefik
-          annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-prod
-            nginx.ingress.kubernetes.io/ssl-redirect: "true"
-          hosts:
-            - host: nextcloud.wayl.one
-              paths:
-                - path: /
-                  type: Prefix
-          tls:
-            - secretName: nextcloud-cert-tls
-              hosts:
-                - nextcloud.wayl.one
-        internalDatabase:
-          enabled: false
-
-        externalDatabase:
-          enabled: true
-          type: postgresql
-          host: nextcloud-db-rw.nextcloud.svc
-          user: nextcloud
-          password: ""
-          database: nextcloud
-          existingSecret:
-            enabled: true
-            secretName: nextcloud-db-secret
-            usernameKey: username
-            passwordKey: password
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: nextcloud
-  syncPolicy:
-    automated:
-      selfHeal: true
-      prune: true
-    syncOptions:
-      - CreateNamespace=true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: nextcloud
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://nextcloud.github.io/helm/
+#     chart: nextcloud
+#     targetRevision: 6.6.10
+#     helm:
+#       values: |
+#         extraInitContainers:
+#           - name: install-ffmpeg
+#             image: debian:bullseye-slim
+#             command: ["/bin/sh", "-c"]
+#             args:
+#               - apt-get update && apt-get install -y ffmpeg && mkdir -p /var/www/html/bin && cp $(which ffmpeg) /var/www/html/bin/ffmpeg
+#             volumeMounts:
+#               - mountPath: /var/www/html
+#                 name: nextcloud-data
+#         cronjob:
+#           enabled: true
+#         hpa:
+#           enabled: false
+#           cputhreshold: 60
+#           minPods: 1
+#           maxPods: 4
+#         redis:
+#           enabled: true
+#           auth:
+#             enabled: true
+#             existingSecret: nextcloud-db-secret
+#             existingSecretPasswordKey: redis-password
+#           global:
+#             storageClass: ""
+#           master:
+#             persistence:
+#               enabled: true
+#           replica:
+#             persistence:
+#               enabled: true
+#         nextcloud:
+#           host: nextcloud.wayl.one
+#           trustedDomains:
+#             - nextcloud.wayl.one
+#           username: admin
+#           password: changeme
+#           extraEnv:
+#             - name: PGSSLMODE
+#               value: disable
+#             - name: OVERWRITECLIURL
+#               value: "https://nextcloud.wayl.one"
+#             - name: OVERWRITEPROTOCOL
+#               value: "https"
+#             - name: OVERWRITEHOST
+#               value: "nextcloud.wayl.one"
+#             - name: TRUSTED_PROXIES
+#               value: "10.0.0.0/8,10.42.0.0/16"
+#             - name: PATH
+#               value: "/var/www/html/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#           ## Use an existing secret
+#           existingSecret:
+#             enabled: false
+#             # secretName: nameofsecret
+#             usernameKey: nextcloud-username
+#             passwordKey: nextcloud-password
+#             tokenKey: ""
+#             smtpUsernameKey: smtp-username
+#             smtpPasswordKey: smtp-password
+#             smtpHostKey: smtp-host
+#         persistence:
+#           enabled: true
+#           existingClaim: nextcloud-html
+#           nextcloudData:
+#             enabled: true
+#             existingClaim: nextcloud-data
+#         nodeSelector:
+#           nextcloud-storage: "true"
+#         ingress:
+#           enabled: true
+#           ingressClassName: traefik
+#           annotations:
+#             cert-manager.io/cluster-issuer: letsencrypt-prod
+#             nginx.ingress.kubernetes.io/ssl-redirect: "true"
+#           hosts:
+#             - host: nextcloud.wayl.one
+#               paths:
+#                 - path: /
+#                   type: Prefix
+#           tls:
+#             - secretName: nextcloud-cert-tls
+#               hosts:
+#                 - nextcloud.wayl.one
+#         internalDatabase:
+#           enabled: false
+#
+#         externalDatabase:
+#           enabled: true
+#           type: postgresql
+#           host: nextcloud-db-rw.nextcloud.svc
+#           user: nextcloud
+#           password: ""
+#           database: nextcloud
+#           existingSecret:
+#             enabled: true
+#             secretName: nextcloud-db-secret
+#             usernameKey: username
+#             passwordKey: password
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: nextcloud
+#   syncPolicy:
+#     automated:
+#       selfHeal: true
+#       prune: true
+#     syncOptions:
+#       - CreateNamespace=true
