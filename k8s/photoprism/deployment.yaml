@@ -6,7 +6,7 @@ metadata:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-photoprism-storage
+  name: pv-photoprism-storage-walkershare
   namespace: photoprism
 spec:
   capacity:
@@ -36,7 +36,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: hostpath
-  volumeName: pv-photoprism-storage
+  volumeName: pv-photoprism-storage-walkershare
   resources:
     requests:
       storage: 500Gi
