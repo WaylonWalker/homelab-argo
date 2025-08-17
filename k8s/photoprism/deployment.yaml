@@ -16,7 +16,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/main/nextcloud/photoprism/storage
+    path: /mnt/main/walkershare/photoprism/storage
     type: DirectoryOrCreate
   nodeAffinity:
     required:
@@ -72,6 +72,11 @@ spec:
       annotations:
         diun.enable: "true"
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
       nodeSelector:
         nextcloud-storage: "true"
       containers:
@@ -131,6 +136,9 @@ spec:
             - name: PHOTOPRISM_SIDECAR_YAML
               value: "true"
           volumeMounts:
+            - name: parents
+              mountPath: /photoprism/originals/parents
+              readOnly: true
             - name: waylon
               mountPath: /photoprism/originals/waylon
               readOnly: true
@@ -145,13 +153,17 @@ spec:
               type: Unconfined
             allowPrivilegeEscalation: false
       volumes:
+        - name: parents
+          hostPath:
+            path: /mnt/main/walkershare/parents/photos
+            type: Directory
         - name: waylon
           hostPath:
-            path: /mnt/main/nextcloud/data/data/waylon/files
+            path: /mnt/main/walkershare/waylon/photos
             type: Directory
         - name: rhiannon
           hostPath:
-            path: /mnt/main/nextcloud/data/data/rhiannon/files
+            path: /mnt/main/walkershare/rhiannon/photos
             type: Directory
         - name: storage
           persistentVolumeClaim:
@@ -160,7 +172,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  creationTimestamp: null
   name: photoprism
   namespace: photoprism
   annotations:
