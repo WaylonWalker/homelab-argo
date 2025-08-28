@@ -39,8 +39,6 @@ spec:
         diun.enable: "true"
     spec:
       securityContext:
-        # runAsUser: 1000
-        # runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
@@ -65,18 +63,18 @@ spec:
             - containerPort: 3000
               name: http
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /api/v1/version
-          #     port: 3000
-          #   initialDelaySeconds: 20
-          #   periodSeconds: 10
-          # readinessProbe:
-          #   httpGet:
-          #     path: /api/v1/version
-          #     port: 3000
-          #   initialDelaySeconds: 10
-          #   periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/v1/version
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/version
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
           resources:
             requests:
               cpu: "1"
@@ -90,7 +88,7 @@ spec:
       volumes:
         - name: forgejo-data
           persistentVolumeClaim:
-            claimName: forgejo-data
+            claimName: forgejo-data-v2
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -106,7 +104,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: forgejo-data
+  name: forgejo-data-v2
   namespace: forgejo
 spec:
   accessModes:
