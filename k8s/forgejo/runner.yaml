@@ -9,13 +9,14 @@ data:
       level: info
       job_level: info
     runner:
-      capacity: 1        # set to 12 if you want 12 concurrent jobs in this one pod
+      capacity: 3
       labels:
         - "ubuntu-latest"
     cache:
       enabled: true
       port: 0
-      dir: "/home/runner/.cache/actcache"
+      # dir: "/home/runner/.cache/actcache"
+      dir: "/data/.cache/actcache"
     container:
       enable_ipv6: false
 ---
@@ -23,10 +24,11 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: forgejo-runner-data
+  name: forgejo-runner-data-v2
   namespace: forgejo
 spec:
-  accessModes: ["ReadWriteOnce"]
+  accessModes:
+    - ReadWriteMany
   resources:
     requests:
       storage: 5Gi
@@ -41,7 +43,7 @@ metadata:
   labels:
     app: forgejo-runner
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: forgejo-runner
@@ -56,7 +58,7 @@ spec:
       volumes:
         - name: runner-data
           persistentVolumeClaim:
-            claimName: forgejo-runner-data
+            claimName: forgejo-runner-data-v2
         - name: docker-run
           emptyDir: {}
         - name: docker-lib
@@ -65,6 +67,15 @@ spec:
           configMap:
             name: forgejo-runner-config
       initContainers:
+        - name: fix-perms
+          image: busybox:1.36
+          command: ["sh", "-c"]
+          args: ["chown -R 1000:1000 /data && chmod -R u+rwX,g+rwX /data"]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: runner-data
+              mountPath: /data
         - name: register
           image: data.forgejo.org/forgejo/runner:9
           imagePullPolicy: IfNotPresent
@@ -83,8 +94,8 @@ spec:
           args:
             - |
               set -x
+              cd /data
               forgejo-runner create-runner-file --instance "$INSTANCE" --secret "$SECRET"
-              cp -v .runner /data/.runner
           workingDir: /home/runner
           securityContext:
             runAsUser: 1000
@@ -102,7 +113,8 @@ spec:
             - name: DOCKER_TLS_CERTDIR
               value: ""
           args:
-            - --registry-mirror=https://registry-1.docker.io
+            - --group=1000
+            # - --registry-mirror=https://registry-1.docker.io
           volumeMounts:
             - name: docker-run
               mountPath: /var/run
@@ -119,6 +131,13 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
+              # wait until DinD exposes a readable socket
+              for i in $(seq 1 120); do
+                if [ -S /var/run/docker.sock ] && [ -r /var/run/docker.sock ]; then
+                  break
+                fi
+                sleep 1
+              done
               test -f /data/.runner || { echo "Missing /data/.runner"; exit 1; }
               exec forgejo-runner daemon --config /config/config.yml
           securityContext:
