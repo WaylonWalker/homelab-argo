@@ -16,20 +16,21 @@ spec:
   resources:
     requests:
       storage: 10Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: kraft-data
-  namespace: kraft
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 10Gi
 
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: kraft-data
+#   namespace: kraft
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: longhorn
+#   resources:
+#     requests:
+#       storage: 10Gi
+#
 # ---
 # apiVersion: batch/v1
 # kind: Job
@@ -116,7 +117,7 @@ spec:
           image: itzg/minecraft-server
           env:
             - name: SEED
-              value: '-4338028305538428199'
+              value: "-4338028305538428199"
             - name: EULA
               value: "true"
             - name: RCON_CMDS_STARTUP
@@ -182,7 +183,12 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/sh", "-c", "mc-send-to-console save-all && mc-send-to-console say Server is shutting down in 10 seconds && sleep 10 && mc-send-to-console save-all && mc-send-to-console stop"]
+                command:
+                  [
+                    "/bin/sh",
+                    "-c",
+                    "mc-send-to-console save-all && mc-send-to-console say Server is shutting down in 10 seconds && sleep 10 && mc-send-to-console save-all && mc-send-to-console stop",
+                  ]
           startupProbe:
             tcpSocket:
               port: 25565
