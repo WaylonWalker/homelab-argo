@@ -70,5 +70,6 @@ spec:
                       #     mountPath: /app/.markata.cache
           imagePullSecrets:
             - name: regcred
+          imagePullPolicy: Always
           restartPolicy: OnFailure
           activeDeadlineSeconds: 1800
