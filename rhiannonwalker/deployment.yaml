@@ -355,6 +355,7 @@ spec:
           volumeMounts:
             - name: webroot
               mountPath: /usr/share/nginx/html
+              subPath: workspace/fluffed-up.com   # ← mount the right folder
               # subPath: /workspace/fluffed-up.com
               # readOnly: true
             - name: nginx-conf
