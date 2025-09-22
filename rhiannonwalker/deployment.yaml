@@ -372,7 +372,7 @@ spec:
       volumes:
         - name: webroot
           persistentVolumeClaim:
-            claimName: rhiannon-config   # <= your PVC name
+            claimName: rhiannonwalker-config
         - name: nginx-conf
           configMap:
             name: fluffed-up-nginx
