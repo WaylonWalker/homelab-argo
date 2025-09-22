@@ -339,13 +339,13 @@ spec:
         diun.enable: "true"
     spec:
       # Make sure /fluffed-up.com exists on the PVC before we mount it via subPath
-      initContainers:
-        - name: make-webroot
-          image: busybox:1.36
-          command: ["sh", "-c", "mkdir -p /config/fluffed-up.com"]
-          volumeMounts:
-            - name: webroot
-              mountPath: /config
+      # initContainers:
+      #   - name: make-webroot
+      #     image: busybox:1.36
+      #     command: ["sh", "-c", "mkdir -p /config/fluffed-up.com"]
+      #     volumeMounts:
+      #       - name: webroot
+      #         mountPath: /config
       containers:
         - name: nginx
           image: nginx:stable-alpine
@@ -356,7 +356,7 @@ spec:
             - name: webroot
               mountPath: /usr/share/nginx/html
               # subPath: /workspace/fluffed-up.com
-              readOnly: true
+              # readOnly: true
             - name: nginx-conf
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
