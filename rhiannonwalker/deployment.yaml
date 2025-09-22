@@ -300,3 +300,147 @@ spec:
   hostPath:
     path: /mnt/vault/nfs/general/pv/rhiannonwalker/config
     type: DirectoryOrCreate
+
+
+# FLUFFED-UP.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluffed-up
+  namespace: rhiannonwalker
+  labels:
+    app: fluffed-up
+spec:
+  selector:
+    app: fluffed-up
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluffed-up
+  namespace: rhiannonwalker
+  labels:
+    app: fluffed-up
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fluffed-up
+  template:
+    metadata:
+      labels:
+        app: fluffed-up
+      annotations:
+        diun.enable: "true"
+    spec:
+      # Make sure /fluffed-up.com exists on the PVC before we mount it via subPath
+      initContainers:
+        - name: make-webroot
+          image: busybox:1.36
+          command: ["sh", "-c", "mkdir -p /config/fluffed-up.com"]
+          volumeMounts:
+            - name: webroot
+              mountPath: /config
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: webroot
+              mountPath: /usr/share/nginx/html
+              subPath: fluffed-up.com   # <= serve this subfolder
+              readOnly: true
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          env:
+            - name: TZ
+              value: America/Chicago
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+      volumes:
+        - name: webroot
+          persistentVolumeClaim:
+            claimName: rhiannon-config   # <= your PVC name
+        - name: nginx-conf
+          configMap:
+            name: fluffed-up-nginx
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluffed-up-nginx
+  namespace: rhiannonwalker
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name fluffed-up.com;
+
+      # Gzip for text assets
+      gzip on;
+      gzip_types text/plain text/css application/json application/javascript application/xml+rss application/xml application/x-javascript image/svg+xml;
+      gzip_min_length 512;
+
+      root /usr/share/nginx/html;
+      index index.html;
+
+      # HTML: fast edits + CDN cache with SWR
+      location ~* \.(html)$ {
+        add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
+        try_files $uri =404;
+      }
+
+      # Static/fingerprinted assets
+      # location ~* \.(?:css|js|mjs|json|ico|png|jpe?g|gif|webp|svg|avif|woff2?)$ {
+      #   add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable, stale-if-error=86400" always;
+      #   try_files $uri =404;
+      # }
+
+      # SPA fallback (remove if not needed)
+      location / {
+        add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
+        try_files $uri $uri/ /index.html;
+      }
+    }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fluffed-up
+  namespace: rhiannonwalker
+  labels:
+    app: fluffed-up
+  annotations:
+    # Uncomment if you use cert-manager:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Optional: speed up TTFB while editing
+    # nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  rules:
+    - host: fluffed-up.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fluffed-up
+                port:
+                  number: 80
+  # If you terminate TLS at the Ingress (recommended with Cloudflare "Full (strict)")
+  # tls:
+  #   - hosts:
+  #       - fluffed-up.com
+  #     secretName: fluffed-up-com-tls
