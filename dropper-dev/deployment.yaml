@@ -12,16 +12,11 @@ spec:
       targetPort: 8000
   selector:
     service: dropper-wayl-one
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: dropper
-  namespace: dropper-dev-dev
-spec: {}
-status: {}
+  name: dropper-dev
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,7 +29,6 @@ spec:
   selector:
     matchLabels:
       service: dropper-wayl-one
-  strategy: {}
   template:
     metadata:
       labels:
@@ -106,7 +100,6 @@ spec:
       imagePullSecrets:
         - name: cluster-regcred
       restartPolicy: Always
-status: {}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -131,8 +124,6 @@ spec:
     - hosts:
         - dropper-dev.wayl.one
       secretName: dropper-cert-tls
-status:
-  loadBalancer: {}
 # ---
 # apiVersion: autoscaling/v2
 # kind: HorizontalPodAutoscaler
