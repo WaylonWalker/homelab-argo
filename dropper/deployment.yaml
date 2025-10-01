@@ -45,13 +45,14 @@ spec:
         diun.enable: "true"
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.11
+        # - image: registry.wayl.one/dropper:0.0.11
+        - image: registry.wayl.one/dropper:0.0.12b1
           name: dropper-wayl-one
           command:
-            - '/bin/bash'
-            - '-c'
+            - "/bin/bash"
+            - "-c"
           args:
-            - 'uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 5'
+            - "uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 5"
           ports:
             - containerPort: 8000
               protocol: TCP
