@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: regcred
+  namespace: dropper-dev
+spec:
+  encryptedData:
+    .dockerconfigjson: AgCJainWcu8FWBIQUKvbze3Z6BKmY4gk3OOcQkaAQRAehmhMm3jRAkcXRhXRNF0ZmEuRw5l3zlK0bVvIkcimFRzMzLhhocL/AXQiyqONI5mX/r6dyk1X4E6GfZU/3EM7s5qIUvAiqebxEgd56e23LaZK8sPZsB85jonhBEQKh+yShuNHmmgaJRaVlJQodWSfGdOm2WeO3o9nK2ijUYJ+sVFNOC9cFu2WcdOoJp98ByD0R8zOu+mVaodxdgsAS925raZJvMyu7kcZuYfpj7moi4rgLg1F72ORLI5t/pYHzWQYkx9ZRuhHCL0P/V7FMG0IJ8sntDOoQO582ZIy1pyn2jBwUFMrfjggae7Naz5qW/Mtfr3cuERycbE9culXvfTSePdyb69N0jE4jbwKaQCX1dTAWZCkqXUMUFwUqzvx78XPbz22ISPAF9i+Rp8sAsmKqvR9IlPYT/GSTNfGqhfTS9BWK1VTOgrPzw4yLKIEe+JW9jyZwaZob/AeA0lZZHwTpXe4djom6PsaKr0IsWF2EIZ3+a3QmUhcLlHUnV35FAefJwAwyYVA66ffyifbW8RBzugcecL3QHxLnF8rUkozhM8dvuQQtgDSzW8ELFu9CpFrRYtN8LaOJQYacXzpShDrlEsXlC0/gzJ4NubEW4wWUGMYMLwkwP45tNryCVarLVCI15Qz3+W0nBDn8mm0T6q2qyiYKvAQJ5bdpNY7IuHykDXF3WzEy7ySy8bVf0Rt1RCtHrm7XicL3wJI1wO+G8XhJT7zYsO8SVFy3kDKs0vgddH5mGKwPU+IY94aQIzjRCZumS6oPR3Z/2xnHq2FwSs9oQglwW8mZ0pI+w==
+  template:
+    metadata:
+      creationTimestamp: null
+      name: regcred
+      namespace: dropper-dev
+    type: kubernetes.io/dockerconfigjson
