@@ -76,19 +76,19 @@ spec:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: dropper-minio-secret
+                  name: dropper-secret
                   key: AWS_ACCESS_KEY_ID
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: dropper-minio-secret
+                  name: dropper-secret
                   key: AWS_SECRET_ACCESS_KEY
             - name: AWS_BUCKET_NAME
               value: dropper
             - name: AWS_REGION
               valueFrom:
                 secretKeyRef:
-                  name: dropper-minio-secret
+                  name: dropper-secret
                   key: AWS_REGION
             - name: BACKEND_CORS_ORIGINS
               valueFrom:
@@ -110,7 +110,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
-    - host: dropper.wayl.one
+    - host: dropper-dev.wayl.one
       http:
         paths:
           - backend:
