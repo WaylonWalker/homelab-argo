@@ -9,7 +9,7 @@ spec:
     namespace: argocd
     server: "https://kubernetes.default.svc"
   source:
-    path: dropper-dev
+    path: k8s/dropper-dev
     repoURL: "https://github.com/waylonwalker/homelab-argo"
     targetRevision: HEAD
   syncPolicy:
