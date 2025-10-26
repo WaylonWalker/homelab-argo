@@ -36,6 +36,7 @@ spec:
       annotations:
         version: 0.0.13
     spec:
+      imagePullPolicy: Always
       containers:
         - image: registry.wayl.one/dropper:0.0.13
           name: dropper-wayl-one
