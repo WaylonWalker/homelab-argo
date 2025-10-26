@@ -16,8 +16,7 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: dropper
-  namespace: dropper-dev
+  name: dropper-dev
 ---
 apiVersion: apps/v1
 kind: Deployment
