@@ -93,10 +93,7 @@ spec:
             #     https://mediafilez.forgecdn.net/files/6341/52/toms_storage_fabric-1.21-2.1.3.jar
             #     https://mediafilez.forgecdn.net/files/5846/878/jei-1.21.1-fabric-19.21.0.247.jar
             - name: RCON_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: kraft-secret
-                  key: rcon-password
+              value: "minecraft"
             - name: ENABLE_RCON
               value: "true"
             - name: MEMORY
