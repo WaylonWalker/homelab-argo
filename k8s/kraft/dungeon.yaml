@@ -95,7 +95,7 @@ spec:
             - name: RCON_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: dungeon-secret
+                  name: kraft-secret
                   key: rcon-password
             - name: ENABLE_RCON
               value: "true"
