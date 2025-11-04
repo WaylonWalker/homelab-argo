@@ -50,7 +50,7 @@ metadata:
   name: dungeon
   namespace: dungeon
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: dungeon
