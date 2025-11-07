@@ -80,7 +80,7 @@ spec:
       volumes:
         - name: dropper-data
           persistentVolumeClaim:
-            claimName: dropper-data
+            claimName: dropper-data-rwx
       imagePullSecrets:
         - name: cluster-regcred
       restartPolicy: Always
@@ -112,12 +112,12 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: dropper-data
+  name: dropper-data-rwx
   namespace: dropper-dev
 spec:
   storageClassName: longhorn-backup
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 5Gi
