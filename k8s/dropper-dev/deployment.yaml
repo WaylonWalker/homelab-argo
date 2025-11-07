@@ -37,7 +37,7 @@ spec:
         version: 0.0.13
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.14dev4
+        - image: registry.wayl.one/dropper:0.0.14dev6
           imagePullPolicy: Always
           name: dropper-wayl-one
           command:
