@@ -92,8 +92,8 @@ metadata:
   namespace: dropper-dev
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.middlewares: >
-      dropper-dev-dropper-ratelimit@kubernetescrd,
+    # traefik.ingress.kubernetes.io/router.middlewares: >
+    #   dropper-dev-dropper-ratelimit@kubernetescrd,
 spec:
   rules:
     - host: dropper-dev.wayl.one
