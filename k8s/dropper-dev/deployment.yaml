@@ -38,6 +38,7 @@ spec:
         - image: registry.wayl.one/dropper:0.0.14dev12
           imagePullPolicy: Always
           name: dropper-wayl-one
+          replicas: 2
           command:
             - "/bin/bash"
             - "-c"
