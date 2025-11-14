@@ -35,7 +35,7 @@ spec:
         service: dropper-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.14dev13
+        - image: registry.wayl.one/dropper:0.0.14dev14
           imagePullPolicy: Always
           name: dropper-wayl-one
           replicas: 2
@@ -73,13 +73,19 @@ spec:
           env:
             - name: DROPPER_STORAGE_DIR
               value: /data
+            - name: DROPPER_CACHE_DIR
+              value: /cache
           volumeMounts:
             - mountPath: /data
               name: dropper-data
+            - mountPath: /cache
+              name: dropper-cache
       volumes:
         - name: dropper-data
           persistentVolumeClaim:
             claimName: dropper-data-rwx
+        - name: dropper-cache
+          emptyDir: {}
       imagePullSecrets:
         - name: cluster-regcred
       restartPolicy: Always
