@@ -27,6 +27,7 @@ metadata:
   name: dropper-wayl-one
   namespace: dropper
 spec:
+  replicas: 3
   selector:
     matchLabels:
       service: dropper-wayl-one
@@ -40,9 +41,8 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.11
         # - image: registry.wayl.one/dropper:0.0.12b1
         # - image: registry.wayl.one/dropper:0.0.14dev15
-        - image: registry.wayl.one/dropper:0.0.14dev16
+        - image: registry.wayl.one/dropper:0.0.14dev18
           name: dropper-wayl-one
-          replicas: 3
           command:
             - "/bin/bash"
             - "-c"
