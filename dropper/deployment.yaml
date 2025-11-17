@@ -27,7 +27,7 @@ metadata:
   name: dropper-wayl-one
   namespace: dropper
 spec:
-  replicas: 3
+  replicas: 6
   selector:
     matchLabels:
       service: dropper-wayl-one
