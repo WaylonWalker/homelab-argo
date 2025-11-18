@@ -154,6 +154,70 @@ spec:
   resources:
     requests:
       storage: 5Gi
+---
+# cronjob backup to s3
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dropper-backup
+  namespace: dropper
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: dropper-backup
+              image: registry.wayl.one/dropper:0.0.14dev15
+              command:
+                - "/bin/bash"
+                - "-c"
+              args:
+                - uv tool run --from awscli aws s3 sync $DROPPER_STORAGE_DIR s3://dropper
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: dropper-minio-secret
+                      key: AWS_ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: dropper-minio-secret
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: AWS_BUCKET_NAME
+                  value: dropper
+                - name: AWS_REGION
+                  valueFrom:
+                    secretKeyRef:
+                      name: dropper-minio-secret
+                      key: AWS_REGION
+                - name: BACKEND_CORS_ORIGINS
+                  valueFrom:
+                    secretKeyRef:
+                      name: dropper-secret
+                      key: BACKEND_CORS_ORIGINS
+                - name: AWS_ENDPOINT_URL
+                  value: "https://minio.wayl.one"
+                - name: DROPPER_STORAGE_DIR
+                  value: /data
+                - name: DROPPER_CACHE_DIR
+                  value: /cache
+              volumeMounts:
+                - mountPath: /data
+                  name: dropper-data
+                - mountPath: /cache
+                  name: dropper-cache
+          volumes:
+            - name: dropper-data
+              persistentVolumeClaim:
+                claimName: dropper-data
+            - name: dropper-cache
+              emptyDir: {}
+          imagePullSecrets:
+            - name: cluster-regcred
+          restartPolicy: OnFailure
 # ---
 # apiVersion: v1
 # kind: Pod
