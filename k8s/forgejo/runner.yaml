@@ -81,10 +81,11 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: INSTANCE
-              valueFrom:
-                secretKeyRef:
-                  name: forgejo-runner-secret
-                  key: INSTANCE_URL
+              value: "http://forgejo-http.git.svc.cluster.local:3000"
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: forgejo-runner-secret
+              #     key: INSTANCE_URL
             - name: SECRET
               valueFrom:
                 secretKeyRef:
