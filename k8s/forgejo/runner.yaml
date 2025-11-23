@@ -12,6 +12,7 @@ data:
       capacity: 3
       labels:
         - "ubuntu-latest"
+        - "ubuntu-22.04"
     cache:
       enabled: true
       port: 0
