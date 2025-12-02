@@ -16,6 +16,20 @@ spec:
   resources:
     requests:
       storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # not a backup, but uses a longhorn storage class with backup applied
+  name: kraft-season2-data
+  namespace: kraft
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
 
 # ---
 # apiVersion: v1
@@ -117,7 +131,10 @@ spec:
           image: itzg/minecraft-server
           env:
             - name: SEED
-              value: "-4338028305538428199"
+              # kraft 1 seed
+              # value: "-4338028305538428199"
+              # kraft 2 seed - Hermitcraft Season 11
+              value: "-2654832327628292536"
             - name: EULA
               value: "true"
             - name: RCON_CMDS_STARTUP
@@ -127,11 +144,13 @@ spec:
             - name: TYPE
               value: "FABRIC"
             - name: VERSION
-              value: "1.21.9"
+              value: "1.21.10"
             # - name: FABRIC_LOADER
-            #   value: "0.16.9"
+            #   value: "0.18.1"
             # - name: MODS
             #   value: |
+            #     https://cdn.modrinth.com/data/Fb4jn8m6/versions/kHb8t0xv/FallingTree-1.21.1-1.21.1.10.jar
+            #     https://cdn.modrinth.com/data/u6dRKJwZ/versions/6qnhXFOn/jei-1.21.10-fabric-26.2.0.27.jar
             #     https://mediafilez.forgecdn.net/files/5671/704/ftb-ultimine-fabric-2101.1.1.jar
             #     https://mediafilez.forgecdn.net/files/6304/124/ftb-library-fabric-2101.1.12.jar
             #     https://mediafilez.forgecdn.net/files/5786/326/architectury-13.0.8-fabric.jar
@@ -221,4 +240,4 @@ spec:
       volumes:
         - name: minecraft-data
           persistentVolumeClaim:
-            claimName: kraft-data-backup
+            claimName: kraft-season2-data

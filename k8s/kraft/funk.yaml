@@ -18,6 +18,20 @@ spec:
       storage: 10Gi
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # not a backup, but uses a longhorn storage class with backup applied
+  name: funk-season2-data
+  namespace: funk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: funk
@@ -70,7 +84,10 @@ spec:
           image: itzg/minecraft-server
           env:
             - name: SEED
-              value: "-4338028305538428199"
+              # kraft 1 seed
+              # value: "-4338028305538428199"
+              # kraft 2 seed - Hermitcraft Season 11
+              value: "-2654832327628292536"
             - name: EULA
               value: "true"
             - name: RCON_CMDS_STARTUP
@@ -80,16 +97,16 @@ spec:
             - name: TYPE
               value: "FABRIC"
             - name: VERSION
-              value: "1.21.6"
+              value: "1.21.10"
             - name: MODE
               value: "creative"
-            - name: FABRIC_LOADER
-              value: "0.16.14"
-            - name: MODS
-              value: |
-                https://cdn.modrinth.com/data/N6n5dqoA/versions/CRjwbqnJ/Axiom-4.9.1-for-MC1.21.6.jar
-                https://cdn.modrinth.com/data/1u6JkXh5/versions/3HceS8fQ/worldedit-mod-7.3.15-beta-02.jar
-                https://cdn.modrinth.com/data/P7dR8mSH/versions/F5TVHWcE/fabric-api-0.128.2%2B1.21.6.jar
+            # - name: FABRIC_LOADER
+            #   value: "0.16.14"
+            # - name: MODS
+            #   value: |
+            #     https://cdn.modrinth.com/data/N6n5dqoA/versions/CRjwbqnJ/Axiom-4.9.1-for-MC1.21.6.jar
+            #     https://cdn.modrinth.com/data/1u6JkXh5/versions/3HceS8fQ/worldedit-mod-7.3.15-beta-02.jar
+            #     https://cdn.modrinth.com/data/P7dR8mSH/versions/F5TVHWcE/fabric-api-0.128.2%2B1.21.6.jar
             # - name: RCON_PASSWORD
             #   valueFrom:
             #     secretKeyRef:
@@ -172,4 +189,5 @@ spec:
       volumes:
         - name: minecraft-data
           persistentVolumeClaim:
-            claimName: funk-data-backup
+            # claimName: funk-data-backup
+            claimName: funk-season2-data
