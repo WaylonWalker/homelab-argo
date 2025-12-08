@@ -58,12 +58,30 @@ spec:
               args:
                 - |
                   set -euxo pipefail
-                  [ -d waylonwalker.com ] || git clone --depth 1 https://github.com/waylonwalker/waylonwalker.com.git /build/waylonwalker.com
-                  pushd waylonwalker.com
-                  git config --global --add safe.directory /build/waylonwalker.com
-                  git fetch --depth 1 origin main
-                  git reset --hard origin/main
-                  git clean -fdx -e markout -e .markata.cache
+
+                  REPO=/build/waylonwalker.com
+                  BRANCH=main
+                  URL=https://github.com/waylonwalker/waylonwalker.com.git
+
+                  git config --global --add safe.directory "$REPO"
+
+                  if [ ! -d "$REPO/.git" ]; then
+                    echo "Fresh shallow clone"
+                    rm -rf "$REPO"
+                    git clone \
+                      --depth=1 \
+                      --no-tags \
+                      --single-branch \
+                      --branch "$BRANCH" \
+                      "$URL" \
+                      "$REPO"
+                  else
+                    echo "Updating shallow repo"
+                    cd "$REPO"
+                    git fetch --depth=1 origin "$BRANCH"
+                    git reset --hard FETCH_HEAD
+                    git clean -fdx -e markout -e .markata.cache
+                  fi
                   [ -d markout ] || mkdir -p markout
                   markata build
                   rsync -av --delete markout/ /site
