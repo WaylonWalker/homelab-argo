@@ -44,6 +44,7 @@ spec:
   storageClassName: hostpath
   hostPath:
     path: /mnt/main/walkershare/dev-waylonwalker-com/build
+    type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
