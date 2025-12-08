@@ -80,7 +80,7 @@ spec:
                     cd "$REPO"
                     git fetch --depth=1 origin "$BRANCH"
                     git reset --hard FETCH_HEAD
-                    git clean -fdx -e markout -e .markata.cache
+                    # git clean -fdx -e markout -e .markata.cache
                   fi
                   [ -d markout ] || mkdir -p markout
                   markata build
