@@ -1,0 +1,248 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-waylonwalker-com
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dev-waylonwalker-com-build
+  namespace: dev-waylonwalker-com
+spec:
+  storageClassName: longhorn-backup
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dev-waylonwalker-com-site
+  namespace: dev-waylonwalker-com
+spec:
+  storageClassName: longhorn-backup
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: waylonwalker-com-cronjob
+  namespace: dev-waylonwalker-com
+spec:
+  schedule: "0/10 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 60
+  successfulJobsHistoryLimit: 6
+  failedJobsHistoryLimit: 6
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: site
+              persistentVolumeClaim:
+                claimName: dev-waylonwalker-com-site
+            - name: build
+              persistentVolumeClaim:
+                claimName: dev-waylonwalker-com-build
+          containers:
+            - name: waylonwalker-com-container
+              image: registry.wayl.one/waylonwalker-com:59
+              command: ["/bin/bash", "-c"]
+              args:
+                - |
+                  set -euxo pipefail
+                  [ -d waylonwalker.com ] || git clone --depth 1 https://github.com/waylonwalker/waylonwalker.com.git /site/waylonwalker.com
+                  pushd waylonwalker.com
+                  git config --global --add safe.directory /build/waylonwalker.com
+                  git fetch --depth 1 origin main
+                  git reset --hard origin/main
+                  git clean -fdx -e markout -e .markata.cache
+                  [ -d markout ] || mkdir -p markout
+                  markata build
+                  rsync -av --delete markout/ /site
+
+              env:
+                - name: TZ
+                  value: America/Chicago
+              workingDir: /build/waylonwalker.com
+              volumeMounts:
+                - name: site
+                  mountPath: /site
+                - name: build
+                  mountPath: /build
+          imagePullSecrets:
+            - name: regcred
+          restartPolicy: OnFailure
+          activeDeadlineSeconds: 3600
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: markata-clean-cronjob
+  namespace: dev-waylonwalker-com
+spec:
+  schedule: "0 0 * * *" # Midnight every day
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 60
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: build
+              persistentVolumeClaim:
+                claimName: dev-waylonwalker-com-build
+          containers:
+            - name: markata-clean-container
+              image: registry.wayl.one/waylonwalker-com:59
+              command: ["markata", "clean"]
+              workingDir: /build/waylonwalker.com
+              volumeMounts:
+                - name: build
+                  mountPath: /build
+          imagePullSecrets:
+            - name: regcred
+          restartPolicy: OnFailure
+          activeDeadlineSeconds: 60
+
+# dev.waylonwalker.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-waylonwalker-com
+  namespace: dev-waylonwalker-com
+  labels:
+    app: dev-waylonwalker-com
+spec:
+  selector:
+    app: dev-waylonwalker-com
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-waylonwalker-com
+  namespace: dev-waylonwalker-com
+  labels:
+    app: dev-waylonwalker-com
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-waylonwalker-com
+  template:
+    metadata:
+      labels:
+        app: dev-waylonwalker-com
+      annotations:
+        diun.enable: "true"
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: webroot
+              mountPath: /usr/share/nginx/html
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          env:
+            - name: TZ
+              value: America/Chicago
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+      volumes:
+        - name: webroot
+          persistentVolumeClaim:
+            claimName: dev-waylonwalker-com-site
+        - name: nginx-conf
+          configMap:
+            name: dev-waylonwalker-com-nginx
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-waylonwalker-com-nginx
+  namespace: dev-waylonwalker-com
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name dev.waylonwalker.com;
+
+      # Gzip for text assets
+      gzip on;
+      gzip_types text/plain text/css application/json application/javascript application/xml+rss application/xml application/x-javascript image/svg+xml;
+      gzip_min_length 512;
+
+      root /usr/share/nginx/html;
+      index index.html;
+
+      # HTML: fast edits + CDN cache with SWR
+      location ~* \.(html)$ {
+        add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
+        try_files $uri =404;
+      }
+
+      # Static/fingerprinted assets
+      # location ~* \.(?:css|js|mjs|json|ico|png|jpe?g|gif|webp|svg|avif|woff2?)$ {
+      #   add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable, stale-if-error=86400" always;
+      #   try_files $uri =404;
+      # }
+
+      # SPA fallback (remove if not needed)
+      location / {
+        add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
+        try_files $uri $uri/ /index.html;
+      }
+    }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev-waylonwalker-com
+  namespace: dev-waylonwalker-com
+  labels:
+    app: dev-waylonwalker-com
+  annotations:
+    # Uncomment if you use cert-manager:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Optional: speed up TTFB while editing
+    # nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  rules:
+    - host: dev.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dev-waylonwalker-com
+                port:
+                  number: 80
+  # If you terminate TLS at the Ingress (recommended with Cloudflare "Full (strict)")
+  # tls:
+  #   - hosts:
+  #       - fluffed-up.com
+  #     secretName: fluffed-up-com-tls
