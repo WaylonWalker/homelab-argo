@@ -19,6 +19,23 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: dev-waylonwalker-com-build-hostpath
+  namespace: dev-waylonwalker-com
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: dev-waylonwalker-com-build-hostpath
+  volumeMode: Filesystem
+  hostPath:
+    path: /mnt/main/walkershare/waylon/dev-waylonwalker-com/build
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: dev-waylonwalker-com-site
   namespace: dev-waylonwalker-com
 spec:
@@ -50,7 +67,7 @@ spec:
                 claimName: dev-waylonwalker-com-site
             - name: build
               persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-build
+                claimName: dev-waylonwalker-com-build-hostpath
           containers:
             - name: waylonwalker-com-container
               image: registry.wayl.one/waylonwalker-com:62
