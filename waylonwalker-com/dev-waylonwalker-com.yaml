@@ -53,7 +53,7 @@ spec:
                 claimName: dev-waylonwalker-com-build
           containers:
             - name: waylonwalker-com-container
-              image: registry.wayl.one/waylonwalker-com:59
+              image: registry.wayl.one/waylonwalker-com:61
               command: ["/bin/bash", "-c"]
               args:
                 - |
@@ -121,7 +121,7 @@ spec:
                 claimName: dev-waylonwalker-com-build
           containers:
             - name: markata-clean-container
-              image: registry.wayl.one/waylonwalker-com:59
+              image: registry.wayl.one/waylonwalker-com:61
               command: ["markata", "clean"]
               workingDir: /build/waylonwalker.com
               volumeMounts:
