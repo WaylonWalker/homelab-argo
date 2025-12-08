@@ -73,10 +73,11 @@ spec:
             #   value: "-4338028305538428199"
             - name: EULA
               value: "true"
-            - name: RCON_CMDS_STARTUP
-              value: |-
-                gamerule keepInventory true
-                pregen start 200
+            # only needed on world rebuild
+            # - name: RCON_CMDS_STARTUP
+            #   value: |-
+            #     gamerule keepInventory true
+            #     pregen start 200
             # - name: TYPE
             #   value: "FABRIC"
             # - name: VERSION
@@ -96,10 +97,18 @@ spec:
               value: "minecraft"
             - name: ENABLE_RCON
               value: "true"
-            - name: MEMORY
+            - name: INIT_MEMORY
+              value: "512M"
+            - name: MAX_MEMORY
               value: "3G"
-            - name: JVM_XX_OPTS
-              value: "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
+            - name: ENABLE_AUTOPAUSE
+              value: "TRUE"
+            - name: AUTOPAUSE_TIMEOUT_EST
+              value: "900" # 15 min after last disconnect
+            - name: AUTOPAUSE_TIMEOUT_INIT
+              value: "600" # 10 min after start if nobody joins
+            # - name: JVM_XX_OPTS
+            #   value: "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
             - name: BACKUP_ENABLED
               value: "true"
             - name: BACKUP_INTERVAL
