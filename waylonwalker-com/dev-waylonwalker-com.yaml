@@ -28,12 +28,12 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: dev-waylonwalker-com-build-hostpath
+  volumeName: dev-waylonwalker-com-build-hostpath2
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: dev-waylonwalker-com-build-hostpath
+  name: dev-waylonwalker-com-build-hostpath2
   namespace: dev-waylonwalker-com
 spec:
   capacity:
