@@ -58,7 +58,7 @@ spec:
               args:
                 - |
                   set -euxo pipefail
-                  [ -d waylonwalker.com ] || git clone --depth 1 https://github.com/waylonwalker/waylonwalker.com.git /site/waylonwalker.com
+                  [ -d waylonwalker.com ] || git clone --depth 1 https://github.com/waylonwalker/waylonwalker.com.git /build/waylonwalker.com
                   pushd waylonwalker.com
                   git config --global --add safe.directory /build/waylonwalker.com
                   git fetch --depth 1 origin main
