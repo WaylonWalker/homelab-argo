@@ -43,7 +43,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/main/walkershare/dev-waylonwalker-com/build
+    path: /mnt/vault/nfs/general/pv/dev-waylonwalker-com
     type: DirectoryOrCreate
 ---
 apiVersion: v1
