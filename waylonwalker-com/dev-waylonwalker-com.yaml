@@ -29,9 +29,21 @@ spec:
     requests:
       storage: 5Gi
   volumeName: dev-waylonwalker-com-build-hostpath
-  volumeMode: Filesystem
+---
+apiVErsion: v1
+kind: PersistentVolume
+metadata:
+  name: dev-waylonwalker-com-build-hostpath
+  namespace: dev-waylonwalker-com
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
   hostPath:
-    path: /mnt/main/walkershare/waylon/dev-waylonwalker-com/build
+    path: /mnt/main/walkershare/dev-waylonwalker-com/build
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
