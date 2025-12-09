@@ -77,23 +77,24 @@ spec:
             - name: site
               persistentVolumeClaim:
                 claimName: dev-waylonwalker-com-site
-            - name: build
-              persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-build-hostpath2
           containers:
             - name: waylonwalker-com-container
               image: registry.wayl.one/waylonwalker-com:64
               command: ["/bin/bash", "-c"]
               args:
                 - |
-
-                  pushd /build
+                  #!/usr/bin/env bash
+                  set -euo pipefail
 
                   REPO=/build/waylonwalker.com
-                  BRANCH=main
-                  URL=https://github.com/waylonwalker/waylonwalker.com.git
+                  BRANCH=${BRANCH:-main}
+                  URL=${URL:-https://github.com/waylonwalker/waylonwalker.com.git}
 
-                  git config --global --add safe.directory "$REPO"
+                  # These are the same PVC, mounted in two places.
+                  mkdir -p /build /site
+                  mkdir -p /site/waylonwalker.com
+
+                  git config --global --add safe.directory "$REPO" || true
 
                   if [ ! -d "$REPO/.git" ]; then
                     echo "Fresh shallow clone"
@@ -105,28 +106,33 @@ spec:
                       --branch "$BRANCH" \
                       "$URL" \
                       "$REPO"
-                    pushd "$REPO"
                   else
                     echo "Updating shallow repo"
-                    pushd "$REPO"
-                    git fetch --depth=1 origin "$BRANCH"
-                    git reset --hard FETCH_HEAD
-                    git clean -fdx -e markout -e .markata.cache
+                    git -C "$REPO" fetch --depth=1 origin "$BRANCH"
+                    git -C "$REPO" reset --hard FETCH_HEAD
+                    git -C "$REPO" clean -fdx -e markout -e .markata.cache
                   fi
-                  [ -d markout ] || mkdir -p markout
 
-                  markata build
-                  mkdir -p /build/waylonwalker.com
-                  rsync -av --delete markout/ /build/waylonwalker.com
+                  cd "$REPO"
+                  mkdir -p markout
+
+                  echo "==> Running markata build"
+                  time markata build
+
+                  echo "==> Syncing markout to /site/waylonwalker.com"
+                  rsync -rlt \
+                    --delete \
+                    --omit-dir-times \
+                    markout/ /site/waylonwalker.com/
 
               env:
                 - name: TZ
                   value: America/Chicago
               volumeMounts:
                 - name: site
-                  mountPath: /site
-                - name: build
-                  mountPath: /build
+                  mountPath: /site # PVC view #1
+                - name: site
+                  mountPath: /build # PVC view #2
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
@@ -212,6 +218,7 @@ spec:
           volumeMounts:
             - name: webroot
               mountPath: /usr/share/nginx/html
+              subPath: site/waylonwalker.com
             - name: nginx-conf
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
