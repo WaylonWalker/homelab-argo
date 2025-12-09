@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: dev-waylonwalker-com-build-hostpath
+  name: dev-waylonwalker-com-build-hostpath2
   namespace: dev-waylonwalker-com
 spec:
   storageClassName: hostpath
@@ -80,10 +80,10 @@ spec:
                 claimName: dev-waylonwalker-com-site
             - name: build
               persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-build-hostpath
+                claimName: dev-waylonwalker-com-build-hostpath2
           containers:
             - name: waylonwalker-com-container
-              image: registry.wayl.one/waylonwalker-com:62
+              image: registry.wayl.one/waylonwalker-com:63
               command: ["/bin/bash", "-c"]
               args:
                 - |
@@ -151,7 +151,7 @@ spec:
                 claimName: dev-waylonwalker-com-build
           containers:
             - name: markata-clean-container
-              image: registry.wayl.one/waylonwalker-com:62
+              image: registry.wayl.one/waylonwalker-com:63
               command: ["markata", "clean"]
               workingDir: /build/waylonwalker.com
               volumeMounts:
