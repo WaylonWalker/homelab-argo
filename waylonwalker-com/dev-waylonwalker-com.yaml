@@ -89,6 +89,8 @@ spec:
                 - |
                   set -euxo pipefail
 
+                  pushd /build
+
                   REPO=/build/waylonwalker.com
                   BRANCH=main
                   URL=https://github.com/waylonwalker/waylonwalker.com.git
@@ -105,21 +107,22 @@ spec:
                       --branch "$BRANCH" \
                       "$URL" \
                       "$REPO"
+                    pushd "$REPO"
                   else
                     echo "Updating shallow repo"
-                    cd "$REPO"
+                    pushd "$REPO"
                     git fetch --depth=1 origin "$BRANCH"
                     git reset --hard FETCH_HEAD
                     git clean -fdx -e markout -e .markata.cache
                   fi
                   [ -d markout ] || mkdir -p markout
+
                   markata build
                   rsync -av --delete markout/ /site
 
               env:
                 - name: TZ
                   value: America/Chicago
-              workingDir: /build/waylonwalker.com
               volumeMounts:
                 - name: site
                   mountPath: /site
