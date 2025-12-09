@@ -72,7 +72,7 @@ spec:
             - '/bin/bash'
             - '-c'
           args:
-            - 'uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 5'
+            - 'uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 1'
           name: shot-wayl-one
           ports:
             - containerPort: 5000
@@ -147,8 +147,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: shot-wayl-one
-  minReplicas: 1
-  maxReplicas: 5
+  minReplicas: 3
+  maxReplicas: 6
   metrics:
     - type: Resource
       resource:
