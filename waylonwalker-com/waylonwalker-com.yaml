@@ -38,7 +38,7 @@ spec:
                 claimName: site-pvc-longhorn-backup
           containers:
             - name: waylonwalker-com-container
-              image: registry.wayl.one/waylonwalker-com:61
+              image: registry.wayl.one/waylonwalker-com:64
               env:
                 - name: CLOUDFLARE_API_TOKEN
                   valueFrom:
@@ -77,7 +77,7 @@ spec:
                 claimName: site-pvc-longhorn-backup
           containers:
             - name: markata-clean-container
-              image: registry.wayl.one/waylonwalker-com:61
+              image: registry.wayl.one/waylonwalker-com:64
               command: ["markata", "clean"]
               workingDir: /site/waylonwalker.com
               volumeMounts:
