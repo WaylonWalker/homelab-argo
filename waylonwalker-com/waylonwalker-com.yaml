@@ -3,13 +3,29 @@ kind: Namespace
 metadata:
   name: waylonwalker-com
 ---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-fast-replicated
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "3"
+  dataLocality: "best-effort"
+  replicaAutoBalance: "disabled"
+  recurringJobSelector: "[]"
+  snapshotDataIntegrity: "disabled"
+  staleReplicaTimeout: "60"
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: site-pvc-longhorn-backup
+  name: site-pvc-longhorn-fast
   namespace: waylonwalker-com
 spec:
-  storageClassName: longhorn-backup
+  storageClassName: longhorn-fast-replicated
   accessModes:
     - ReadWriteOnce
   resources:
@@ -35,7 +51,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc-longhorn-backup
+                claimName: site-pvc-longhorn-fast
           containers:
             - name: waylonwalker-com-container
               image: registry.wayl.one/waylonwalker-com:64
@@ -74,7 +90,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: site-pvc-longhorn-backup
+                claimName: site-pvc-longhorn-fast
           containers:
             - name: markata-clean-container
               image: registry.wayl.one/waylonwalker-com:64
