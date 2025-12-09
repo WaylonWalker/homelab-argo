@@ -87,18 +87,13 @@ spec:
               command: ["/bin/bash", "-c"]
               args:
                 - |
-                  #!/usr/bin/env bash
-                  set -euo pipefail
+                  set -euxo pipefail
 
                   REPO=/build/waylonwalker.com
-                  BRANCH=${BRANCH:-main}
-                  URL=${URL:-https://github.com/waylonwalker/waylonwalker.com.git}
+                  BRANCH=main
+                  URL=https://github.com/waylonwalker/waylonwalker.com.git
 
-                  # Make sure parent dir exists
-                  mkdir -p "$(dirname "$REPO")"
-
-                  # Only touch this repo, not global config (and don't die if it fails)
-                  git config --global --add safe.directory "$REPO" || true
+                  git config --global --add safe.directory "$REPO"
 
                   if [ ! -d "$REPO/.git" ]; then
                     echo "Fresh shallow clone"
@@ -112,26 +107,15 @@ spec:
                       "$REPO"
                   else
                     echo "Updating shallow repo"
-                    git -C "$REPO" fetch --depth=1 origin "$BRANCH"
-                    git -C "$REPO" reset --hard FETCH_HEAD
-                    git -C "$REPO" clean -fdx -e markout -e .markata.cache
+                    cd "$REPO"
+                    git fetch --depth=1 origin "$BRANCH"
+                    git reset --hard FETCH_HEAD
+                    git clean -fdx -e markout -e .markata.cache
                   fi
+                  [ -d markout ] || mkdir -p markout
+                  markata build
+                  rsync -av --delete markout/ /site
 
-                  cd "$REPO"
-
-                  # Ensure markout exists inside the repo, not in / (important)
-                  mkdir -p markout
-
-                  # Optional: add timing for visibility
-                  echo "==> Running markata build"
-                  time markata build
-
-                  echo "==> Syncing markout to /site"
-                  # Lighter rsync flags for speed: preserve links & times; skip perms/owners/dir times
-                  rsync -rlt \
-                    --delete \
-                    --omit-dir-times \
-                    markout/ /site/
               env:
                 - name: TZ
                   value: America/Chicago
