@@ -58,16 +58,27 @@ spec:
               command: ["/bin/bash", "-c"]
               args:
                 - |
-                  #!/bin/bash
+                  #!/usr/bin/env bash
                   set -euxo pipefail
-                  [ -d /site/waylonwalker.com ] || git clone https://github.com/waylonwalker/waylonwalker.com.git /site/waylonwalker.com
-                  pushd /site/waylonwalker.com
+
+                  # If it's not a git repo, (re)clone it
+                  if [ ! -d /site/waylonwalker.com/.git ]; then
+                    rm -rf /site/waylonwalker.com || true
+                    git clone https://github.com/waylonwalker/waylonwalker.com.git /site/waylonwalker.com
+                  fi
+
                   git config --global --add safe.directory /site/waylonwalker.com
+
+                  cd /site/waylonwalker.com
                   pwd
-                  git pull
+
+                  # safer than plain pull if you just want "whatever is on main"
+                  git fetch origin
+                  git reset --hard origin/main
+
                   mkdir -p markout
                   markata build
-                  # wrangler pages deploy markout --project-name dev-waylonwalker-com --branch main --commit-message "deploy main $(date)"
+
                   wrangler pages deploy markout --project-name waylonwalker-com --branch markout
               env:
                 - name: CLOUDFLARE_API_TOKEN
