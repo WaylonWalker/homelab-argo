@@ -86,7 +86,6 @@ spec:
               command: ["/bin/bash", "-c"]
               args:
                 - |
-                  set -euxo pipefail
 
                   pushd /build
 
