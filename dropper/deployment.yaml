@@ -47,7 +47,7 @@ spec:
             - "/bin/bash"
             - "-c"
           args:
-            - "uv run --no-dev uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 5"
+            - "uv run --no-dev uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 1"
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -73,7 +73,7 @@ spec:
             requests:
               cpu: "200m"
             limits:
-              cpu: "500m"
+              cpu: "1000m"
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
