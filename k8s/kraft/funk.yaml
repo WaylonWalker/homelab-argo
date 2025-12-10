@@ -97,7 +97,7 @@ spec:
             - name: TYPE
               value: "FABRIC"
             - name: VERSION
-              value: "1.21.10"
+              value: "1.21.11"
             - name: MODE
               value: "creative"
             # - name: FABRIC_LOADER
