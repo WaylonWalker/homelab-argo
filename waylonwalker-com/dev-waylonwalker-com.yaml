@@ -86,18 +86,19 @@ spec:
                   #!/usr/bin/env bash
                   set -euo pipefail
 
-                  REPO=/build/waylonwalker.com
+                  ROOT=/site
+                  REPO="$ROOT/build/waylonwalker.com"
+                  SITE_DIR="$ROOT/site/waylonwalker.com"
+
                   BRANCH=${BRANCH:-main}
                   URL=${URL:-https://github.com/waylonwalker/waylonwalker.com.git}
 
-                  # These are the same PVC, mounted in two places.
-                  mkdir -p /build /site
-                  mkdir -p /site/waylonwalker.com
+                  mkdir -p "$REPO" "$SITE_DIR"
 
                   git config --global --add safe.directory "$REPO" || true
 
                   if [ ! -d "$REPO/.git" ]; then
-                    echo "Fresh shallow clone"
+                    echo "Fresh shallow clone into $REPO"
                     rm -rf "$REPO"
                     git clone \
                       --depth=1 \
@@ -107,7 +108,7 @@ spec:
                       "$URL" \
                       "$REPO"
                   else
-                    echo "Updating shallow repo"
+                    echo "Updating shallow repo in $REPO"
                     git -C "$REPO" fetch --depth=1 origin "$BRANCH"
                     git -C "$REPO" reset --hard FETCH_HEAD
                     git -C "$REPO" clean -fdx -e markout -e .markata.cache
@@ -119,20 +120,33 @@ spec:
                   echo "==> Running markata build"
                   time markata build
 
-                  echo "==> Syncing markout to /site/waylonwalker.com"
+                  echo "==> Syncing markout to $SITE_DIR"
+                  set +e
                   rsync -rlt \
                     --delete \
                     --omit-dir-times \
-                    markout/ /site/waylonwalker.com/
+                    markout/ "$SITE_DIR"/
+                  RSYNC_EXIT=$?
+                  set -e
 
+                  case "$RSYNC_EXIT" in
+                    0)
+                      echo "rsync completed successfully."
+                      ;;
+                    24)
+                      echo "rsync completed with code 24 (some files vanished) – treating as success."
+                      ;;
+                    *)
+                      echo "rsync failed with exit code $RSYNC_EXIT"
+                      exit "$RSYNC_EXIT"
+                      ;;
+                  esac
               env:
                 - name: TZ
                   value: America/Chicago
               volumeMounts:
                 - name: site
-                  mountPath: /site # PVC view #1
-                - name: site
-                  mountPath: /build # PVC view #2
+                  mountPath: /site
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
@@ -154,20 +168,29 @@ spec:
       template:
         spec:
           volumes:
-            - name: build
+            - name: site
               persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-build
-            - name: build2
-              persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-build-hostpath2
+                claimName: dev-waylonwalker-com-site
           containers:
             - name: markata-clean-container
               image: registry.wayl.one/waylonwalker-com:64
-              command: ["markata", "clean"]
-              workingDir: /build/waylonwalker.com
+              command: ["/bin/bash", "-c"]
+              args:
+                - |
+                  set -euo pipefail
+                  ROOT=/site
+                  REPO="$ROOT/build/waylonwalker.com"
+
+                  if [ -d "$REPO" ]; then
+                    cd "$REPO"
+                    echo "Running markata clean in $REPO"
+                    markata clean
+                  else
+                    echo "Repo directory $REPO does not exist, skipping clean."
+                  fi
               volumeMounts:
-                - name: build2
-                  mountPath: /build
+                - name: site
+                  mountPath: /site
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
@@ -238,6 +261,7 @@ spec:
         - name: nginx-conf
           configMap:
             name: dev-waylonwalker-com-nginx
+
 ---
 apiVersion: v1
 kind: ConfigMap
