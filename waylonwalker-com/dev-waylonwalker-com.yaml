@@ -156,11 +156,18 @@ spec:
 
                   # At this point: build + sync succeeded. Notify ntfy if configured.
                   if [ -n "$NTFY_URL" ]; then
-                    # Build a nice message body
+
+                    # Determine if there were meaningful changes
+                    if [ "$FRESH_CLONE" -eq 0 ] && [ -z "$CHANGES" ]; then
+                      echo "No changes detected, skipping ntfy notification."
+                      exit 0
+                    fi
+
+                    # Build message body
                     if [ -n "$CHANGES" ]; then
                       CHANGE_SUMMARY="$CHANGES"
                     else
-                      CHANGE_SUMMARY="(No file changes – repository already up to date.)"
+                      CHANGE_SUMMARY="(Fresh clone — initial import)"
                     fi
 
                     if [ "$FRESH_CLONE" -eq 1 ]; then
@@ -180,14 +187,14 @@ spec:
                     echo "==> Sending ntfy notification"
                     # Don't let ntfy failure break the job
                     curl -H "Title: waylonwalker.com build success" \
-                         -H "Tags: white_check_mark" \
-                         -d "$BODY" \
-                         "$NTFY_URL" \
+                        -H "Tags: white_check_mark" \
+                        -d "$BODY" \
+                        "$NTFY_URL" \
                       || echo "ntfy notification failed (non-fatal)"
-                  else
-                    echo "NTFY_URL not set; skipping ntfy notification."
-                  fi
 
+                  else
+                    echo "NTFY_URL not set; skipping notification."
+                  fi
               env:
                 - name: TZ
                   value: America/Chicago
