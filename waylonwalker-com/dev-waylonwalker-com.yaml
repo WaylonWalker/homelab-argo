@@ -3,19 +3,11 @@ kind: Namespace
 metadata:
   name: dev-waylonwalker-com
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: dev-waylonwalker-com-build
-  namespace: dev-waylonwalker-com
-spec:
-  storageClassName: longhorn-backup
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
----
+# hostPath is faster because pods read/write directly to the node filesystem
+# with no Longhorn engine in between. There’s no network replication or storage
+# abstraction layer, so I/O latency and overhead are minimized.
+#
+# In testing this made total run time go 3x faster from 45s to 15s compared to longhorn-backup.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -64,7 +56,7 @@ metadata:
   name: waylonwalker-com-cronjob
   namespace: dev-waylonwalker-com
 spec:
-  schedule: "0/10 * * * *"
+  schedule: "*/10 * * * *"
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 60
   successfulJobsHistoryLimit: 6
@@ -93,9 +85,15 @@ spec:
                   BRANCH=${BRANCH:-main}
                   URL=${URL:-https://github.com/waylonwalker/waylonwalker.com.git}
 
+                  # Full ntfy topic URL, e.g. https://ntfy.sh/waylonwalker-com-build
+                  NTFY_URL="${NTFY_URL:-https://ntfy.wayl.one/dev-waylonwalker-com-build}"
+
                   mkdir -p "$REPO" "$SITE_DIR"
 
                   git config --global --add safe.directory "$REPO" || true
+
+                  CHANGES=""      # Will hold name-status list of changed files
+                  FRESH_CLONE=0   # Track if this was a fresh clone
 
                   if [ ! -d "$REPO/.git" ]; then
                     echo "Fresh shallow clone into $REPO"
@@ -107,9 +105,23 @@ spec:
                       --branch "$BRANCH" \
                       "$URL" \
                       "$REPO"
+
+                    FRESH_CLONE=1
+
+                    # For a fresh clone, treat everything in the initial checkout as "added"
+                    # Use name-status for consistency with the update path
+                    CHANGES=$(git -C "$REPO" show --pretty='' --name-status HEAD || true)
                   else
                     echo "Updating shallow repo in $REPO"
+
+                    # Fetch latest from origin, but compute changes vs HEAD before reset
                     git -C "$REPO" fetch --depth=1 origin "$BRANCH"
+
+                    # Compare current HEAD to origin/BRANCH to see what changed
+                    # Use '|| true' so diff's exit code (1 when there ARE differences) doesn't
+                    # kill the script under 'set -e'
+                    CHANGES=$(git -C "$REPO" diff --name-status HEAD.."origin/$BRANCH" || true)
+
                     git -C "$REPO" reset --hard FETCH_HEAD
                     git -C "$REPO" clean -fdx -e markout -e .markata.cache
                   fi
@@ -141,6 +153,41 @@ spec:
                       exit "$RSYNC_EXIT"
                       ;;
                   esac
+
+                  # At this point: build + sync succeeded. Notify ntfy if configured.
+                  if [ -n "$NTFY_URL" ]; then
+                    # Build a nice message body
+                    if [ -n "$CHANGES" ]; then
+                      CHANGE_SUMMARY="$CHANGES"
+                    else
+                      CHANGE_SUMMARY="(No file changes – repository already up to date.)"
+                    fi
+
+                    if [ "$FRESH_CLONE" -eq 1 ]; then
+                      ACTION_LINE="Fresh shallow clone of $URL ($BRANCH)."
+                    else
+                      ACTION_LINE="Updated shallow repo from $URL ($BRANCH)."
+                    fi
+
+                    BODY="$ACTION_LINE
+                  Build: SUCCESS
+                  Site dir: $SITE_DIR
+
+                  Changed files (name-status):
+                  $CHANGE_SUMMARY
+                  "
+
+                    echo "==> Sending ntfy notification"
+                    # Don't let ntfy failure break the job
+                    curl -H "Title: waylonwalker.com build success" \
+                         -H "Tags: white_check_mark" \
+                         -d "$BODY" \
+                         "$NTFY_URL" \
+                      || echo "ntfy notification failed (non-fatal)"
+                  else
+                    echo "NTFY_URL not set; skipping ntfy notification."
+                  fi
+
               env:
                 - name: TZ
                   value: America/Chicago
@@ -310,7 +357,7 @@ metadata:
     app: dev-waylonwalker-com
   annotations:
     # Uncomment if you use cert-manager:
-    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     # Optional: speed up TTFB while editing
     # nginx.ingress.kubernetes.io/proxy-buffering: "off"
 spec:
@@ -326,7 +373,7 @@ spec:
                 port:
                   number: 80
   # If you terminate TLS at the Ingress (recommended with Cloudflare "Full (strict)")
-  # tls:
-  #   - hosts:
-  #       - fluffed-up.com
-  #     secretName: fluffed-up-com-tls
+  tls:
+    - hosts:
+        - dev.waylonwalker.com
+      secretName: dev-waylonwalker-com-tls
