@@ -134,7 +134,10 @@ spec:
 
                   echo "==> Syncing markout to $SITE_DIR"
                   set +e
-                  rsync -rlt \
+                  rsync \
+                    --recursive \
+                    --links \
+                    --times \
                     --delete \
                     --omit-dir-times \
                     markout/ "$SITE_DIR"/
