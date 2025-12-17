@@ -73,8 +73,10 @@ spec:
           resources:
             requests:
               cpu: "200m"
+              memory: "256Mi"
             limits:
               cpu: "1000m"
+              memory: "2Gi"
           env:
             - name: DROPPER_BASE_URL
               value: "https://dropper.wayl.one/"
