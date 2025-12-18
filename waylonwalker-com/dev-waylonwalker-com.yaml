@@ -348,13 +348,18 @@ data:
         # Otherwise continue to normal processing
       }
 
+      # Set variable for markdown accept detection
+      set $markdown_accept 0;
+      if ($http_accept ~* "text/markdown") {
+        set $markdown_accept 1;
+      }
+
       # Rewrite directory URLs to .md files when Accept: text/markdown
       location ~ ^/([^/]+)/$ {
-        # Check if client accepts markdown and .md file exists
-        if ($http_accept ~* "text/markdown") {
+        if ($markdown_accept = 1) {
           return 302 $scheme://$host/$1.md;
         }
-        # Otherwise continue to normal processing
+        # Normal directory processing
         try_files $uri $uri/index.html /index.html;
       }
 
