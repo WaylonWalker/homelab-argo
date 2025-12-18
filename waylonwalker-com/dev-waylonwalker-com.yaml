@@ -348,6 +348,16 @@ data:
         # Otherwise continue to normal processing
       }
 
+      # Rewrite directory URLs to .md files when Accept: text/markdown
+      location ~ ^/([^/]+)/$ {
+        # Check if client accepts markdown and .md file exists
+        if ($http_accept ~* "text/markdown") {
+          return 302 $scheme://$host/$1.md;
+        }
+        # Otherwise continue to normal processing
+        try_files $uri $uri/index.html /index.html;
+      }
+
       # Serve Markdown files when Accept: text/markdown is requested
       location ~ \.md$ {
         # Check if client accepts markdown
