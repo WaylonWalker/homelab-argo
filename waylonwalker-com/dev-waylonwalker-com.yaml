@@ -378,6 +378,46 @@ data:
       #   try_files $uri =404;
       # }
 
+      # SPA fallback (remove if not needed)
+      location / {
+        add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
+        try_files $uri $uri/ /index.html;
+      }
+    }
+
+      # Rewrite directory URLs to .md files when Accept: text/markdown
+      location ~ ^/([^/]+)/$ {
+        if ($markdown_accept = 1) {
+          return 302 $scheme://$host/$1.md;
+        }
+        # Normal directory processing
+        try_files $uri $uri/index.html /index.html;
+      }
+
+      # Serve Markdown files when Accept: text/markdown is requested
+      location ~ \.md$ {
+        # Check if client accepts markdown
+        if ($http_accept ~* "text/markdown") {
+          add_header Content-Type "text/markdown; charset=utf-8" always;
+          break;
+        }
+        # Otherwise, serve as plain text (fallback)
+        add_header Content-Type "text/plain; charset=utf-8" always;
+        try_files $uri =404;
+      }
+
+      # HTML: fast edits + CDN cache with SWR
+      location ~* \.(html)$ {
+        add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
+        try_files $uri =404;
+      }
+
+      # Static/fingerprinted assets
+      # location ~* \.(?:css|js|mjs|json|ico|png|jpe?g|gif|webp|svg|avif|woff2?)$ {
+      #   add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable, stale-if-error=86400" always;
+      #   try_files $uri =404;
+      # }
+
       # Internal location for serving HTML
       location @html {
         add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
