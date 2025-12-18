@@ -354,14 +354,9 @@ data:
         try_files $uri $uri/index.html /index.html;
       }
 
-      # Serve Markdown files when Accept: text/markdown is requested
+      # Serve Markdown files
       location ~ \.md$ {
-        # Check if client accepts markdown
-        if ($http_accept ~* "text/markdown") {
-          add_header Content-Type "text/markdown; charset=utf-8" always;
-          break;
-        }
-        # Otherwise, serve as plain text (fallback)
+        # Always serve as text/plain so browsers display rather than download
         add_header Content-Type "text/plain; charset=utf-8" always;
         try_files $uri =404;
       }
