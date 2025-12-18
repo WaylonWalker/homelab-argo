@@ -339,6 +339,15 @@ data:
       root /usr/share/nginx/html;
       index index.html;
 
+      # Rewrite directory URLs to .md files when Accept: text/markdown
+      location ~ ^/([^/]+)/$ {
+        # Check if client accepts markdown and .md file exists
+        if ($http_accept ~* "text/markdown") {
+          try_files $uri$1.md @html;
+        }
+        # Otherwise continue to normal processing
+      }
+
       # Serve Markdown files when Accept: text/markdown is requested
       location ~ \.md$ {
         # Check if client accepts markdown
@@ -362,6 +371,12 @@ data:
       #   add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable, stale-if-error=86400" always;
       #   try_files $uri =404;
       # }
+
+      # Internal location for serving HTML
+      location @html {
+        add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=30, stale-if-error=86400" always;
+        try_files $uri $uri/index.html /index.html;
+      }
 
       # SPA fallback (remove if not needed)
       location / {
