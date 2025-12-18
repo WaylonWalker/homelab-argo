@@ -333,11 +333,23 @@ data:
 
       # Gzip for text assets
       gzip on;
-      gzip_types text/plain text/css application/json application/javascript application/xml+rss application/xml application/x-javascript image/svg+xml;
+      gzip_types text/plain text/css application/json application/javascript application/xml+rss application/xml application/x-javascript image/svg+xml text/markdown;
       gzip_min_length 512;
 
       root /usr/share/nginx/html;
       index index.html;
+
+      # Serve Markdown files when Accept: text/markdown is requested
+      location ~ \.md$ {
+        # Check if client accepts markdown
+        if ($http_accept ~* "text/markdown") {
+          add_header Content-Type "text/markdown; charset=utf-8" always;
+          try_files $uri =404;
+        }
+        # Otherwise, serve as plain text (fallback)
+        add_header Content-Type "text/plain; charset=utf-8" always;
+        try_files $uri =404;
+      }
 
       # HTML: fast edits + CDN cache with SWR
       location ~* \.(html)$ {
