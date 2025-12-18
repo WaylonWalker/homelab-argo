@@ -339,15 +339,6 @@ data:
       root /usr/share/nginx/html;
       index index.html;
 
-      # Rewrite directory URLs to .md files when Accept: text/markdown
-      location ~ ^/([^/]+)/$ {
-        # Check if client accepts markdown and .md file exists
-        if ($http_accept ~* "text/markdown") {
-          try_files $uri$1.md @html;
-        }
-        # Otherwise continue to normal processing
-      }
-
       # Set variable for markdown accept detection
       set $markdown_accept 0;
       if ($http_accept ~* "text/markdown") {
