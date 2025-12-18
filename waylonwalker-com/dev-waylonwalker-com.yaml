@@ -344,7 +344,7 @@ data:
         # Check if client accepts markdown
         if ($http_accept ~* "text/markdown") {
           add_header Content-Type "text/markdown; charset=utf-8" always;
-          try_files $uri =404;
+          break;
         }
         # Otherwise, serve as plain text (fallback)
         add_header Content-Type "text/plain; charset=utf-8" always;
