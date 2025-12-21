@@ -125,7 +125,7 @@ spec:
                     CHANGES=$(git -C "$REPO" diff --name-status HEAD.."origin/$BRANCH" || true)
 
                     git -C "$REPO" reset --hard FETCH_HEAD
-                    git -C "$REPO" clean -fdx -e markout -e .markata.cache
+                    # git -C "$REPO" clean -fdx -e markout -e .markata.cache
                   fi
 
                   cd "$REPO"
