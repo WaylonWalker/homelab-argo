@@ -50,6 +50,19 @@ spec:
     requests:
       storage: 5Gi
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dev-waylonwalker-com-site-replicated
+  namespace: dev-waylonwalker-com
+spec:
+  storageClassName: longhorn-fast-replicated
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -68,7 +81,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-site
+                claimName: dev-waylonwalker-com-site-replicated
             - name: build
               persistentVolumeClaim:
                 claimName: dev-waylonwalker-com-build-hostpath2
