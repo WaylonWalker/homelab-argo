@@ -69,6 +69,9 @@ spec:
             - name: site
               persistentVolumeClaim:
                 claimName: dev-waylonwalker-com-site
+            - name: build
+              persistentVolumeClaim:
+                claimName: dev-waylonwalker-com-build-hostpath2
           containers:
             - name: waylonwalker-com-container
               image: registry.wayl.one/waylonwalker-com:64
@@ -78,9 +81,8 @@ spec:
                   #!/usr/bin/env bash
                   set -euo pipefail
 
-                  ROOT=/site
-                  REPO="$ROOT/build/waylonwalker.com"
-                  SITE_DIR="$ROOT/site/waylonwalker.com"
+                  REPO="/build/waylonwalker.com"
+                  SITE_DIR="/site/waylonwalker.com"
 
                   BRANCH=${BRANCH:-main}
                   URL=${URL:-https://github.com/waylonwalker/waylonwalker.com.git}
@@ -204,6 +206,8 @@ spec:
               volumeMounts:
                 - name: site
                   mountPath: /site
+                - name: build
+                  mountPath: /build
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
@@ -225,9 +229,9 @@ spec:
       template:
         spec:
           volumes:
-            - name: site
+            - name: build
               persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-site
+                claimName: dev-waylonwalker-com-build-hostpath2
           containers:
             - name: markata-clean-container
               image: registry.wayl.one/waylonwalker-com:64
@@ -235,7 +239,7 @@ spec:
               args:
                 - |
                   set -euo pipefail
-                  ROOT=/site
+                  ROOT=/build
                   REPO="$ROOT/build/waylonwalker.com"
 
                   if [ -d "$REPO" ]; then
@@ -246,8 +250,8 @@ spec:
                     echo "Repo directory $REPO does not exist, skipping clean."
                   fi
               volumeMounts:
-                - name: site
-                  mountPath: /site
+                - name: build
+                  mountPath: /build
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
