@@ -252,8 +252,7 @@ spec:
               args:
                 - |
                   set -euo pipefail
-                  ROOT=/build
-                  REPO="$ROOT/build/waylonwalker.com"
+                  REPO="/build/waylonwalker.com"
 
                   if [ -d "$REPO" ]; then
                     cd "$REPO"
