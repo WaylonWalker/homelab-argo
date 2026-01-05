@@ -81,7 +81,7 @@ spec:
           volumes:
             - name: site
               persistentVolumeClaim:
-                claimName: dev-waylonwalker-com-site-replicated
+                claimName: dev-waylonwalker-com-site
             - name: build
               persistentVolumeClaim:
                 claimName: dev-waylonwalker-com-build-hostpath2
