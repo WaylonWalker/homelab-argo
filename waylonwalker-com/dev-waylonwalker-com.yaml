@@ -95,7 +95,7 @@ spec:
                   set -euo pipefail
 
                   REPO="/build/waylonwalker.com"
-                  SITE_DIR="/site/waylonwalker.com"
+                  SITE_DIR="/site/site/waylonwalker.com"
 
                   BRANCH=${BRANCH:-main}
                   URL=${URL:-https://github.com/waylonwalker/waylonwalker.com.git}
