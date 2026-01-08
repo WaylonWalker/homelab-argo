@@ -142,9 +142,20 @@ spec:
                   number: 8000
             path: /
             pathType: Prefix
+    - host: dropper.waylonwalker.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: dropper-wayl-one
+                port:
+                  number: 8000
+            path: /
+            pathType: Prefix
   tls:
     - hosts:
         - dropper.wayl.one
+        - dropper.waylonwalker.com
       secretName: dropper-cert-tls
 ---
 apiVersion: v1
