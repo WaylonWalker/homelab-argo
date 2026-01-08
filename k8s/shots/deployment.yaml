@@ -131,12 +131,21 @@ spec:
                   number: 5000
             path: /
             pathType: Prefix
+    - host: shots.waylonwalker.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: shot-wayl-one
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix
   tls:
     - hosts:
         - shots.wayl.one
+        - shots.waylonwalker.com
       secretName: shots-cert-tls
-status:
-  loadBalancer: {}
 # ---
 # apiVersion: autoscaling/v2
 # kind: HorizontalPodAutoscaler
