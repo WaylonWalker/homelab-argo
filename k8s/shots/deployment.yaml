@@ -70,7 +70,8 @@ spec:
         # - image: registry.wayl.one/shot-scraper-api:0.0.24
         # - image: registry.wayl.one/shot-scraper-api:0.0.26
         # - image: registry.wayl.one/shot-scraper-api:0.0.27
-        - image: registry.wayl.one/shot-scraper-api:0.0.28
+        # - image: registry.wayl.one/shot-scraper-api:0.0.28
+        - image: registry.wayl.one/shot-scraper-api:0.0.29
           command:
             - '/bin/bash'
             - '-c'
