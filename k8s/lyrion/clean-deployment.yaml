@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: lyrion
+  name: lyrion
+  namespace: lyrion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: lyrion
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: lyrion
+      annotations:
+        diun.enable: "true"
+    spec:
+      containers:
+        - env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Chicago"
+            - name: SMB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: lyrion-smb-credentials
+                  key: username
+            - name: SMB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lyrion-smb-credentials
+                  key: password
+          image: lmscommunity/lyrionmusicserver:latest
+          name: lyrion
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsGroup: 0
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    /bin/sh -c "apk add --no-cache cifs-utils" 2>/dev/null || true
+                    mount -t cifs //192.168.1.168/waylon/music /music -o username=${SMB_USER},password=${SMB_PASSWORD},uid=1000,gid=1000,iocharset=utf8,vers=3.0
+                    mount -t cifs //192.168.1.168/waylon/playlist /playlist -o username=${SMB_USER},password=${SMB_PASSWORD},uid=1000,gid=1000,iocharset=utf8,vers=3.0
+                    mountpoint -q /music && echo "Music mount successful!" || echo "Music mount failed!"
+                    mountpoint -q /playlist && echo "Playlist mount successful!" || echo "Playlist mount failed!"
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 3483
+              protocol: TCP
+            - containerPort: 3483
+              protocol: UDP
+          volumeMounts:
+            - mountPath: /config
+              name: lyrion-config
+            - mountPath: /music
+              name: lyrion-music
+            - mountPath: /playlist
+              name: lyrion-playlist
+      restartPolicy: Always
+      volumes:
+        - name: lyrion-config
+          persistentVolumeClaim:
+            claimName: lyrion-config
+        - name: lyrion-music
+          emptyDir: {}
+        - name: lyrion-playlist
+          emptyDir: {}

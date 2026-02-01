@@ -34,6 +34,59 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Chicago"
+            - name: SMB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: lyrion-smb-credentials
+                  key: username
+            - name: SMB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lyrion-smb-credentials
+                  key: password
+          image: lmscommunity/lyrionmusicserver:latest
+          name: lyrion
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsGroup: 0
+          command:
+            - sh
+            - -c
+            - |
+              # Install cifs-utils and mount SMB share before starting Lyrion
+              apk add --no-cache cifs-utils
+              mkdir -p /music
+              mount -t cifs //192.168.1.168/waylon/music /music -o username=${SMB_USER},password=${SMB_PASSWORD},uid=1000,gid=1000,iocharset=utf8,vers=3.0
+              echo "SMB mount status:"
+              mountpoint -q /music && echo "Mount successful!" || echo "Mount failed!"
+              ls -la /music | head -10
+              # Start the original Lyrion entrypoint
+              /usr/local/bin/squeezeboxserver
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 3483
+              protocol: TCP
+            - containerPort: 3483
+              protocol: UDP
+          resources: {}
+          volumeMounts:
+            - mountPath: /config
+              name: lyrion-config
+            - mountPath: /music
+              name: lyrion-music
+            - mountPath: /playlist
+              name: lyrion-playlist
+        - env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Chicago"
           image: lmscommunity/lyrionmusicserver:latest
           name: lyrion
           ports:
@@ -53,34 +106,6 @@ spec:
               name: lyrion-music
             - mountPath: /playlist
               name: lyrion-playlist
-        - name: smb-client
-          image: alpine:latest
-          securityContext:
-            privileged: true
-            runAsUser: 0
-            runAsGroup: 0
-          command:
-            - sh
-            - -c
-            - |
-              apk add --no-cache cifs-utils
-              mkdir -p /music
-              mount -t cifs //192.168.1.168/waylon/music /music -o username=${SMB_USER},password=${SMB_PASSWORD},uid=1000,gid=1000,iocharset=utf8,vers=3.0
-              sleep infinity
-          env:
-            - name: SMB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: lyrion-smb-credentials
-                  key: username
-            - name: SMB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: lyrion-smb-credentials
-                  key: password
-          volumeMounts:
-            - mountPath: /music
-              name: lyrion-music
       restartPolicy: Always
       volumes:
         - name: lyrion-config
