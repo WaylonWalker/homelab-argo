@@ -33,7 +33,7 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Chicago"
-          image: lmscommunity/logitechmediaserver:latest
+          image: lmscommunity/lyrionmusicserver:latest
           name: lyrion
           ports:
             - containerPort: 9000
@@ -158,4 +158,3 @@ spec:
   resources:
     requests:
       storage: 1Gi
-
