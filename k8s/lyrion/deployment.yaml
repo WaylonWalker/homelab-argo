@@ -4,6 +4,7 @@ metadata:
   name: lyrion
   namespace: lyrion
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,14 +53,37 @@ spec:
               name: lyrion-music
             - mountPath: /playlist
               name: lyrion-playlist
+        - name: smb-client
+          image: alpine:latest
+          command:
+            - sh
+            - -c
+            - |
+              apk add --no-cache cifs-utils
+              mkdir -p /music-share
+              mount -t cifs //192.168.1.168/waylon/music /music-share -o username=${SMB_USER},password=${SMB_PASSWORD},uid=1000,gid=1000,iocharset=utf8
+              sleep infinity
+          env:
+            - name: SMB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: lyrion-smb-credentials
+                  key: username
+            - name: SMB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lyrion-smb-credentials
+                  key: password
+          volumeMounts:
+            - mountPath: /music-share
+              name: lyrion-music
       restartPolicy: Always
       volumes:
         - name: lyrion-config
           persistentVolumeClaim:
             claimName: lyrion-config
         - name: lyrion-music
-          persistentVolumeClaim:
-            claimName: lyrion-music
+          emptyDir: {}
         - name: lyrion-playlist
           persistentVolumeClaim:
             claimName: lyrion-playlist
