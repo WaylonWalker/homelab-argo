@@ -64,8 +64,8 @@ spec:
             - -c
             - |
               apk add --no-cache cifs-utils
-              mkdir -p /music-share
-              mount -t cifs //192.168.1.168/waylon/music /music-share -o username=${SMB_USER},password=${SMB_PASSWORD},uid=1000,gid=1000,iocharset=utf8,vers=3.0
+              mkdir -p /music
+              mount -t cifs //192.168.1.168/waylon/music /music -o username=${SMB_USER},password=${SMB_PASSWORD},uid=1000,gid=1000,iocharset=utf8,vers=3.0
               sleep infinity
           env:
             - name: SMB_USER
@@ -79,7 +79,7 @@ spec:
                   name: lyrion-smb-credentials
                   key: password
           volumeMounts:
-            - mountPath: /music-share
+            - mountPath: /music
               name: lyrion-music
       restartPolicy: Always
       volumes:
