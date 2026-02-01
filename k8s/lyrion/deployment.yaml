@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lyrion
+  namespace: lyrion
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: lyrion
+  name: lyrion
+  namespace: lyrion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: lyrion
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: lyrion
+      annotations:
+        diun.enable: "true"
+    spec:
+      containers:
+        - env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Chicago"
+          image: lmscommunity/logitechmediaserver:latest
+          name: lyrion
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 3483
+              protocol: TCP
+            - containerPort: 3483
+              protocol: UDP
+          resources: {}
+          volumeMounts:
+            - mountPath: /config
+              name: lyrion-config
+            - mountPath: /music
+              name: lyrion-music
+            - mountPath: /playlist
+              name: lyrion-playlist
+      restartPolicy: Always
+      volumes:
+        - name: lyrion-config
+          persistentVolumeClaim:
+            claimName: lyrion-config
+        - name: lyrion-music
+          persistentVolumeClaim:
+            claimName: lyrion-music
+        - name: lyrion-playlist
+          persistentVolumeClaim:
+            claimName: lyrion-playlist
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: lyrion
+  name: lyrion
+  namespace: lyrion
+spec:
+  ports:
+    - name: "9000"
+      port: 9000
+      targetPort: 9000
+    - name: "9090"
+      port: 9090
+      targetPort: 9090
+    - name: "3483-tcp"
+      port: 3483
+      targetPort: 3483
+      protocol: TCP
+    - name: "3483-udp"
+      port: 3483
+      targetPort: 3483
+      protocol: UDP
+  selector:
+    service: lyrion
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    service: lyrion
+  name: lyrion
+  namespace: lyrion
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: lyrion.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: lyrion
+                port:
+                  number: 9000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - lyrion.wayl.one
+      secretName: lyrion-cert-tls
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: lyrion
+  name: lyrion-config
+  namespace: lyrion
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: lyrion
+  name: lyrion-music
+  namespace: lyrion
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: lyrion
+  name: lyrion-playlist
+  namespace: lyrion
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+

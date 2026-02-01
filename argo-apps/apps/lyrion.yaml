@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lyrion
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: lyrion
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: k8s/lyrion
+    repoURL: 'https://github.com/waylonwalker/homelab-argo'
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
