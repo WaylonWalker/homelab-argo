@@ -171,7 +171,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 50Gi
 ---
 # cronjob backup to s3
 apiVersion: batch/v1
