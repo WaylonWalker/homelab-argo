@@ -3,6 +3,39 @@ set dotenv-load
 default:
   @just --list
 
+private-secret app env_file secret_name=(app + "-secret") namespace=app:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    mkdir -p private
+    kubectl create secret generic "{{secret_name}}" \
+      --namespace "{{namespace}}" \
+      --from-env-file "{{env_file}}" \
+      --dry-run=client -o yaml > "private/{{app}}.yaml"
+
+seal-secret app secret_name=(app + "-secret") namespace=app in_file=("private/" + app + ".yaml") out_file=("k8s/" + app + "/" + app + "-sealed-secret.yaml"):
+    #!/usr/bin/env bash
+    set -euo pipefail
+    mkdir -p "k8s/{{app}}"
+    kubeseal -f "{{in_file}}" -w "{{out_file}}" --namespace "{{namespace}}" --name "{{secret_name}}"
+
+secret-to-sealed app env_file secret_name=(app + "-secret") namespace=app:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    just private-secret "{{app}}" "{{env_file}}" "{{secret_name}}" "{{namespace}}"
+    just seal-secret "{{app}}" "{{secret_name}}" "{{namespace}}"
+
+seal-posse-party:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    just private-secret "posse-party" "private/posse-party.env" "posse-party-secret" "posse-party"
+    just seal-secret "posse-party" "posse-party-secret" "posse-party" "private/posse-party.yaml" "k8s/posse-party/posse-party-sealed-secret.yaml"
+
+seal-posse-party-db:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    just private-secret "posse-party-db-credentials" "private/posse-party-db-credentials.env" "posse-party-db-credentials" "posse-party"
+    just seal-secret "posse-party" "posse-party-db-credentials" "posse-party" "private/posse-party-db-credentials.yaml" "k8s/posse-party/posse-party-db-credentials-sealed-secret.yaml"
+
 seal-old:
     kubeseal -f private/minio-secret.yaml -w active/sealed-minio-secret.yaml --namespace minio-homelab --name minio-secret
     kubeseal -f private/minio-minio-secret.yaml -w minio/minio-minio-secret.yaml --namespace minio --name minio-secret

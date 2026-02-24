@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: posse-party
+  namespace: posse-party
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: posseparty.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: posse-party
+                port:
+                  number: 3000
+    - host: posseparty.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: posse-party
+                port:
+                  number: 3000
+  tls:
+    - hosts:
+        - posseparty.wayl.one
+        - posseparty.waylonwalker.com
+      secretName: posseparty-cert-tls

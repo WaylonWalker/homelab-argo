@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: posse-party-migrate
+  namespace: posse-party
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: ghcr.io/searlsco/posse_party:latest
+          imagePullPolicy: Always
+          command:
+            - ./script/release
+          envFrom:
+            - secretRef:
+                name: posse-party-secret
+            - secretRef:
+                name: posse-party-db-credentials
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: posse-party-db-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: posse-party-db-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: posse-party-db-credentials
+                  key: database
+            - name: DATABASE_URL
+              value: "postgresql://$(DB_USER):$(DB_PASSWORD)@posse-party-db-rw.posse-party.svc.cluster.local:5432/$(DB_NAME)"

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: posse-party
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: posse-party
+    server: "https://kubernetes.default.svc"
+  source:
+    repoURL: "https://github.com/waylonwalker/homelab-argo"
+    path: k8s/posse-party
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true

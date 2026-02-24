@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: posse-party-db
+  namespace: posse-party
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn-backup
+    size: 5Gi
+  bootstrap:
+    initdb:
+      database: posse_party_production
+      owner: posse_party
+      secret:
+        name: posse-party-db-credentials
