@@ -110,7 +110,7 @@ spec:
         # - image: registry.wayl.one/shot-scraper-api:0.0.26
         # - image: registry.wayl.one/shot-scraper-api:0.0.27
         # - image: registry.wayl.one/shot-scraper-api:0.0.28
-        - image: registry.wayl.one/shot-scraper-api:0.0.31
+        - image: registry.wayl.one/shot-scraper-api:0.0.32
           command:
             - "/bin/bash"
             - "-c"
@@ -177,7 +177,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.31
+        - image: registry.wayl.one/shot-scraper-api:0.0.32
           command:
             - "/bin/bash"
             - "-c"
