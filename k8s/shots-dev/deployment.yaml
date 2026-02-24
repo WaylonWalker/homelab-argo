@@ -1,0 +1,252 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: shot-wayl-one
+  name: shot-wayl-one
+  namespace: shots-dev
+spec:
+  ports:
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: shot-wayl-one
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shot
+  namespace: shots-dev
+spec: {}
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: shot-wayl-one
+  name: shot-wayl-one
+  namespace: shots-dev
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: shot-wayl-one
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        diun.enable: "true"
+      labels:
+        app: shot-wayl-one
+    spec:
+      containers:
+        # working versions
+        # - image: registry.wayl.one/shot-scraper-api:0.0.6
+        # - image: registry.wayl.one/shot-scraper-api:0.0.18
+        # - image: registry.wayl.one/shot-scraper-api:0.0.23
+        # - image: registry.wayl.one/shot-scraper-api:0.0.24
+        # - image: registry.wayl.one/shot-scraper-api:0.0.26
+        # - image: registry.wayl.one/shot-scraper-api:0.0.27
+        # - image: registry.wayl.one/shot-scraper-api:0.0.28
+        - image: registry.wayl.one/shot-scraper-api:0.0.30
+          command:
+            - "/bin/bash"
+            - "-c"
+          args:
+            - "uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 1"
+          name: shot-wayl-one
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "300Mi"
+            limits:
+              cpu: "1000m"
+              memory: "4Gi"
+          env:
+            - name: ENV
+              value: "prod"
+            - name: CACHE_DIR
+              value: "/cache"
+            - name: QUEUE_BACKEND
+              value: "redis"
+            - name: QUEUE_PROCESSOR_ENABLED
+              value: "false"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: shot-secret
+                  key: REDIS_URL
+            - name: AWS_ENDPOINT_URL
+              value: http://minio.minio.svc.cluster.local:9000
+          envFrom:
+            - secretRef:
+                name: shot-minio-secret
+            - secretRef:
+                name: shot-secret
+          volumeMounts:
+            - mountPath: /cache
+              name: cache
+      imagePullSecrets:
+        - name: cluster-regcred
+      restartPolicy: Always
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: cache
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: shot-wayl-one-worker
+  name: shot-wayl-one-worker
+  namespace: shots-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shot-wayl-one-worker
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: shot-wayl-one-worker
+    spec:
+      containers:
+        - image: registry.wayl.one/shot-scraper-api:0.0.30
+          command:
+            - "/bin/bash"
+            - "-c"
+          args:
+            - "python -m shot_scraper_api.worker"
+          name: shot-wayl-one-worker
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "300Mi"
+            limits:
+              cpu: "1000m"
+              memory: "4Gi"
+          env:
+            - name: ENV
+              value: "prod"
+            - name: CACHE_DIR
+              value: "/cache"
+            - name: QUEUE_BACKEND
+              value: "redis"
+            - name: QUEUE_PROCESSOR_ENABLED
+              value: "true"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: shot-secret
+                  key: REDIS_URL
+            - name: AWS_ENDPOINT_URL
+              value: http://minio.minio.svc.cluster.local:9000
+          envFrom:
+            - secretRef:
+                name: shot-minio-secret
+            - secretRef:
+                name: shot-secret
+          volumeMounts:
+            - mountPath: /cache
+              name: cache
+      imagePullSecrets:
+        - name: cluster-regcred
+      restartPolicy: Always
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: cache
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shot-wayl-one
+  namespace: shots-dev
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: shots-dev.wayl.one
+      http:
+        paths:
+          - backend:
+              service:
+                name: shot-wayl-one
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix
+    - host: shots-dev.waylonwalker.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: shot-wayl-one
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - shots-dev.wayl.one
+        - shots-dev.waylonwalker.com
+      secretName: shots-cert-tls
+# ---
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: shot-wayl-one-hpa
+#   namespace: shots-dev
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: shot-wayl-one
+#   minReplicas: 3
+#   maxReplicas: 6
+#   metrics:
+#     - type: Resource
+#       resource:
+#         name: cpu
+#         target:
+#           type: Utilization
+#           averageUtilization: 50
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cache
+  namespace: shots-dev
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+  volumeName: pv-hostpath-general-cache
+  storageClassName: hostpath
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath-general-cache
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteMany # Ensure your use case allows this, as hostPath is node-specific
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
+    path: /mnt/vault/nfs/general/pv/shots/cache
+    type: DirectoryOrCreate
