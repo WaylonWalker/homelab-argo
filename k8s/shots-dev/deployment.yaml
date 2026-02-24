@@ -75,7 +75,7 @@ spec:
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: shot-secret
+                  name: shots-dev-secret
                   key: REDIS_URL
             - name: AWS_ENDPOINT_URL
               value: http://minio.minio.svc.cluster.local:9000
@@ -139,7 +139,7 @@ spec:
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: shot-secret
+                  name: shots-dev-secret
                   key: REDIS_URL
             - name: AWS_ENDPOINT_URL
               value: http://minio.minio.svc.cluster.local:9000
