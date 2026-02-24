@@ -83,7 +83,7 @@ spec:
             # - secretRef:
             #     name: shot-minio-secret
             - secretRef:
-                name: shot-secret
+                name: shots-dev-secret
           volumeMounts:
             - mountPath: /cache
               name: cache
@@ -147,7 +147,7 @@ spec:
             # - secretRef:
             #     name: shot-minio-secret
             - secretRef:
-                name: shot-secret
+                name: shots-dev-secret
           volumeMounts:
             - mountPath: /cache
               name: cache
