@@ -18,6 +18,70 @@ kind: Namespace
 metadata:
   name: shots-dev
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: shots-dev-redis
+  name: shots-dev-redis
+  namespace: shots-dev
+spec:
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+  selector:
+    app: shots-dev-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: shots-dev-redis
+  name: shots-dev-redis
+  namespace: shots-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shots-dev-redis
+  template:
+    metadata:
+      labels:
+        app: shots-dev-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: shots-dev-redis-ingress
+  namespace: shots-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: shots-dev-redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 6379
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
