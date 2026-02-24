@@ -225,7 +225,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-hostpath-general-cache
+  volumeName: pv-hostpath-general-shots-dev-cache
   storageClassName: hostpath
 ---
 apiVersion: v1
