@@ -231,7 +231,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-hostpath-general-cache
+  name: pv-hostpath-general-shots-dev-cache
 spec:
   capacity:
     storage: 500Mi
@@ -240,5 +240,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/vault/nfs/general/pv/shots/cache
+    path: /mnt/vault/nfs/general/pv/shots-dev/cache
     type: DirectoryOrCreate
