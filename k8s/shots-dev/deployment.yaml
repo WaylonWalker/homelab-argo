@@ -145,7 +145,7 @@ spec:
               value: http://minio.minio.svc.cluster.local:9000
           envFrom:
             - secretRef:
-                name: shot-minio-secret
+                name: shots-dev-minio-secret
             - secretRef:
                 name: shots-dev-secret
           volumeMounts:
@@ -209,7 +209,7 @@ spec:
               value: http://minio.minio.svc.cluster.local:9000
           envFrom:
             - secretRef:
-                name: shot-minio-secret
+                name: shots-dev-minio-secret
             - secretRef:
                 name: shots-dev-secret
           volumeMounts:
