@@ -12,15 +12,11 @@ spec:
       targetPort: 5000
   selector:
     app: shot-wayl-one
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: shots-dev
-spec: {}
-status: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,7 +30,6 @@ spec:
   selector:
     matchLabels:
       app: shot-wayl-one
-  strategy: {}
   template:
     metadata:
       annotations:
@@ -112,7 +107,6 @@ spec:
   selector:
     matchLabels:
       app: shot-wayl-one-worker
-  strategy: {}
   template:
     metadata:
       labels:
@@ -233,7 +227,6 @@ spec:
       storage: 100Mi
   volumeName: pv-hostpath-general-cache
   storageClassName: hostpath
-status: {}
 ---
 apiVersion: v1
 kind: PersistentVolume
