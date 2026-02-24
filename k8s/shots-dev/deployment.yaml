@@ -18,8 +18,7 @@ status:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: shot
-  namespace: shots-dev
+  name: shots-dev
 spec: {}
 status: {}
 ---
