@@ -82,7 +82,7 @@ spec:
               memory: "2Gi"
           env:
             - name: DROPPER_BASE_URL
-              value: "https://dropper.wayl.one/"
+              value: "https://dropper.waylonwalker.com/"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
