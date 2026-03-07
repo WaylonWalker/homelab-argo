@@ -93,13 +93,14 @@ spec:
   replicas: 4
   selector:
     matchLabels:
-      app: shot-wayl-one
+      io.kompose.service: shot-wayl-one
   template:
     metadata:
       annotations:
         diun.enable: "true"
       labels:
         app: shot-wayl-one
+        io.kompose.service: shot-wayl-one
     spec:
       containers:
         # working versions
@@ -139,15 +140,15 @@ spec:
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: shots-secret
+                  name: shot-secret
                   key: REDIS_URL
             - name: AWS_ENDPOINT_URL
               value: http://minio.minio.svc.cluster.local:9000
           envFrom:
             - secretRef:
-                name: shots-minio-secret
+                name: shot-minio-secret
             - secretRef:
-                name: shots-secret
+                name: shot-secret
           volumeMounts:
             - mountPath: /cache
               name: cache
@@ -203,15 +204,15 @@ spec:
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
-                  name: shots-secret
+                  name: shot-secret
                   key: REDIS_URL
             - name: AWS_ENDPOINT_URL
               value: http://minio.minio.svc.cluster.local:9000
           envFrom:
             - secretRef:
-                name: shots-minio-secret
+                name: shot-minio-secret
             - secretRef:
-                name: shots-secret
+                name: shot-secret
           volumeMounts:
             - mountPath: /cache
               name: cache
@@ -289,13 +290,13 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-hostpath-general-shots-cache
+  volumeName: pv-hostpath-general-cache
   storageClassName: hostpath
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-hostpath-general-shots-cache
+  name: pv-hostpath-general-cache
 spec:
   capacity:
     storage: 500Mi
