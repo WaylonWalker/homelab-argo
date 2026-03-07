@@ -30,6 +30,20 @@ spec:
   resources:
     requests:
       storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # not a backup, but uses a longhorn storage class with backup applied
+  name: kraft-season3-data
+  namespace: kraft
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
 
 # ---
 # apiVersion: v1
@@ -134,7 +148,9 @@ spec:
               # kraft 1 seed
               # value: "-4338028305538428199"
               # kraft 2 seed - Hermitcraft Season 11
-              value: "-2654832327628292536"
+              # value: "-2654832327628292536"
+              # kraft 3 seed - The Pale Mansion
+              value: "-7286370756041736131"
             - name: EULA
               value: "true"
             - name: RCON_CMDS_STARTUP
@@ -242,4 +258,4 @@ spec:
       volumes:
         - name: minecraft-data
           persistentVolumeClaim:
-            claimName: kraft-season2-data
+            claimName: kraft-season3-data
