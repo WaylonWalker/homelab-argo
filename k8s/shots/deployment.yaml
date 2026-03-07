@@ -1,14 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -o deployment.yaml -n shot --replicas 3
-    kompose.image-pull-secret: regcred
-    kompose.service.expose: shots.wayl.one, shots.k.waylonwalker.com
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
   labels:
-    io.kompose.service: shot-wayl-one
+    app: shot-wayl-one
   name: shot-wayl-one
   namespace: shot
 spec:
@@ -17,50 +11,95 @@ spec:
       port: 5000
       targetPort: 5000
   selector:
-    io.kompose.service: shot-wayl-one
-status:
-  loadBalancer: {}
+    app: shot-wayl-one
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  creationTimestamp: null
   name: shot
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: shots-redis
+  name: shots-redis
   namespace: shot
-spec: {}
-status: {}
+spec:
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+  selector:
+    app: shots-redis
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -o deployment.yaml -n shot --replicas 3
-    kompose.image-pull-secret: regcred
-    kompose.service.expose: shots.wayl.one, shots.k.waylonwalker.com
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
   labels:
-    io.kompose.service: shot-wayl-one
+    app: shots-redis
+  name: shots-redis
+  namespace: shot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shots-redis
+  template:
+    metadata:
+      labels:
+        app: shots-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: shots-redis-ingress
+  namespace: shot
+spec:
+  podSelector:
+    matchLabels:
+      app: shots-redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: shot-wayl-one
   name: shot-wayl-one
   namespace: shot
 spec:
   replicas: 4
   selector:
     matchLabels:
-      io.kompose.service: shot-wayl-one
-  strategy: {}
+      app: shot-wayl-one
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -o deployment.yaml -n shot --replicas 3
-        kompose.image-pull-secret: regcred
-        kompose.service.expose: shots.wayl.one, shots.k.waylonwalker.com
-        kompose.version: 1.31.2 (a92241f79)
         diun.enable: "true"
-      creationTimestamp: null
       labels:
-        io.kompose.network/shot-scraper-api-default: "true"
-        io.kompose.service: shot-wayl-one
+        app: shot-wayl-one
     spec:
       containers:
         # working versions
@@ -71,12 +110,12 @@ spec:
         # - image: registry.wayl.one/shot-scraper-api:0.0.26
         # - image: registry.wayl.one/shot-scraper-api:0.0.27
         # - image: registry.wayl.one/shot-scraper-api:0.0.28
-        - image: registry.wayl.one/shot-scraper-api:0.0.29
+        - image: registry.wayl.one/shot-scraper-api:0.0.35
           command:
-            - '/bin/bash'
-            - '-c'
+            - "/bin/bash"
+            - "-c"
           args:
-            - 'uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 1'
+            - "uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 1"
           name: shot-wayl-one
           ports:
             - containerPort: 5000
@@ -92,15 +131,87 @@ spec:
             - name: ENV
               value: "prod"
             - name: CACHE_DIR
-              value: '/cache'
-          envFrom:
-            - secretRef:
-                name: shot-minio-secret
-            - secretRef:
-                name: shot-secret
-          env:
+              value: "/cache"
+            - name: QUEUE_BACKEND
+              value: "redis"
+            - name: QUEUE_PROCESSOR_ENABLED
+              value: "false"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: REDIS_URL
             - name: AWS_ENDPOINT_URL
               value: http://minio.minio.svc.cluster.local:9000
+          envFrom:
+            - secretRef:
+                name: shots-minio-secret
+            - secretRef:
+                name: shots-secret
+          volumeMounts:
+            - mountPath: /cache
+              name: cache
+      imagePullSecrets:
+        - name: cluster-regcred
+      restartPolicy: Always
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: cache
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: shot-wayl-one-worker
+  name: shot-wayl-one-worker
+  namespace: shot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shot-wayl-one-worker
+  template:
+    metadata:
+      labels:
+        app: shot-wayl-one-worker
+    spec:
+      containers:
+        - image: registry.wayl.one/shot-scraper-api:0.0.35
+          command:
+            - "/bin/bash"
+            - "-c"
+          args:
+            - "python -m shot_scraper_api.worker"
+          name: shot-wayl-one-worker
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "300Mi"
+            limits:
+              cpu: "1000m"
+              memory: "4Gi"
+          env:
+            - name: ENV
+              value: "prod"
+            - name: CACHE_DIR
+              value: "/cache"
+            - name: QUEUE_BACKEND
+              value: "redis"
+            - name: QUEUE_PROCESSOR_ENABLED
+              value: "true"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: shots-secret
+                  key: REDIS_URL
+            - name: AWS_ENDPOINT_URL
+              value: http://minio.minio.svc.cluster.local:9000
+          envFrom:
+            - secretRef:
+                name: shots-minio-secret
+            - secretRef:
+                name: shots-secret
           volumeMounts:
             - mountPath: /cache
               name: cache
@@ -115,9 +226,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: shot-wayl-one
   name: shot-wayl-one
   namespace: shot
   annotations:
@@ -181,14 +289,13 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-hostpath-general-cache
+  volumeName: pv-hostpath-general-shots-cache
   storageClassName: hostpath
-status: {}
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-hostpath-general-cache
+  name: pv-hostpath-general-shots-cache
 spec:
   capacity:
     storage: 500Mi
