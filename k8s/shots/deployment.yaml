@@ -138,10 +138,7 @@ spec:
             - name: QUEUE_PROCESSOR_ENABLED
               value: "false"
             - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  name: shot-secret
-                  key: REDIS_URL
+              value: redis://shots-redis.shot.svc.cluster.local:6379/0
             - name: AWS_ENDPOINT_URL
               value: http://minio.minio.svc.cluster.local:9000
           envFrom:
