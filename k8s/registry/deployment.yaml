@@ -229,7 +229,7 @@ spec:
             - name: DELETE_IMAGES
               value: "true"
             - name: NGINX_PROXY_PASS_URL
-              value: https://registry.wayl.one
+              value: http://registry-server:5000
             - name: REGISTRY_SECURED
               value: "true"
             - name: REGISTRY_TITLE
