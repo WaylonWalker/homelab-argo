@@ -234,8 +234,10 @@ spec:
               value: "true"
             - name: REGISTRY_TITLE
               value: Waylon Walker's Docker Registry
+            - name: PULL_URL
+              value: registry.wayl.one
             - name: REGISTRY_URL
-              value: https://registry.wayl.one
+              value: https://registry-ui.wayl.one
             - name: SHOW_CATALOG_NB_TAGS
               value: "true"
             - name: SHOW_CONTENT_DIGEST
