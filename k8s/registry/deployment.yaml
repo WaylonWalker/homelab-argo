@@ -246,7 +246,7 @@ spec:
               value: "true"
             - name: TAGLIST_PAGE_SIZE
               value: "100"
-          image: joxit/docker-registry-ui:main
+          image: joxit/docker-registry-ui:2.6.0
           name: registry-ui
           ports:
             - containerPort: 80
