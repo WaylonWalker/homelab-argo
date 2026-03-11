@@ -103,7 +103,7 @@ spec:
     spec:
       containers:
         # working versions
-        - image: registry.wayl.one/shot-scraper-api:0.0.36
+        - image: registry.wayl.one/shot-scraper-api:0.0.37
           command:
             - "/bin/bash"
             - "-c"
@@ -129,6 +129,12 @@ spec:
               value: "redis"
             - name: QUEUE_PROCESSOR_ENABLED
               value: "false"
+            - name: QUEUE_PROCESSOR_CONCURRENCY
+              value: "4"
+            - name: RENDER_CONCURRENCY
+              value: "4"
+            - name: POSTPROCESS_CONCURRENCY
+              value: "2"
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
@@ -160,7 +166,7 @@ metadata:
   name: shot-wayl-one-worker
   namespace: shots-dev
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: shot-wayl-one-worker
@@ -170,7 +176,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.36
+        - image: registry.wayl.one/shot-scraper-api:0.0.37
           command:
             - "/bin/bash"
             - "-c"
@@ -193,6 +199,12 @@ spec:
               value: "redis"
             - name: QUEUE_PROCESSOR_ENABLED
               value: "true"
+            - name: QUEUE_PROCESSOR_CONCURRENCY
+              value: "4"
+            - name: RENDER_CONCURRENCY
+              value: "4"
+            - name: POSTPROCESS_CONCURRENCY
+              value: "2"
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef:
