@@ -93,16 +93,16 @@ spec:
   replicas: 4
   selector:
     matchLabels:
-      app: shot-wayl-one
+      io.kompose.service: shot-wayl-one
   template:
     metadata:
       annotations:
         diun.enable: "true"
       labels:
         app: shot-wayl-one
+        io.kompose.service: shot-wayl-one
     spec:
       containers:
-        # working versions
         - image: registry.wayl.one/shot-scraper-api:0.0.38
           command:
             - "/bin/bash"
@@ -282,6 +282,7 @@ spec:
                   curl --fail --show-error --silent
                   -X POST
                   "http://shot-wayl-one.shot.svc.cluster.local:5000/queue/cleanup?completed_age_hours=24&stale_age_minutes=30"
+
 # ---
 # apiVersion: autoscaling/v2
 # kind: HorizontalPodAutoscaler
