@@ -103,7 +103,7 @@ spec:
     spec:
       containers:
         # working versions
-        - image: registry.wayl.one/shot-scraper-api:0.0.37
+        - image: registry.wayl.one/shot-scraper-api:0.0.38
           command:
             - "/bin/bash"
             - "-c"
@@ -176,7 +176,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.37
+        - image: registry.wayl.one/shot-scraper-api:0.0.38
           command:
             - "/bin/bash"
             - "-c"
@@ -262,6 +262,33 @@ spec:
         - shots-dev.wayl.one
         - shots-dev.waylonwalker.com
       secretName: shots-cert-tls
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: shot-wayl-one-cleanup
+  namespace: shots-dev
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: cleanup
+              image: curlimages/curl:8.10.1
+              args:
+                - /bin/sh
+                - -lc
+                - >-
+                  curl --fail --show-error --silent
+                  -X POST
+                  "http://shot-wayl-one.shots-dev.svc.cluster.local:5000/queue/cleanup?completed_age_hours=24&stale_age_minutes=30"
+
 # ---
 # apiVersion: autoscaling/v2
 # kind: HorizontalPodAutoscaler
