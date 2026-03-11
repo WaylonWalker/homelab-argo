@@ -93,25 +93,17 @@ spec:
   replicas: 4
   selector:
     matchLabels:
-      io.kompose.service: shot-wayl-one
+      app: shot-wayl-one
   template:
     metadata:
       annotations:
         diun.enable: "true"
       labels:
         app: shot-wayl-one
-        io.kompose.service: shot-wayl-one
     spec:
       containers:
         # working versions
-        # - image: registry.wayl.one/shot-scraper-api:0.0.6
-        # - image: registry.wayl.one/shot-scraper-api:0.0.18
-        # - image: registry.wayl.one/shot-scraper-api:0.0.23
-        # - image: registry.wayl.one/shot-scraper-api:0.0.24
-        # - image: registry.wayl.one/shot-scraper-api:0.0.26
-        # - image: registry.wayl.one/shot-scraper-api:0.0.27
-        # - image: registry.wayl.one/shot-scraper-api:0.0.28
-        - image: registry.wayl.one/shot-scraper-api:0.0.35
+        - image: registry.wayl.one/shot-scraper-api:0.0.38
           command:
             - "/bin/bash"
             - "-c"
@@ -137,6 +129,12 @@ spec:
               value: "redis"
             - name: QUEUE_PROCESSOR_ENABLED
               value: "false"
+            - name: QUEUE_PROCESSOR_CONCURRENCY
+              value: "4"
+            - name: RENDER_CONCURRENCY
+              value: "4"
+            - name: POSTPROCESS_CONCURRENCY
+              value: "2"
             - name: REDIS_URL
               value: redis://shots-redis.shot.svc.cluster.local:6379/0
             - name: AWS_ENDPOINT_URL
@@ -165,7 +163,7 @@ metadata:
   name: shot-wayl-one-worker
   namespace: shot
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: shot-wayl-one-worker
@@ -175,7 +173,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.35
+        - image: registry.wayl.one/shot-scraper-api:0.0.38
           command:
             - "/bin/bash"
             - "-c"
@@ -198,6 +196,12 @@ spec:
               value: "redis"
             - name: QUEUE_PROCESSOR_ENABLED
               value: "true"
+            - name: QUEUE_PROCESSOR_CONCURRENCY
+              value: "4"
+            - name: RENDER_CONCURRENCY
+              value: "4"
+            - name: POSTPROCESS_CONCURRENCY
+              value: "2"
             - name: REDIS_URL
               value: redis://shots-redis.shot.svc.cluster.local:6379/0
             - name: AWS_ENDPOINT_URL
@@ -252,6 +256,32 @@ spec:
         - shots.wayl.one
         - shots.waylonwalker.com
       secretName: shots-cert-tls
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: shot-wayl-one-cleanup
+  namespace: shot
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: cleanup
+              image: curlimages/curl:8.10.1
+              args:
+                - /bin/sh
+                - -lc
+                - >-
+                  curl --fail --show-error --silent
+                  -X POST
+                  "http://shot-wayl-one.shot.svc.cluster.local:5000/queue/cleanup?completed_age_hours=24&stale_age_minutes=30"
 # ---
 # apiVersion: autoscaling/v2
 # kind: HorizontalPodAutoscaler
