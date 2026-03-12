@@ -103,7 +103,7 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.39
+        - image: registry.wayl.one/shot-scraper-api:0.0.40
           command:
             - "/bin/bash"
             - "-c"
@@ -173,7 +173,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.39
+        - image: registry.wayl.one/shot-scraper-api:0.0.40
           command:
             - "/bin/bash"
             - "-c"
@@ -282,6 +282,7 @@ spec:
                   curl --fail --show-error --silent
                   -X POST
                   "http://shot-wayl-one.shot.svc.cluster.local:5000/queue/cleanup?completed_age_hours=24&stale_age_minutes=30"
+
 
 # ---
 # apiVersion: autoscaling/v2
