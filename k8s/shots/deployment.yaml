@@ -180,6 +180,36 @@ spec:
           args:
             - "python -m shot_scraper_api.worker"
           name: shot-wayl-one-worker
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - "-f"
+                - "shot_scraper_api.worker"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - pgrep
+                - "-f"
+                - "shot_scraper_api.worker"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+          startupProbe:
+            exec:
+              command:
+                - pgrep
+                - "-f"
+                - "shot_scraper_api.worker"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+            timeoutSeconds: 5
           resources:
             requests:
               cpu: "100m"
