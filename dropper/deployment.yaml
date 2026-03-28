@@ -45,7 +45,8 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev21
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
-        - image: registry.wayl.one/dropper:0.0.14dev32
+        # - image: registry.wayl.one/dropper:0.0.14dev32
+        - image: registry.wayl.one/dropper:0.0.14dev33
           name: dropper-wayl-one
           command:
             - "/bin/bash"
@@ -188,7 +189,7 @@ spec:
         spec:
           containers:
             - name: dropper-backup
-              image: registry.wayl.one/dropper:0.0.14dev32
+              image: registry.wayl.one/dropper:0.0.14dev33
               command:
                 - "/bin/bash"
                 - "-c"
