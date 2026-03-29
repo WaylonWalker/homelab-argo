@@ -324,7 +324,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hostpath
   hostPath:
-    path: /mnt/vault/nfs/general/pv/frigate4/frigate-temp
+    path: /var/lib/frigate-cache
     type: DirectoryOrCreate
   nodeAffinity:
     required:
