@@ -139,7 +139,7 @@ spec:
             claimName: storage
         - name: frigate-temp
           persistentVolumeClaim:
-            claimName: frigate-temp
+            claimName: frigate-temp-ssd
         - emptyDir:
             medium: Memory
             sizeLimit: 1Gi
@@ -198,7 +198,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: frigate-temp
+  name: frigate-temp-ssd
   namespace: frigate
 spec:
   accessModes:
@@ -206,7 +206,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  volumeName: pv-hostpath-general-temp
+  volumeName: pv-hostpath-ssd-frigate-temp
   storageClassName: hostpath
 ---
 apiVersion: networking.k8s.io/v1
@@ -314,7 +314,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-hostpath-general-temp
+  name: pv-hostpath-ssd-frigate-temp
   namespace: frigate
 spec:
   capacity:
