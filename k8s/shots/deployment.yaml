@@ -103,7 +103,7 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.41
+        - image: registry.wayl.one/shot-scraper-api:0.0.42
           command:
             - "/bin/bash"
             - "-c"
@@ -173,7 +173,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.41
+        - image: registry.wayl.one/shot-scraper-api:0.0.42
           command:
             - "/bin/bash"
             - "-c"
@@ -183,21 +183,22 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pgrep
-                - "-f"
-                - "shot_scraper_api.worker"
-            initialDelaySeconds: 30
-            periodSeconds: 10
+                - python
+                - -m
+                - shot_scraper_api.worker_health
+                - --queue-stall
+            initialDelaySeconds: 45
+            periodSeconds: 15
             failureThreshold: 3
             timeoutSeconds: 5
           readinessProbe:
             exec:
               command:
-                - pgrep
-                - "-f"
-                - "shot_scraper_api.worker"
+                - python
+                - -m
+                - shot_scraper_api.worker_health
             initialDelaySeconds: 10
-            periodSeconds: 5
+            periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 5
           startupProbe:
@@ -232,6 +233,12 @@ spec:
               value: "4"
             - name: POSTPROCESS_CONCURRENCY
               value: "2"
+            - name: WORKER_HEARTBEAT_INTERVAL_SECONDS
+              value: "10"
+            - name: WORKER_HEARTBEAT_TIMEOUT_SECONDS
+              value: "45"
+            - name: WORKER_STALLED_QUEUE_THRESHOLD_SECONDS
+              value: "180"
             - name: REDIS_URL
               value: redis://shots-redis.shot.svc.cluster.local:6379/0
             - name: AWS_ENDPOINT_URL
