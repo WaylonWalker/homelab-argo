@@ -1,0 +1,291 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: magnet-smp
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # not a backup, but uses a longhorn storage class with backup applied
+  name: magnet-smp-data-backup
+  namespace: magnet-smp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # not a backup, but uses a longhorn storage class with backup applied
+  name: magnet-smp-season1-data
+  namespace: magnet-smp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: magnet-smp
+  namespace: magnet-smp
+spec:
+  selector:
+    app: magnet-smp
+  ports:
+    - name: minecraft
+      port: 25565
+      targetPort: 25565
+      protocol: TCP
+    - name: bedrock
+      port: 19132
+      targetPort: 19132
+      protocol: UDP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: magnet-smp-geyser-config
+  namespace: magnet-smp
+data:
+  config.yml: |
+    # Managed from Git so Bedrock/playit settings survive restarts.
+    bedrock:
+      address: 0.0.0.0
+      port: 19132
+      clone-remote-port: false
+      motd1: "get magnet-smping"
+      motd2: "on magnet-smp"
+      server-name: "magnet-smp"
+      compression-level: 6
+      broadcast-port: ${CFG_PLAYIT_BEDROCK_PORT}
+      enable-proxy-protocol: false
+    remote:
+      address: 127.0.0.1
+      port: 25565
+      auth-type: floodgate
+      use-proxy-protocol: false
+      forward-hostname: false
+    floodgate-key-file: key.pem
+    saved-user-logins:
+      - ThisExampleUsernameShouldBeLongEnoughToNeverBeAnXboxUsername
+      - ThisOtherExampleUsernameShouldAlsoBeLongEnough
+    pending-authentication-timeout: 120
+    command-suggestions: true
+    passthrough-motd: true
+    passthrough-player-counts: true
+    legacy-ping-passthrough: false
+    ping-passthrough-interval: 3
+    forward-player-ping: false
+    max-players: 100
+    debug-mode: false
+    show-cooldown: title
+    show-coordinates: true
+    disable-bedrock-scaffolding: false
+    emote-offhand-workaround: "disabled"
+    cache-images: 0
+    allow-custom-skulls: true
+    max-visible-custom-skulls: 128
+    custom-skull-render-distance: 32
+    add-non-bedrock-items: true
+    above-bedrock-nether-building: false
+    force-resource-packs: true
+    xbox-achievements-enabled: false
+    log-player-ip-addresses: true
+    notify-on-new-bedrock-update: true
+    unusable-space-block: minecraft:barrier
+    metrics:
+      enabled: true
+      uuid: 00000000-0000-0000-0000-000000000000
+    scoreboard-packet-threshold: 20
+    enable-proxy-connections: false
+    mtu: 1400
+    use-direct-connection: true
+    disable-compression: true
+    config-version: 4
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: magnet-smp-pdb
+  namespace: magnet-smp
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: magnet-smp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: magnet-smp
+  namespace: magnet-smp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: magnet-smp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: magnet-smp
+      annotations:
+        diun.enable: "true"
+    spec:
+      # nodeSelector:
+      #   magnet-smp: "true"
+      containers:
+        - name: magnet-smp
+          image: itzg/minecraft-server
+          env:
+            - name: SEED
+              # kraft 1 seed
+              # value: "-4338028305538428199"
+              # kraft 2 seed - Hermitcraft Season 11
+              # value: "-2654832327628292536"
+              # kraft 3 seed - The Pale Mansion
+              value: "-7286370756041736131"
+            - name: EULA
+              value: "true"
+            - name: RCON_CMDS_STARTUP
+              value: |-
+                gamerule keepInventory true
+                fwhitelist add WaylonSWalker
+            - name: TYPE
+              value: "PAPER"
+            - name: VERSION
+              value: "1.21.11"
+            - name: MOTD
+              value: "motd magnet-smp"
+            - name: PLUGINS
+              value: |
+                https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
+                https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
+            - name: COPY_CONFIG_DEST
+              value: "/data/plugins/Geyser-Spigot"
+            - name: SYNC_SKIP_NEWER_IN_DESTINATION
+              value: "false"
+            - name: REPLACE_ENV_DURING_SYNC
+              value: "true"
+            - name: CFG_PLAYIT_BEDROCK_PORT
+              value: "19132"
+            - name: RCON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: magnet-smp-secret
+                  key: rcon-password
+            - name: ENABLE_RCON
+              value: "true"
+            - name: INIT_MEMORY
+              value: "512M"
+            - name: MAX_MEMORY
+              value: "3G"
+            # - name: JVM_XX_OPTS
+            #   value: "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
+            - name: BACKUP_ENABLED
+              value: "true"
+            - name: BACKUP_INTERVAL
+              value: "2h"
+            - name: BACKUP_RETENTION
+              value: "24"
+            - name: ONLINE_MODE
+              value: "true"
+            - name: ENFORCE_WHITELIST
+              value: "true"
+            - name: WHITELIST
+              value: "quadmx08,WyattBubbyLee,AylaWalker"
+            - name: OPS
+              value: "quadmx08"
+            - name: OVERRIDE_SERVER_PROPERTIES
+              value: "true"
+            - name: DIFFICULTY
+              value: "normal"
+            - name: ALLOW_NETHER
+              value: "true"
+            - name: MAX_PLAYERS
+              value: "10"
+            - name: ENABLE_COMMAND_BLOCK
+              value: "true"
+          ports:
+            - containerPort: 25565
+              protocol: TCP
+              name: minecraft
+            - containerPort: 19132
+              protocol: UDP
+              name: bedrock
+            - containerPort: 25575
+              protocol: TCP
+              name: rcon
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  [
+                    "/bin/sh",
+                    "-c",
+                    "mc-send-to-console save-all && mc-send-to-console say Server is shutting down in 10 seconds && sleep 10 && mc-send-to-console save-all && mc-send-to-console stop",
+                  ]
+          startupProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: 25565
+            periodSeconds: 10
+            initialDelaySeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: 25565
+            periodSeconds: 20
+            initialDelaySeconds: 30
+          resources:
+            requests:
+              memory: "3Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "3"
+          stdin: true
+          tty: true
+          volumeMounts:
+            - name: minecraft-data
+              mountPath: /data
+            - name: geyser-config
+              mountPath: /config
+              readOnly: true
+        - name: playit-agent
+          image: ghcr.io/playit-cloud/playit-agent:latest
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: magnet-smp-playit-secret
+                  key: SECRET_KEY
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+      restartPolicy: Always
+      volumes:
+        - name: minecraft-data
+          persistentVolumeClaim:
+            claimName: magnet-smp-season1-data
+        - name: geyser-config
+          configMap:
+            name: magnet-smp-geyser-config
