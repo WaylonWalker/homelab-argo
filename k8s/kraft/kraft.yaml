@@ -123,9 +123,9 @@ data:
       address: 0.0.0.0
       port: 19132
       clone-remote-port: false
-      motd1: "Kraft"
-      motd2: "Java + Bedrock crossplay"
-      server-name: "Kraft"
+      motd1: "get krafting"
+      motd2: "on kraft"
+      server-name: "kraft"
       compression-level: 6
       broadcast-port: ${CFG_PLAYIT_BEDROCK_PORT}
       enable-proxy-protocol: false
@@ -226,6 +226,8 @@ spec:
               value: "PAPER"
             - name: VERSION
               value: "1.21.11"
+            - name: MOTD
+              value: "motd kraft"
             - name: PLUGINS
               value: |
                 https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
