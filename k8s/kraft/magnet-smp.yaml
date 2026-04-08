@@ -180,13 +180,13 @@ spec:
               value: "true"
             - name: CFG_PLAYIT_BEDROCK_PORT
               value: "19132"
-            - name: RCON_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: magnet-smp-secret
-                  key: rcon-password
-            - name: ENABLE_RCON
-              value: "true"
+            # - name: RCON_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: magnet-smp-secret
+            #       key: rcon-password
+            # - name: ENABLE_RCON
+            #   value: "true"
             - name: INIT_MEMORY
               value: "512M"
             - name: MAX_MEMORY
@@ -206,7 +206,7 @@ spec:
             - name: WHITELIST
               value: "quadmx08,WyattBubbyLee,AylaWalker"
             - name: OPS
-              value: "quadmx08"
+              value: "quadmx08,WyattBubbyLee,BubbyWyattLee"
             - name: OVERRIDE_SERVER_PROPERTIES
               value: "true"
             - name: DIFFICULTY
