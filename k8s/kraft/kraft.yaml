@@ -262,9 +262,9 @@ spec:
             - name: ENFORCE_WHITELIST
               value: "true"
             - name: WHITELIST
-              value: "quadmx08,WyattBubbyLee,AylaWalker,.quadmx08,.WyattBubbyLee,.AylaWalker"
+              value: "quadmx08,WyattBubbyLee,AylaWalker"
             - name: OPS
-              value: "quadmx08,.quadmx08"
+              value: "quadmx08"
             - name: OVERRIDE_SERVER_PROPERTIES
               value: "true"
             - name: DIFFICULTY
