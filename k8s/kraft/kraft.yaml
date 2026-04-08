@@ -219,9 +219,8 @@ spec:
             - name: EULA
               value: "true"
             - name: RCON_CMDS_STARTUP
-              # value: |-
-              #   gamerule keepInventory true
-              #   pregen start 200
+              value: |-
+                fwhitelist add WaylonSWalker
             - name: TYPE
               value: "PAPER"
             - name: VERSION
