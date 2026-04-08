@@ -161,6 +161,7 @@ spec:
               value: |-
                 gamerule keepInventory true
                 fwhitelist add WaylonSWalker
+                fwhitelist add BubbyWyattLee
             - name: TYPE
               value: "PAPER"
             - name: VERSION
