@@ -220,7 +220,7 @@ spec:
               value: "true"
             - name: RCON_CMDS_STARTUP
               value: |-
-                gamerule keepInventory true
+                gamerule keep_inventory true
                 fwhitelist add WaylonSWalker
                 fwhitelist add BubbyWyattLee
             - name: TYPE
