@@ -24,6 +24,36 @@ secret-to-sealed app env_file secret_name=(app + "-secret") namespace=app:
     just private-secret "{{app}}" "{{env_file}}" "{{secret_name}}" "{{namespace}}"
     just seal-secret "{{app}}" "{{secret_name}}" "{{namespace}}"
 
+kraft-playit-secret-from-clipboard:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if command -v wl-paste >/dev/null 2>&1; then
+      clipboard_cmd=(wl-paste --no-newline)
+    elif command -v xclip >/dev/null 2>&1; then
+      clipboard_cmd=(xclip -selection clipboard -o)
+    elif command -v xsel >/dev/null 2>&1; then
+      clipboard_cmd=(xsel --clipboard --output)
+    else
+      echo "No clipboard tool found. Install wl-clipboard, xclip, or xsel." >&2
+      exit 1
+    fi
+
+    mkdir -p private/kraft
+    mkdir -p k8s/kraft
+
+    "${clipboard_cmd[@]}" | kubectl create secret generic kraft-playit-secret \
+      --namespace kraft \
+      --from-file=SECRET_KEY=/dev/stdin \
+      --dry-run=client -o yaml > private/kraft/kraft-playit-secret.yaml
+
+    kubeseal -f private/kraft/kraft-playit-secret.yaml \
+      -w k8s/kraft/kraft-playit-sealed-secret.yaml \
+      --namespace kraft \
+      --name kraft-playit-secret
+
+    echo "Created k8s/kraft/kraft-playit-sealed-secret.yaml"
+
 seal-posse-party:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -162,11 +192,11 @@ minio-access name:
     mkdir -p private/{{name}}
     mkdir -p private/{{name}}/minio-access
 
-    mc admin policy create minio-wayl-one {{name}}-readwrite private/{{name}}/minio-rw-policy.json
-    mc admin user add minio-wayl-one {{name}} $NEWPASSWORD
-    mc admin policy attach minio-wayl-one {{name}}-readwrite --user {{name}}
-    # mc config host add minio-wayl-one https://minio.wayl.one {{name}} $NEWPASSWORD
-    mc admin user svcacct add                       \
+    mcli admin policy create minio-wayl-one {{name}}-readwrite private/{{name}}/minio-rw-policy.json
+    mcli admin user add minio-wayl-one {{name}} $NEWPASSWORD
+    mcli admin policy attach minio-wayl-one {{name}}-readwrite --user {{name}}
+    # mcli config host add minio-wayl-one https://minio.wayl.one {{name}} $NEWPASSWORD
+    mcli admin user svcacct add                       \
     minio-wayl-one {{name}}                     \
     --name "{{name}}-RW-Access"                         \
     --description "{{name}} Key for read write access" \
@@ -179,7 +209,7 @@ minio-access name:
     --from-literal=AWS_ENDPOINT_URL=https://minio.wayl.one \
     --from-literal=AWS_REGION=us-east-1 \
     --dry-run=client -o yaml > private/{{name}}/minio-secret.yaml
-    kubeseal -f private/{{name}}/minio-secret.yaml -w {{name}}/sealed-minio-secret.yaml --namespace {{name}} --name {{name}}-minio-secret
+    kubeseal -f private/{{name}}/minio-secret.yaml -w k8s/{{name}}/sealed-minio-secret.yaml --namespace {{name}} --name {{name}}-minio-secret
 
 create-secret:
     kubectl create secret generic dropper-secret --from-env-file=.env -n dropper --dry-run=client -o yaml > ../homelab-argo/private/dropper.yaml
