@@ -48,7 +48,49 @@ spec:
       port: 19132
       targetPort: 19132
       protocol: UDP
+    - name: bluemap
+      port: 8100
+      targetPort: 8100
+      protocol: TCP
   type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: magnet-smp-map
+  namespace: magnet-smp
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: magnet-smp-magnet-smp-map-no-cache@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: magnet-map.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: magnet-smp
+                port:
+                  number: 8100
+  tls:
+    - hosts:
+        - magnet-map.wayl.one
+      secretName: magnet-smp-map-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: magnet-smp-map-no-cache
+  namespace: magnet-smp
+spec:
+  headers:
+    customResponseHeaders:
+      Cache-Control: "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+      Pragma: "no-cache"
+      Expires: "0"
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -62,8 +104,8 @@ data:
       address: 0.0.0.0
       port: 19132
       clone-remote-port: false
-      motd1: "get magnet-smping"
-      motd2: "on magnet-smp"
+      motd1: "MAGNET SMP | Super strong survival"
+      motd2: "Pulling players, farms, and shops together"
       server-name: "magnet-smp"
       compression-level: 6
       broadcast-port: ${CFG_PLAYIT_BEDROCK_PORT}
@@ -112,6 +154,95 @@ data:
     disable-compression: true
     config-version: 4
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: magnet-smp-bluemap-config
+  namespace: magnet-smp
+data:
+  core.conf: |
+    # BlueMap needs this acknowledgement before it can download Minecraft assets
+    # required for rendering map textures.
+    accept-download: true
+  webserver.conf: |
+    enabled: true
+    port: 8100
+  webapp.conf: |
+    enabled: true
+    webroot: "bluemap/web"
+    update-settings-file: true
+    default-to-flat-view: true
+    scripts: [
+      "custom/magnet-smp-brand.js"
+    ]
+  magnet-smp-brand.js: |
+    (() => {
+      const iconUrl = "https://www.magnet4less.com/mfl75mobile.png";
+      const title = "magnet-smp map";
+
+      function upsertMeta(attr, key, value) {
+        let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+        if (!el) {
+          el = document.createElement("meta");
+          el.setAttribute(attr, key);
+          document.head.appendChild(el);
+        }
+        el.setAttribute("content", value);
+      }
+
+      function upsertIcon(rel) {
+        let el = document.head.querySelector(`link[rel="${rel}"]`);
+        if (!el) {
+          el = document.createElement("link");
+          el.setAttribute("rel", rel);
+          document.head.appendChild(el);
+        }
+        el.setAttribute("href", iconUrl);
+        el.setAttribute("type", "image/png");
+      }
+
+      function updateHead() {
+        document.title = title;
+        upsertMeta("property", "og:title", title);
+        upsertMeta("property", "og:site_name", title);
+        upsertMeta("property", "og:image", iconUrl);
+        upsertIcon("icon");
+        upsertIcon("apple-touch-icon");
+      }
+
+      function shouldReplaceImage(img) {
+        const src = (img.getAttribute("src") || "").toLowerCase();
+        const alt = (img.getAttribute("alt") || "").toLowerCase();
+        const cls = (img.getAttribute("class") || "").toLowerCase();
+        return src.includes("logo") || alt.includes("bluemap") || cls.includes("logo");
+      }
+
+      function updateImages(root = document) {
+        root.querySelectorAll("img").forEach((img) => {
+          if (!shouldReplaceImage(img)) return;
+          if (img.getAttribute("src") === iconUrl) return;
+          img.setAttribute("src", iconUrl);
+          img.removeAttribute("srcset");
+        });
+      }
+
+      updateHead();
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => updateImages());
+      } else {
+        updateImages();
+      }
+
+      new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          for (const node of mutation.addedNodes) {
+            if (node.nodeType !== Node.ELEMENT_NODE) continue;
+            updateImages(node);
+          }
+        }
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    })();
+---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -144,6 +275,18 @@ spec:
     spec:
       # nodeSelector:
       #   magnet-smp: "true"
+      initContainers:
+        - name: bluemap-config-sync
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - mkdir -p /data/plugins/BlueMap /data/bluemap/web/custom && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf && cp /config/webapp.conf /data/plugins/BlueMap/webapp.conf && cp /config/magnet-smp-brand.js /data/bluemap/web/custom/magnet-smp-brand.js && chown -R 1000:1000 /data/plugins/BlueMap /data/bluemap/web/custom
+          volumeMounts:
+            - name: minecraft-data
+              mountPath: /data
+            - name: bluemap-config
+              mountPath: /config
       containers:
         - name: magnet-smp
           image: itzg/minecraft-server
@@ -159,7 +302,7 @@ spec:
               value: "true"
             - name: RCON_CMDS_STARTUP
               value: |-
-                gamerule keepInventory true
+                gamerule keep_inventory true
                 fwhitelist add WaylonSWalker
                 fwhitelist add BubbyWyattLee
             - name: TYPE
@@ -167,11 +310,22 @@ spec:
             - name: VERSION
               value: "1.21.11"
             - name: MOTD
-              value: "motd magnet-smp"
+              value: "\u00A79\u00A7lMAGNET SMP\u00A7r \u00A77| \u00A7fSuper strong survival\n\u00A77Pulling players, farms, and shops together"
+            - name: ICON
+              value: "https://www.magnet4less.com/mfl75mobile.png"
+            - name: OVERRIDE_ICON
+              value: "true"
             - name: PLUGINS
               value: |
                 https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
                 https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
+                https://cdn.modrinth.com/data/swbUV1cr/versions/Vb2ZE8bR/bluemap-5.16-paper.jar
+                https://cdn.modrinth.com/data/9tQwxSFr/versions/cNbupZrr/SmartSpawner-1.6.5.jar
+                https://cdn.modrinth.com/data/ijC5dDkD/versions/QdShnamC/QuickShop-Hikari-6.2.0.11.jar
+                https://cdn.modrinth.com/data/ijC5dDkD/versions/QdShnamC/Addon-BlueMap-6.2.0.11.jar
+                https://cdn.modrinth.com/data/HYKaKraK/versions/YNJlvBGJ/packetevents-spigot-2.12.0.jar
+                https://cdn.modrinth.com/data/ayRaM8J7/versions/WBBC6arh/VaultUnlocked-2.19.0.jar
+                https://cdn.modrinth.com/data/r0FB9U1e/versions/y9uRVTyP/CoinsEngine-2.7.0.jar
                 https://cdn.modrinth.com/data/JXxFOmdy/versions/CsbOcaCo/MineXFarmRegen-6.2.0.jar
             - name: COPY_CONFIG_DEST
               value: "/data/plugins/Geyser-Spigot"
@@ -225,6 +379,9 @@ spec:
             - containerPort: 19132
               protocol: UDP
               name: bedrock
+            - containerPort: 8100
+              protocol: TCP
+              name: bluemap
             - containerPort: 25575
               protocol: TCP
               name: rcon
@@ -291,3 +448,6 @@ spec:
         - name: geyser-config
           configMap:
             name: magnet-smp-geyser-config
+        - name: bluemap-config
+          configMap:
+            name: magnet-smp-bluemap-config
