@@ -152,8 +152,8 @@ data:
       address: 0.0.0.0
       port: 19132
       clone-remote-port: false
-      motd1: "get krafting"
-      motd2: "on kraft"
+      motd1: "KRAFT | Basement-hosted, somehow still online"
+      motd2: "Powered by Kubernetes and questionable decisions"
       server-name: "kraft"
       compression-level: 6
       broadcast-port: ${CFG_PLAYIT_BEDROCK_PORT}
@@ -358,7 +358,7 @@ spec:
             - name: VERSION
               value: "1.21.11"
             - name: MOTD
-              value: "motd kraft"
+              value: "\u00A7b\u00A7lKRAFT\u00A7r \u00A77| \u00A7fBasement-hosted, somehow still online\n\u00A77Powered by \u00A7aKubernetes\u00A77 and questionable decisions"
             - name: ICON
               value: "https://dropper.wayl.one/file/b3840adf-81da-459b-8d13-c752396fb15c.webp"
             - name: OVERRIDE_ICON
