@@ -177,7 +177,7 @@ data:
     ]
   magnet-smp-brand.js: |
     (() => {
-      const iconUrl = "https://www.magnet4less.com/mfl75mobile.png";
+      const iconUrl = "http://dropper.wayl.one/file/66047fea-00ac-4a5f-a708-c287be1965d7.webp";
       const title = "magnet-smp map";
 
       function upsertMeta(attr, key, value) {
@@ -310,7 +310,7 @@ spec:
             - name: MOTD
               value: "\u00A79\u00A7lMAGNET SMP\u00A7r \u00A77| \u00A7fSuper strong survival\n\u00A77Pulling players, farms, and shops together"
             - name: ICON
-              value: "https://www.magnet4less.com/mfl75mobile.png"
+              value: "http://dropper.wayl.one/file/66047fea-00ac-4a5f-a708-c287be1965d7.webp"
             - name: OVERRIDE_ICON
               value: "true"
             - name: PLUGINS
