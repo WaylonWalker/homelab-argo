@@ -109,7 +109,36 @@ spec:
       port: 19132
       targetPort: 19132
       protocol: UDP
+    - name: bluemap
+      port: 8100
+      targetPort: 8100
+      protocol: TCP
   type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kraft-map
+  namespace: kraft
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: kraft-map.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kraft
+                port:
+                  number: 8100
+  tls:
+    - hosts:
+        - kraft-map.wayl.one
+      secretName: kraft-map-tls
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -173,6 +202,20 @@ data:
     disable-compression: true
     config-version: 4
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kraft-bluemap-config
+  namespace: kraft
+data:
+  core.conf: |
+    # BlueMap needs this acknowledgement before it can download Minecraft assets
+    # required for rendering map textures.
+    accept-download: true
+  webserver.conf: |
+    enabled: true
+    port: 8100
+---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -205,6 +248,18 @@ spec:
     spec:
       # nodeSelector:
       #   kraft: "true"
+      initContainers:
+        - name: bluemap-config-sync
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - mkdir -p /data/plugins/BlueMap && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf
+          volumeMounts:
+            - name: minecraft-data
+              mountPath: /data
+            - name: bluemap-config
+              mountPath: /config
       containers:
         - name: kraft
           image: itzg/minecraft-server
@@ -233,6 +288,7 @@ spec:
               value: |
                 https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
                 https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
+                https://cdn.modrinth.com/data/swbUV1cr/versions/Vb2ZE8bR/bluemap-5.16-paper.jar
             - name: COPY_CONFIG_DEST
               value: "/data/plugins/Geyser-Spigot"
             - name: SYNC_SKIP_NEWER_IN_DESTINATION
@@ -285,6 +341,9 @@ spec:
             - containerPort: 19132
               protocol: UDP
               name: bedrock
+            - containerPort: 8100
+              protocol: TCP
+              name: bluemap
             - containerPort: 25575
               protocol: TCP
               name: rcon
@@ -351,3 +410,6 @@ spec:
         - name: geyser-config
           configMap:
             name: kraft-geyser-config
+        - name: bluemap-config
+          configMap:
+            name: kraft-bluemap-config
