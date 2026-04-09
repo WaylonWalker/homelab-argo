@@ -215,6 +215,81 @@ data:
   webserver.conf: |
     enabled: true
     port: 8100
+  webapp.conf: |
+    enabled: true
+    webroot: "bluemap/web"
+    update-settings-file: true
+    default-to-flat-view: true
+    scripts: [
+      "custom/kraft-brand.js"
+    ]
+  kraft-brand.js: |
+    (() => {
+      const iconUrl = "https://dropper.wayl.one/file/b3840adf-81da-459b-8d13-c752396fb15c.webp";
+      const title = "kraft map";
+
+      function upsertMeta(attr, key, value) {
+        let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+        if (!el) {
+          el = document.createElement("meta");
+          el.setAttribute(attr, key);
+          document.head.appendChild(el);
+        }
+        el.setAttribute("content", value);
+      }
+
+      function upsertIcon(rel) {
+        let el = document.head.querySelector(`link[rel="${rel}"]`);
+        if (!el) {
+          el = document.createElement("link");
+          el.setAttribute("rel", rel);
+          document.head.appendChild(el);
+        }
+        el.setAttribute("href", iconUrl);
+        el.setAttribute("type", "image/webp");
+      }
+
+      function updateHead() {
+        document.title = title;
+        upsertMeta("property", "og:title", title);
+        upsertMeta("property", "og:site_name", title);
+        upsertMeta("property", "og:image", iconUrl);
+        upsertIcon("icon");
+        upsertIcon("apple-touch-icon");
+      }
+
+      function shouldReplaceImage(img) {
+        const src = (img.getAttribute("src") || "").toLowerCase();
+        const alt = (img.getAttribute("alt") || "").toLowerCase();
+        const cls = (img.getAttribute("class") || "").toLowerCase();
+        return src.includes("logo") || alt.includes("bluemap") || cls.includes("logo");
+      }
+
+      function updateImages(root = document) {
+        root.querySelectorAll("img").forEach((img) => {
+          if (!shouldReplaceImage(img)) return;
+          if (img.getAttribute("src") === iconUrl) return;
+          img.setAttribute("src", iconUrl);
+          img.removeAttribute("srcset");
+        });
+      }
+
+      updateHead();
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => updateImages());
+      } else {
+        updateImages();
+      }
+
+      new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          for (const node of mutation.addedNodes) {
+            if (node.nodeType !== Node.ELEMENT_NODE) continue;
+            updateImages(node);
+          }
+        }
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    })();
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -254,7 +329,7 @@ spec:
           command:
             - /bin/sh
             - -c
-            - mkdir -p /data/plugins/BlueMap && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf && chown -R 1000:1000 /data/plugins/BlueMap
+            - mkdir -p /data/plugins/BlueMap /data/bluemap/web/custom && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf && cp /config/webapp.conf /data/plugins/BlueMap/webapp.conf && cp /config/kraft-brand.js /data/bluemap/web/custom/kraft-brand.js && chown -R 1000:1000 /data/plugins/BlueMap /data/bluemap/web/custom
           volumeMounts:
             - name: minecraft-data
               mountPath: /data
@@ -284,6 +359,10 @@ spec:
               value: "1.21.11"
             - name: MOTD
               value: "motd kraft"
+            - name: ICON
+              value: "https://dropper.wayl.one/file/b3840adf-81da-459b-8d13-c752396fb15c.webp"
+            - name: OVERRIDE_ICON
+              value: "true"
             - name: PLUGINS
               value: |
                 https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
