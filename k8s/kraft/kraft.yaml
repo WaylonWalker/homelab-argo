@@ -254,7 +254,7 @@ spec:
           command:
             - /bin/sh
             - -c
-            - mkdir -p /data/plugins/BlueMap && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf
+            - mkdir -p /data/plugins/BlueMap && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf && chown -R 1000:1000 /data/plugins/BlueMap
           volumeMounts:
             - name: minecraft-data
               mountPath: /data
