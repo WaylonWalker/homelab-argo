@@ -303,8 +303,6 @@ spec:
             - name: RCON_CMDS_STARTUP
               value: |-
                 gamerule keep_inventory true
-                fwhitelist add WaylonSWalker
-                fwhitelist add BubbyWyattLee
             - name: TYPE
               value: "PAPER"
             - name: VERSION
@@ -357,9 +355,7 @@ spec:
             - name: ONLINE_MODE
               value: "true"
             - name: ENFORCE_WHITELIST
-              value: "true"
-            - name: WHITELIST
-              value: "quadmx08,WyattBubbyLee,AylaWalker"
+              value: "false"
             - name: OPS
               value: "quadmx08,WyattBubbyLee"
             - name: OVERRIDE_SERVER_PROPERTIES
