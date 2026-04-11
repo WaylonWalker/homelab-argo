@@ -61,7 +61,6 @@ metadata:
   namespace: magnet-smp
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.middlewares: magnet-smp-magnet-smp-map-no-cache@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
