@@ -54,7 +54,7 @@ kraft-playit-secret-from-clipboard:
 
     echo "Created k8s/kraft/kraft-playit-sealed-secret.yaml"
 
-terraria-playit-secret-from-clipboard:
+kave-playit-secret-from-clipboard:
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -69,20 +69,50 @@ terraria-playit-secret-from-clipboard:
       exit 1
     fi
 
-    mkdir -p private/terraria
-    mkdir -p k8s/terraria
+    mkdir -p private/kave
+    mkdir -p k8s/kave
 
-    "${clipboard_cmd[@]}" | kubectl create secret generic terraria-playit-secret \
-      --namespace terraria \
+    "${clipboard_cmd[@]}" | kubectl create secret generic kave-playit-secret \
+      --namespace kave \
       --from-file=SECRET_KEY=/dev/stdin \
-      --dry-run=client -o yaml > private/terraria/terraria-playit-secret.yaml
+      --dry-run=client -o yaml > private/kave/kave-playit-secret.yaml
 
-    kubeseal -f private/terraria/terraria-playit-secret.yaml \
-      -w k8s/terraria/terraria-playit-sealed-secret.yaml \
-      --namespace terraria \
-      --name terraria-playit-secret
+    kubeseal -f private/kave/kave-playit-secret.yaml \
+      -w k8s/kave/kave-playit-sealed-secret.yaml \
+      --namespace kave \
+      --name kave-playit-secret
 
-    echo "Created k8s/terraria/terraria-playit-sealed-secret.yaml"
+    echo "Created k8s/kave/kave-playit-sealed-secret.yaml"
+
+magnet-smp-playit-secret-from-clipboard:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if command -v wl-paste >/dev/null 2>&1; then
+      clipboard_cmd=(wl-paste --no-newline)
+    elif command -v xclip >/dev/null 2>&1; then
+      clipboard_cmd=(xclip -selection clipboard -o)
+    elif command -v xsel >/dev/null 2>&1; then
+      clipboard_cmd=(xsel --clipboard --output)
+    else
+      echo "No clipboard tool found. Install wl-clipboard, xclip, or xsel." >&2
+      exit 1
+    fi
+
+    mkdir -p private/magnet-smp
+    mkdir -p k8s/magnet-smp
+
+    "${clipboard_cmd[@]}" | kubectl create secret generic magnet-smp-playit-secret \
+      --namespace magnet-smp \
+      --from-file=SECRET_KEY=/dev/stdin \
+      --dry-run=client -o yaml > private/magnet-smp/magnet-smp-playit-secret.yaml
+
+    kubeseal -f private/magnet-smp/magnet-smp-playit-secret.yaml \
+      -w k8s/kraft/magnet-smp-playit-sealed-secret.yaml \
+      --namespace magnet-smp \
+      --name magnet-smp-playit-secret
+
+    echo "Created k8s/magnet-smp/magnet-smp-playit-sealed-secret.yaml"
 
 seal-posse-party:
     #!/usr/bin/env bash

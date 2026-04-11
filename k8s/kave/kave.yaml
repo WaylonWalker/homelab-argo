@@ -29,7 +29,7 @@ data:
     difficulty=1
     maxplayers=8
     port=7777
-    motd=wayl.one terraria
+    motd=wayl.one kave
     secure=1
 ---
 apiVersion: v1
@@ -41,7 +41,7 @@ spec:
   selector:
     app: kave
   ports:
-    - name: terraria
+    - name: kave
       port: 7777
       targetPort: 7777
       protocol: TCP
@@ -79,7 +79,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 30
       containers:
-        - name: terraria
+        - name: kave
           image: ryshe/terraria:latest
           args:
             - -config
@@ -87,7 +87,7 @@ spec:
           ports:
             - containerPort: 7777
               protocol: TCP
-              name: terraria
+              name: kave
           startupProbe:
             tcpSocket:
               port: 7777
