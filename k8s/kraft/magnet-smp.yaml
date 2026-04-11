@@ -177,7 +177,7 @@ data:
     ]
   magnet-smp-brand.js: |
     (() => {
-      const iconUrl = "http://dropper.wayl.one/file/66047fea-00ac-4a5f-a708-c287be1965d7.webp";
+      const iconUrl = "https://dropper.wayl.one/file/66047fea-00ac-4a5f-a708-c287be1965d7.webp";
       const title = "magnet-smp map";
 
       function upsertMeta(attr, key, value) {
@@ -198,7 +198,7 @@ data:
           document.head.appendChild(el);
         }
         el.setAttribute("href", iconUrl);
-        el.setAttribute("type", "image/png");
+        el.setAttribute("type", "image/webp");
       }
 
       function updateHead() {
