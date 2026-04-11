@@ -324,6 +324,7 @@ spec:
                 https://cdn.modrinth.com/data/ayRaM8J7/versions/WBBC6arh/VaultUnlocked-2.19.0.jar
                 https://cdn.modrinth.com/data/r0FB9U1e/versions/y9uRVTyP/CoinsEngine-2.7.0.jar
                 https://cdn.modrinth.com/data/JXxFOmdy/versions/CsbOcaCo/MineXFarmRegen-6.2.0.jar
+                https://cdn.modrinth.com/data/dw7LChq9/versions/5GCMlK4e/patpat-plugin-1.2.5.jar
             - name: COPY_CONFIG_DEST
               value: "/data/plugins/Geyser-Spigot"
             - name: SYNC_SKIP_NEWER_IN_DESTINATION
@@ -353,6 +354,8 @@ spec:
               value: "24"
             - name: ONLINE_MODE
               value: "true"
+            - name: ENABLE_WHITELIST
+              value: "false"
             - name: ENFORCE_WHITELIST
               value: "false"
             - name: OPS
