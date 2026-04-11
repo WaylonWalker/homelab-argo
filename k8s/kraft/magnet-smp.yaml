@@ -281,7 +281,7 @@ spec:
           command:
             - /bin/sh
             - -c
-            - mkdir -p /data/plugins/BlueMap /data/bluemap/web/custom && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf && cp /config/webapp.conf /data/plugins/BlueMap/webapp.conf && cp /config/magnet-smp-brand.js /data/bluemap/web/custom/magnet-smp-brand.js && chown -R 1000:1000 /data/plugins/BlueMap /data/bluemap/web/custom
+            - mkdir -p /data/plugins/BlueMap /data/bluemap/web/custom && cp /config/core.conf /data/plugins/BlueMap/core.conf && cp /config/webserver.conf /data/plugins/BlueMap/webserver.conf && cp /config/webapp.conf /data/plugins/BlueMap/webapp.conf && cp /config/magnet-smp-brand.js /data/bluemap/web/custom/magnet-smp-brand.js && chown -R 1000:1000 /data/plugins/BlueMap /data/bluemap
           volumeMounts:
             - name: minecraft-data
               mountPath: /data

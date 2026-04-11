@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: terraria
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: terraria-data
+  namespace: terraria
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-backup
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terraria-server-config
+  namespace: terraria
+data:
+  serverconfig.txt: |
+    world=/root/.local/share/Terraria/Worlds/wayl-one.wld
+    worldname=wayl-one
+    autocreate=2
+    difficulty=1
+    maxplayers=8
+    port=7777
+    motd=wayl.one terraria
+    secure=1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: terraria
+  namespace: terraria
+spec:
+  selector:
+    app: terraria
+  ports:
+    - name: terraria
+      port: 7777
+      targetPort: 7777
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: terraria-pdb
+  namespace: terraria
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: terraria
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: terraria
+  namespace: terraria
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: terraria
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: terraria
+      annotations:
+        diun.enable: "true"
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: terraria
+          image: ryshe/terraria:latest
+          args:
+            - -config
+            - /config/serverconfig.txt
+          ports:
+            - containerPort: 7777
+              protocol: TCP
+              name: terraria
+          startupProbe:
+            tcpSocket:
+              port: 7777
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: 7777
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 7777
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          stdin: true
+          tty: true
+          volumeMounts:
+            - name: terraria-data
+              mountPath: /root/.local/share/Terraria/Worlds
+            - name: terraria-server-config
+              mountPath: /config
+              readOnly: true
+        - name: playit-agent
+          image: ghcr.io/playit-cloud/playit-agent:latest
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: terraria-playit-secret
+                  key: SECRET_KEY
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+      restartPolicy: Always
+      volumes:
+        - name: terraria-data
+          persistentVolumeClaim:
+            claimName: terraria-data
+        - name: terraria-server-config
+          configMap:
+            name: terraria-server-config
