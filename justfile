@@ -54,6 +54,36 @@ kraft-playit-secret-from-clipboard:
 
     echo "Created k8s/kraft/kraft-playit-sealed-secret.yaml"
 
+terraria-playit-secret-from-clipboard:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if command -v wl-paste >/dev/null 2>&1; then
+      clipboard_cmd=(wl-paste --no-newline)
+    elif command -v xclip >/dev/null 2>&1; then
+      clipboard_cmd=(xclip -selection clipboard -o)
+    elif command -v xsel >/dev/null 2>&1; then
+      clipboard_cmd=(xsel --clipboard --output)
+    else
+      echo "No clipboard tool found. Install wl-clipboard, xclip, or xsel." >&2
+      exit 1
+    fi
+
+    mkdir -p private/terraria
+    mkdir -p k8s/terraria
+
+    "${clipboard_cmd[@]}" | kubectl create secret generic terraria-playit-secret \
+      --namespace terraria \
+      --from-file=SECRET_KEY=/dev/stdin \
+      --dry-run=client -o yaml > private/terraria/terraria-playit-secret.yaml
+
+    kubeseal -f private/terraria/terraria-playit-secret.yaml \
+      -w k8s/terraria/terraria-playit-sealed-secret.yaml \
+      --namespace terraria \
+      --name terraria-playit-secret
+
+    echo "Created k8s/terraria/terraria-playit-sealed-secret.yaml"
+
 seal-posse-party:
     #!/usr/bin/env bash
     set -euo pipefail
