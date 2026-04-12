@@ -325,6 +325,7 @@ spec:
                 https://cdn.modrinth.com/data/r0FB9U1e/versions/y9uRVTyP/CoinsEngine-2.7.0.jar
                 https://cdn.modrinth.com/data/JXxFOmdy/versions/CsbOcaCo/MineXFarmRegen-6.2.0.jar
                 https://cdn.modrinth.com/data/dw7LChq9/versions/5GCMlK4e/patpat-plugin-1.2.5.jar
+                https://cdn.modrinth.com/data/g8Zwnnmn/versions/H4neKLlv/ExecutableItems-7.26.4.5.jar
             - name: COPY_CONFIG_DEST
               value: "/data/plugins/Geyser-Spigot"
             - name: SYNC_SKIP_NEWER_IN_DESTINATION
