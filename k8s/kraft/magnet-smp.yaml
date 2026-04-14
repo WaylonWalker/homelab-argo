@@ -327,6 +327,8 @@ spec:
                 https://cdn.modrinth.com/data/dw7LChq9/versions/5GCMlK4e/patpat-plugin-1.2.5.jar
                 https://cdn.modrinth.com/data/g8Zwnnmn/versions/H4neKLlv/ExecutableItems-7.26.4.5.jar
                 https://cdn.modrinth.com/data/ZfcV7L06/versions/QrApe1e5/SCore-5.26.4.5.jar
+                https://cdn.modrinth.com/data/18sjyZwv/versions/1uiUcfwo/BlockShips-0.0.13.jar
+                https://github.com/dmulloy2/ProtocolLib/releases/download/5.4.0/ProtocolLib.jar
             - name: COPY_CONFIG_DEST
               value: "/data/plugins/Geyser-Spigot"
             - name: SYNC_SKIP_NEWER_IN_DESTINATION
