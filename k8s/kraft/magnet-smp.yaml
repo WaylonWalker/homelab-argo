@@ -21,7 +21,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   # not a backup, but uses a longhorn storage class with backup applied
-  name: magnet-smp-season1-data
+  name: magnet-smp-season2-data
   namespace: magnet-smp
 spec:
   accessModes:
@@ -88,7 +88,7 @@ spec:
               # kraft 2 seed - Hermitcraft Season 11
               # value: "-2654832327628292536"
               # kraft 3 seed - The Pale Mansion
-              value: "-7286370756041736131"
+              value: "322055699665419007"
             - name: EULA
               value: "true"
             - name: RCON_CMDS_STARTUP
@@ -104,7 +104,6 @@ spec:
                 oWaK0Q19:FIeWE7UC
                 gnOpd0sq:ZzZU3gZb
                 8BmcQJ2H:gFmrC8Ru
-                fPetb5Kh:nFniEtJV
                 ordsPcFz:NrSebcsG
                 T9PomCSv:ZYLSN31S
             - name: MOTD
@@ -214,4 +213,4 @@ spec:
       volumes:
         - name: minecraft-data
           persistentVolumeClaim:
-            claimName: magnet-smp-season1-data
+            claimName: magnet-smp-season2-data
