@@ -107,13 +107,13 @@ spec:
               value: "1.21.1"
             - name: MODRINTH_PROJECTS
               value: |
-                LNytGWDc:6.0.9
-                oWaK0Q19:1.0.3
-                gnOpd0sq:1.0.6
-                8BmcQJ2H:4.8.4
+                LNytGWDc:n7NADxiG
+                oWaK0Q19:FIeWE7UC
+                gnOpd0sq:ZzZU3gZb
+                8BmcQJ2H:gFmrC8Ru
                 ordsPcFz:NrSebcsG
-                T9PomCSv:1.0.6
-                2AIZDfYo:0.5.2+1.21.1-neoforge
+                T9PomCSv:ZYLSN31S
+                2AIZDfYo:SGnkF0Pb
             - name: MOTD
               value: "\u00A79\u00A7lMAGNET SMP\u00A7r \u00A77| \u00A7fSuper strong survival\n\u00A77Pulling players, farms, and shops together"
             - name: ICON
