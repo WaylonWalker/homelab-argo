@@ -98,15 +98,37 @@ spec:
               value: "NEOFORGE"
             - name: VERSION
               value: "1.21.1"
+            - name: MODRINTH_DOWNLOAD_DEPENDENCIES
+              value: "required"
             - name: MODRINTH_PROJECTS
               value: |
-                LNytGWDc:n7NADxiG
-                oWaK0Q19:FIeWE7UC
+                # Create (create) - 6.0.10+mc1.21.1
+                LNytGWDc:UjX6dr61
+                # Create Aeronautics (create-aeronautics) - 1.1.3+mc1.21.1
+                oWaK0Q19:1sv6OtSz
+                # Create: Tradeworks (tradeworks) - 1.0.6
                 gnOpd0sq:ZzZU3gZb
+                # Geckolib (geckolib) - 4.8.4
                 8BmcQJ2H:gFmrC8Ru
+                # Nature's Compass (natures-compass) - 1.21.1-3.4.0-neoforge
                 fPetb5Kh:nFniEtJV
+                # Kotlin for Forge (kotlin-for-forge) - 5.11.0
                 ordsPcFz:NrSebcsG
-                T9PomCSv:ZYLSN31S
+                # Sable (sable) - 1.1.3+mc1.21.1
+                T9PomCSv:g8CObHcP
+                # Farmer's Delight (farmers-delight) - 1.21.1-1.2.11a
+                R2OftAxM:rOESN0jP
+                # Waystones (waystones) - 21.1.30+neoforge-1.21.1
+                LOpKHB2A:ylfzux81
+                # Just Enough Items (JEI) (jei) - 19.27.0.340
+                u6dRKJwZ:YAcQ6elZ
+                # Balm (balm) - 21.0.57+neoforge-1.21.1
+                MBAkmtvl:XC1JUHmA
+                # Create: Dragons Plus (create-dragons-plus) - 1.10.0b
+                dzb1a5WV:ew6gKsnx
+                # Create: Integrated Farming (create-integrated-farming) - 1.2.2
+                9k1pAsfR:DKe4Owf4
+
             - name: MOTD
               value: "\u00A79\u00A7lMAGNET SMP\u00A7r \u00A77| \u00A7fSuper strong survival\n\u00A77Pulling players, farms, and shops together"
             - name: ICON
