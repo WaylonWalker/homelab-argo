@@ -3,6 +3,38 @@ kind: Namespace
 metadata:
   name: forgejo
 ---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: forgejo-db
+  namespace: forgejo
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn-backup
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: forgejo
+      owner: forgejo
+      secret:
+        name: forgejo-db-credentials
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: forgejo-db-credentials
+  namespace: forgejo
+spec:
+  encryptedData:
+    username: AgAb+3w4y7vabESIP7XcnBFcpDStnFFrZYgPfrtK40AaJoTnpFveLK8y/hMQGrHooSfSAOicRqCKq1k+kxS96zo/jOGISYwo4JaMMyjiTKx5hWAMLVMck+rKmj1NDoNBWPV+9MnafLy/VOzRx0mohT+rKUv0bNoXtJfgH6+A9ThbPCkUyovTRdjpqzWA9KmLZSpQwheihJfHeY716E5B2ywyTZNRXOMHAOQoMhktnNW+/HfLe8K6sMYhuA7zEo2ZvXL6l7vLj8OO/4WECkZForQn162rMIyjj5a4klZIGNNIkw2EMk76ZFHzHCqYsgLIAmYJae78nBjkei5iLHn9tw18HqQ3VWEBgIMTFNC9AUTvI3Qecnrd54E4kJnUqLsZzT8shRDFj+iRlyrvCaR7PddlgQ0cLOlL3RUOD+41g9qY2eAwk0sOv0waxKqrrk3LOmoRmRHo1+Z26pMEEIeXqZ829vKLFFuXZ4AB/Ziuobgy0XmI5PTAYWBzV5xwtwL4nA95aSxWZrlXwA6lqaW+2n8MDnGtEKDe73Go5LvgXqq6PXZl5SSj7jOUzvd0s7mpUOb+2aXFj196d9TZIhDnxCyny17fZNLsOwhpURKX8SS8hy7jGBlAkwRfyGkcojlsMeWlwh99ltHhR+261knq6McJJctMwd6bAac+o60M6Iwn+3kR+T55nb+2n3LEvcf4px0jXC6BcIAv
+    password: AgAvbHhBwxzrKJYaVnaNcfeeu5b9GH2j/Se6sMPRs8+kWbztqmLHXwuhYi+uxsXecpY9UDBFuTE42RESVR2PFOuBBYpz+G7xD49erkreSDBUU9JAMOnWjJKpujp9IyurGv6yL8fAQ8Koc0glAqsVuOHYIXltjNBnMEU8CHzLNCfncq2feHz4yMIv2eI+zJ3TUzmoYhxvsHZqrZB9X+FnDOV++C/VVP3UU7G9Py/Sj0w2Bgjq4E2tBnhjkV8J/bbIX6kUPmGGBGDtCl8TC8Ys2476Ru89plEv/Y4RT4ToFWHAk9Vh980zRVDxolNw1WCPJPhGkbXzhJymdA7rWyHFZiVZ0jCfwRMySa2H0+L6VYwd/DkbC38kX7tpiuggoVTDKHsyOsLFk0np84PTA2fnVR7PCCn+8TGyHJISrbxfT5UerDsH3tW/d2EBl5IEahrcpXKv+aEZcZOzfIUvVeFVaZkvZY2h2y0fFmaLxPZSd14vVXjGWmL/DyGMX6jweG5ymfn6OkBjVuQ5yznKpb3UCsJo0LuPKRVDW71Q7AUOhk+uOlcHHt7A5mjMQhAiGmsCxHbziNZivA9pkhNQOsH8R0OF/2ETFlYmTWGdtqbpCsFkBIaHSDODNbm8D72qFx9HCWp8w6N3lS0UuuC0++w1Nb2MHL7Bqh/4ij/Jud0+BEPXOEg7dkevbYkG+Ru8fQHSNbxAbOrocVydDYfITyVsA3SP96HlkBG1B49ephR3NB+W7Q==
+    database: AgBR6oawKRIUEHkGY40oQs4bc7BqBOO3O4sPom1jxobD+3MIkcWxKqvaNTTxo2Ou8GQbtiko3XZAZ2df4OAi+IY7F6WASfLCSmZIB3Ox7jPDalseJD+2kELFlIxk+unSrexCBEF9ptv5aka8LOxO53uj1DYIXXThf/LwWDfALKOpweQ/dueOjAwuOxkYSrQavnyikvdYPcR6RxibQDHGxy3ooV5FZ/XmHS8yfaCbxhfojtCwSiWmD1TjP4kQ3L6giEZNeMpPw3WhNgCQ6FyJ8gA1TOR3ZY3ATJHjsiMV8v+EBrDIQBN6OIsiVvUcqg30jGutClLpv0lIeS2dZXNSfrraG50OSQdho4xXvZCk7JfN1Y66AFje2oMgOXwpdC87lEoW5xascsEmRtjUyih20Cy9tOp7kenQxdTDayR6e5XgNyhFZgSHLBwaVswHthUceLmsxL4zgpcf7UuYhVYvjIjUoepjMduNDFOqfzLqPhMyVhnVFeh0jiMHntyaXJb/sFrToMNR7KEPr+dKqvgZ7JkQ22QgszvnRXR3aHaTLG6bY4v8WWdqJNreiNDV3cmTAWpFh54m476Kb4xVf+J7nSkMlGXMdJ+R3sTUFI1LU9OayhfmwelWV0RG93Op/0Lu4Vx0A8mKpL+NhPRT82uS+RNqNM9SqXdq1Z1a4GUqZ+RGsaqiR7vPk9oZ1Kn2PzIUB1xBriO3XjZr
+  template:
+    metadata:
+      name: forgejo-db-credentials
+      namespace: forgejo
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -59,6 +91,25 @@ spec:
               value: "0.0.0.0"
             - name: FORGEJO__server__HTTP_PORT
               value: "3000"
+            - name: FORGEJO__database__DB_TYPE
+              value: postgres
+            - name: FORGEJO__database__HOST
+              value: forgejo-db-rw.forgejo.svc.cluster.local:5432
+            - name: FORGEJO__database__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-credentials
+                  key: database
+            - name: FORGEJO__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-credentials
+                  key: username
+            - name: FORGEJO__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-db-credentials
+                  key: password
           ports:
             - containerPort: 3000
               name: http
