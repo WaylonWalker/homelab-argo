@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dozzle
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dozzle
+  namespace: dozzle
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dozzle
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/exec", "pods/attach"]
+    verbs: ["create", "get"]
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dozzle
+subjects:
+  - kind: ServiceAccount
+    name: dozzle
+    namespace: dozzle
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dozzle
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dozzle
+  namespace: dozzle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dozzle
+  template:
+    metadata:
+      labels:
+        app: dozzle
+    spec:
+      serviceAccountName: dozzle
+      containers:
+        - name: dozzle
+          image: amir20/dozzle:v10.5.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DOZZLE_MODE
+              value: k8s
+            - name: DOZZLE_ENABLE_SHELL
+              value: "true"
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dozzle
+  namespace: dozzle
+spec:
+  selector:
+    app: dozzle
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: dozzle-basic-auth
+  namespace: dozzle
+spec:
+  basicAuth:
+    secret: dozzle-basic-auth-secret
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dozzle
+  namespace: dozzle
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: dozzle-dozzle-basic-auth@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: dozzle.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dozzle
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - dozzle.wayl.one
+      secretName: dozzle-cert-tls
