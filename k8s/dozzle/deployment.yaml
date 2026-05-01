@@ -60,17 +60,28 @@ spec:
           env:
             - name: DOZZLE_MODE
               value: k8s
+            - name: DOZZLE_AUTH_PROVIDER
+              value: simple
             - name: DOZZLE_ENABLE_SHELL
               value: "true"
           ports:
             - containerPort: 8080
               name: http
+          volumeMounts:
+            - name: dozzle-users
+              mountPath: /data/users.yml
+              subPath: users.yml
+              readOnly: true
           resources:
             requests:
               cpu: 50m
               memory: 128Mi
             limits:
               memory: 512Mi
+      volumes:
+        - name: dozzle-users
+          secret:
+            secretName: dozzle-auth-secret
 ---
 apiVersion: v1
 kind: Service
@@ -85,15 +96,6 @@ spec:
       port: 8080
       targetPort: http
 ---
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: dozzle-basic-auth
-  namespace: dozzle
-spec:
-  basicAuth:
-    secret: dozzle-basic-auth-secret
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -101,7 +103,6 @@ metadata:
   namespace: dozzle
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.middlewares: dozzle-dozzle-basic-auth@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
