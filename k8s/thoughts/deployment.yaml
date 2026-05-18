@@ -1,0 +1,158 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: thoughts
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thoughts
+  namespace: thoughts
+  labels:
+    app: thoughts
+spec:
+  selector:
+    app: thoughts
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thoughts
+  namespace: thoughts
+  labels:
+    app: thoughts
+  annotations:
+    diun.enable: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thoughts
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: thoughts
+      annotations:
+        diun.enable: "true"
+    spec:
+      containers:
+        - name: thoughts
+          image: registry.wayl.one/thoughts:0.0.27
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+              name: http
+              protocol: TCP
+          env:
+            - name: TZ
+              value: America/Chicago
+            - name: DATABASE_URL
+              value: sqlite:////data/database.db
+            - name: ENV
+              value: prod
+          envFrom:
+            - secretRef:
+                name: thoughts-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: cluster-regcred
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: thoughts-data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: thoughts-data
+  namespace: thoughts
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn-backup
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: thoughts
+  namespace: thoughts
+  labels:
+    app: thoughts
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  rules:
+    - host: thoughts.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: thoughts
+                port:
+                  number: 5000
+    - host: thoughts.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: thoughts
+                port:
+                  number: 5000
+  tls:
+    - hosts:
+        - thoughts.wayl.one
+        - thoughts.waylonwalker.com
+      secretName: thoughts-tls
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: thoughts
+  namespace: thoughts
+spec:
+  minAvailable: 0
+  selector:
+    matchLabels:
+      app: thoughts
