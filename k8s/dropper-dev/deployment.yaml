@@ -36,7 +36,7 @@ spec:
         service: dropper-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.14dev37
+        - image: registry.wayl.one/dropper:0.0.14dev38
           imagePullPolicy: IfNotPresent
           name: dropper-wayl-one
           command:
