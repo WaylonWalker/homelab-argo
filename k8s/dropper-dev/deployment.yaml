@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
         - image: registry.wayl.one/dropper:0.0.14dev36
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: dropper-wayl-one
           command:
             - "/bin/bash"
