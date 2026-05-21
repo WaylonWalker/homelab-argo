@@ -46,7 +46,7 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.14dev42
+        - image: registry.wayl.one/dropper:0.0.14dev43
           name: dropper-wayl-one
           command:
             - "uvicorn"
