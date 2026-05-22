@@ -7,20 +7,6 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   # not a backup, but uses a longhorn storage class with backup applied
-  name: magnet-smp-data-backup
-  namespace: magnet-smp
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: longhorn-backup
-  resources:
-    requests:
-      storage: 10Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  # not a backup, but uses a longhorn storage class with backup applied
   name: magnet-smp-season2-data
   namespace: magnet-smp
 spec:
@@ -43,6 +29,10 @@ spec:
     - name: minecraft
       port: 25565
       targetPort: 25565
+      protocol: TCP
+    - name: rcon
+      port: 25575
+      targetPort: 25575
       protocol: TCP
   type: ClusterIP
 ---
@@ -135,13 +125,13 @@ spec:
               value: "http://dropper.wayl.one/file/66047fea-00ac-4a5f-a708-c287be1965d7.webp"
             - name: OVERRIDE_ICON
               value: "true"
-            # - name: RCON_PASSWORD
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: magnet-smp-secret
-            #       key: rcon-password
-            # - name: ENABLE_RCON
-            #   value: "true"
+            - name: RCON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: magnet-smp-secret
+                  key: rcon-password
+            - name: ENABLE_RCON
+              value: "true"
             - name: INIT_MEMORY
               value: "512M"
             - name: MAX_MEMORY
