@@ -66,7 +66,7 @@ spec:
         - name: cluster-regcred
       containers:
         - name: app
-          image: registry.wayl.one/kraft-admin/app:0.3.8
+          image: registry.wayl.one/kraft-admin/app:0.3.9
           imagePullPolicy: Always
           command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
           ports:
