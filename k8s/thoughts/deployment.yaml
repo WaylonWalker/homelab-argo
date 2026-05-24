@@ -17,8 +17,8 @@ spec:
     app: thoughts
   ports:
     - name: http
-      port: 5000
-      targetPort: 5000
+      port: 5400
+      targetPort: 5400
   type: ClusterIP
 
 ---
@@ -51,7 +51,7 @@ spec:
           image: registry.wayl.one/thoughts:0.0.28
           imagePullPolicy: Always
           ports:
-            - containerPort: 5000
+            - containerPort: 5400
               name: http
               protocol: TCP
           env:
@@ -77,13 +77,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 5000
+              port: 5400
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
-              port: 5000
+              port: 5400
             initialDelaySeconds: 10
             periodSeconds: 5
       imagePullSecrets:
@@ -129,7 +129,7 @@ spec:
               service:
                 name: thoughts
                 port:
-                  number: 5000
+                  number: 5400
     - host: thoughts.waylonwalker.com
       http:
         paths:
@@ -139,7 +139,7 @@ spec:
               service:
                 name: thoughts
                 port:
-                  number: 5000
+                  number: 5400
   tls:
     - hosts:
         - thoughts.wayl.one
