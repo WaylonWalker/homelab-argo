@@ -47,7 +47,8 @@ spec:
     spec:
       containers:
         - name: thoughts
-          image: registry.wayl.one/thoughts:0.0.27
+          # image: registry.wayl.one/thoughts:0.0.27
+          image: registry.wayl.one/thoughts:0.0.28
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
@@ -152,7 +153,7 @@ metadata:
   name: thoughts
   namespace: thoughts
 spec:
-  minAvailable: 0
+  minAvailable: 1
   selector:
     matchLabels:
       app: thoughts
