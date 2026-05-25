@@ -48,7 +48,7 @@ spec:
       containers:
         - name: thoughts
           # image: registry.wayl.one/thoughts:0.0.27
-          image: registry.wayl.one/thoughts:0.0.29
+          image: registry.wayl.one/thoughts:0.0.30
           imagePullPolicy: Always
           ports:
             - containerPort: 5400
