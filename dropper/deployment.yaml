@@ -4,6 +4,38 @@ kind: Namespace
 metadata:
   name: dropper
 ---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: dropper-db-credentials
+  namespace: dropper
+spec:
+  encryptedData:
+    database: AgBxip28yCain0q7/tniq03KrR8tE8XM0wfMkQvLjR0z+LSUCt/frx8AFM0iDJYLGQeaoMFzo7+0FqreUp97Ca3BqxyukjjcetJyybv3lb8Ahh3bbsa/EdTmLlb6u4G+FKWzz4AgUC1zCOYTV3Z0FAz67WyqsbLhQO39N3FmY3YkWp2E4bWNPhUYIMBmsUyFcGSULRhRpje8TMftuxh69A9ybWHUmVNjzOlOcXQhnozGKJE48vL0vUY7WSnvfFd8OwLEm+al4arDBP+iXVy0hvxX+h+OwZmY6kejqS/OlZILx04hoBE12LvkvoOqEKPeVFe4cVRnC3b+gtLPRaGhtKhScNDN+VFP86E/yxGP5zkSL4Aq0YE2lnyTglYxCsn8P0+8itkwwtL6yWWNrL8jNJep8asc29+9p8EzeWMOc5Y4zCWp83gIexDW+Sv6iexYQMH5N7S/YL1SBNpV6sEwT7TrEhR+ue/C8+4Cfb6AdXkgjjVt9c0EggeDIx8PtmqUPZol9hIogVnE+g3Gl4OLGbl+APz03EFEf6jzJajNQu+Rrq0IbaW4ZRqUA/HDZW+mY2c79dWi2RuHsVF3PLGCwunc6w9mgiG9pzzLRdbl6LA0NJw8wC4p9uSh5ULCVD4dlhMO32jX1IRXP+yTh/oXqJfHT36rTkCWt4o5XfTJYdh9Zfv6SglYfSdhWFp5AACguaHnHQ35aC3+
+    password: AgCHPLiXa19Uzu6vs1H3+sWAw8nRGRZAwUEItFA6ADnytDok8wzONClCqfiY9MRvdtqaaRFJCnUocmVKnHhnmPQbL0sOfSc691rl0jqadQ2LbUeyNUZ7fIGleweboWPhX1DS8WHOpoWhT2m8oV/Qo1BnkDpTJxgbAyBN5wWfFIEEfmGPl6nUOEZaAncYgeq7S8fQjmbbk2799zRzcPAMuwXX8aegb0W0iG8uSni3XLGVf9YJnurAIkVBkJtvVHLrw2pAam3X00/ShzdnMQqJ7yafNtImtiam+Lb+keq5oV7XMgIpvwDITg5DQi0IiAWoIxMCDBkCfrpJBkL10Kn49JPuHpxw8P6CK7Jgwiq/X7eg44RehexO1iQ136C2PGhTB55FoT9DDCu42NxO4t6KsG0AFeOx6z8dwwJ50fTcV7OO3PvEw8Dz4y/bqec/G964huLKSlqlYIf+9AYTZpWDxoRNrHfFapaC7u2GJt2DxcxE2cCJ9Uve4bh6CJcYHO25H/77QbG9HLVrRr7D54okejopVdZEP7p/lvgxvPqDZnB+i/ETMQK0T6vpnYvEBeZCJaKhH2gc3lnURncMS5X9pn8mlLv1yjmby/1zLldAlvju1ciraiPQ42Fop7sL7UTIrceFB0et/2bfxYzvsbAYqktSD0YR4MPX00nhw3BwD7D1vghQO3wYoRaN6eD9y5zH/k8nx49gnZ5L+Vx8kf1vcWXfElU99QlfkgDxY6HrmQcuEG1uitQ2fpQwHu+Nia2Obv0=
+    username: AgBEipvuK0iYFgqN0FWp+HBy27gl8mIu9F2uq47pGaYWQSPm6DrllqRv+UPZf3loKP8j62J5dNUUmzG0fM+1tXnJkmyfx1SqD2U+4XNJlqYeQDx6q6tDJw+x8czuKEYqrVvicgrbnk0M3Ebj7J9EcG2aovpgxxOySbKSFpIg6rnrGwU9kHCh037lAk5w7egdxDmiBBBF9o8JR3CxJMB16l+GLRSz744muliGXlwU8PwQJ77lL5GDo9/vW0GEinp7Gjxeyt5hj1rDRtlPliSS8TYoFLprzUHbp/wPuIRYDpDYITtdxcaTJyaQkaUlxrivSYcpKn1590jK5UW63/Y4FjcRcZtUq+DD9XZSPqgkU2tL2mi44uvRpXPHNUXyEv3hF/fDpINeuCl/vU9PDDcmKdYvSDyg1atO58Oez0tb2BBXnxsaziti3i7vH4l8zjnGX/YQv+DUz1VHZAnzc954pXSgFMujidc6vFTjeVw69sXqE9ZdEBieLy5AgW1B+WnMob7TDwU9Y9A9pPyv6eQkQumdWy5FLfCwcpFxy+q6q3EX/JMKI1YFKVA3gLpywarmcrKZjv6JKzLt3F4gxxBGTnexB4DbPDg19mgSHbg1V6KBQTo1Gwjo+/uaeX2YG0xapXHgrvkCwP1ttnEuZ99P4wvQJeSkjGyNN98qmloW9Q0LZcRf6wM6+7olXpfjpO8yjk9tAPrPHpD7
+  template:
+    metadata:
+      name: dropper-db-credentials
+      namespace: dropper
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: dropper-db
+  namespace: dropper
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn-backup
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: dropper
+      owner: dropper
+      secret:
+        name: dropper-db-credentials
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -46,17 +78,15 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.15
+        - image: registry.wayl.one/dropper:0.0.16
           name: dropper-wayl-one
           command:
-            - "uvicorn"
-            - "dropper.api.main:app"
-            - "--host"
-            - "0.0.0.0"
-            - "--port"
-            - "8000"
-            - "--workers"
-            - "1"
+            - "/bin/sh"
+            - "-c"
+          args:
+            - >-
+              alembic upgrade head &&
+              uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 1
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -112,6 +142,23 @@ spec:
                   key: BACKEND_CORS_ORIGINS
             - name: AWS_ENDPOINT_URL
               value: "https://minio.wayl.one"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dropper-db-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dropper-db-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: dropper-db-credentials
+                  key: database
+            - name: DROPPER_DATABASE_URL
+              value: "postgresql+psycopg://$(DB_USER):$(DB_PASSWORD)@dropper-db-rw.dropper.svc.cluster.local:5432/$(DB_NAME)"
             - name: DROPPER_STORAGE_DIR
               value: /data
             - name: DROPPER_CACHE_DIR
@@ -224,6 +271,23 @@ spec:
                       key: BACKEND_CORS_ORIGINS
                 - name: AWS_ENDPOINT_URL
                   value: "https://minio.wayl.one"
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: dropper-db-credentials
+                      key: username
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: dropper-db-credentials
+                      key: password
+                - name: DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: dropper-db-credentials
+                      key: database
+                - name: DROPPER_DATABASE_URL
+                  value: "postgresql+psycopg://$(DB_USER):$(DB_PASSWORD)@dropper-db-rw.dropper.svc.cluster.local:5432/$(DB_NAME)"
                 - name: DROPPER_STORAGE_DIR
                   value: /data
                 - name: DROPPER_CACHE_DIR

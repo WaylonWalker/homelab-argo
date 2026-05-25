@@ -18,6 +18,38 @@ kind: Namespace
 metadata:
   name: dropper-dev
 ---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: dropper-db-credentials
+  namespace: dropper-dev
+spec:
+  encryptedData:
+    database: AgCKCrw5dgHlnYcpoTSDr87SP1jZCG/jUkBfn1LKyRw63+ukTlkpHbEvxBYHcBcK7sRfixEMV3G0r4TSMtvtsMMezvap+c77d8LXVn6H9Iip8TQVDvtSz2b2wtoJuRbSZTjrIkZCOer/y0h9ME7fBBZnraUT8tMo1P/t7ID+tiNn10iob3RkMOO7vq3cVnHl/7XlHn+okTK5556CWzkeZ51IH/ofIhR0O7dSvunJBiG2C/58/c2fjSjnomfwz+xi/qzAc3FaDWYagEhrspJL3XsnTEIlcD49sZOEp7hcwFUROZB7lNaU5W9TFKm4CACH2I2n+Q2SGj23XaLDhG5DlsvuyxpGSeFRvaD3NyaDFyB093Wtjyp55z6Y1+V587V7CghPWTu9MOh+kctH/ClnOZeVNV7eEyvEyhTQTwAxeroGgCQe1zeu5R8V0djGifVQSDXmZ3qLb8WifrL+oPg67mnrZefO2P+HSNFGH+RXyw/etB386+8YbyOjj4xl6ZYhiLpz9SLRY23y9JPtW4WVWtip0nuw3bxAZfvwxmMNdk6CpNfmYdzWUdQo3ddceA1bIu8bRnpd4kXIOl4tehcfOYC94SzraFWJoFu/LPq4+KCLQNgsuMzeLIBIA6p3TsSzsHdFXd//EEvI5uOmE/KS6v+P//pce+xFStQIiXLelLXVTA+ZSr2fLNHgKVwbZoCEyMfw0VX2lUN4
+    password: AgAg7WnRbukUFTk6vRixV26qBsce/rFeERHuszCj/9jsYPl6v2036zXRTonykNkxdnBOeJn+l2MoH5EfRbNef+OqMKZXOIQyuZSCW7BSRYUYIkMfBv8TXWxYK6sNRfov2tKWZsrYw/w+YDxzGYA8kOZT/xtQD/WPIOaCXdbP6n2zWHvEuhnnOECNagC0AvmZjD0ob20RuczpVJh7OZeAKTfioYuB2ZbK9zGatAHnPzKBOF65ml5OMtlszxDNJKYWWvvQ/q/+PNeV2+EgpzrwPG4iMO15gWdXxXWg9lKCBjr2EUFrDzB6cjj/9dyATVpjR0BhG+JSg+oRjay+QfWOqCcLw3HT8ku3g3yoeDJdwiXAk2LEVYucI20dnePh8CU4C+cLufUDlE6VeCotXaL/3+shoPvMO0xS9Fs7SNB5Xzgky2xiBjlxMC46h8dWlWKFUw8D8c/IqMS6lpbZm2FNdxbrTKmYSYBaRMoSiMjVe6H6cUfNOHhxBrIhQjQNQ7pkgnVHjmhVV8KJ8AT9/3xpCYBSAWnVOKgeZR0Eud9dT/YMxqx+wZcp0GGKlvZlYD0u4DmkfLYYMvmehrqA2YKamAbdx4cK2K5PlDXsNipJyxm/3slWUrTZJvoVpSb0bDa1WCxwyjuDteqHaHj6YsYnlE0J0UzLVhN/xob8+f6GvuDLXUDThb0HYqdoR9awVzYYNvG1nvo8OX2J9iPAcNnhbAeuYInDaLUi8dRS6gTtgO2BQ/LutnhELNljFvZaUkoyquI=
+    username: AgBzX4GrByb9OqzRPo+SlYZRVEm8LT3hC8PPTA+au+ghne2XhG5nA4rdU6q/p9TlzhYxD1NiqrYvfZG1jnH6TIeDxLgBKTAUTNh24U9IyUvStb03YWv03Rcx0q/sYKRGv25NB5Di8BjIamCUKsen67hNqc/Xyon/rEAReZm0gRCjdy0heEqAgbuQOzrkM26ialLTSIXzN54XWAS1W3FEBELP2DvfTJbjmInV+AtokvMI/+Bns5Z0lZoxUqJQgHMzwmQHupTO3cBEpCsBa5pf8GyNRlXAMvF6pp4Y5QW2JQg99NG2b9GQCGpcybllGD2wz8BhQ2m8O8c1Wss7995razs1Dx9xMWFUcfvTH6dHFBhSqCKjbOWtjDmx//yoYsQExG8CqJgu/VMoyhu2jgfIpjLK5qRi51rp6DkKsjmcd2zkcwAK4izwhQNVGfuH8ueXOSK3yr73wN+CcvbTmEZoyYAER5XpJdG6fXcAG56bU0szaTEIl58BDMXDwUoIXAznfIFjrbkMZekWP6GZZvlMsiSyuFJ9r7OuKxrlfyPfJA+0JF6FkhB9gCCEHb88aITbbTiFxRgiRpztYEqwXkd3h90RHH70Ex9BebHlaAEWrbxMKs42ihUvj/RNu3KOQH8Eyjp6Ymc85Rih0sioHtrxsN/Ss/BuNee4KsMkeScOdh4eH0enocymkHxWDAMfMGA0qQ0eAtDoa8br
+  template:
+    metadata:
+      name: dropper-db-credentials
+      namespace: dropper-dev
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: dropper-db
+  namespace: dropper-dev
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn-backup
+    size: 5Gi
+  bootstrap:
+    initdb:
+      database: dropper
+      owner: dropper
+      secret:
+        name: dropper-db-credentials
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -36,18 +68,16 @@ spec:
         service: dropper-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.15
+        - image: registry.wayl.one/dropper:0.0.16
           imagePullPolicy: IfNotPresent
           name: dropper-wayl-one
           command:
-            - "uvicorn"
-            - "dropper.api.main:app"
-            - "--host"
-            - "0.0.0.0"
-            - "--port"
-            - "8000"
-            - "--workers"
-            - "1"
+            - "/bin/sh"
+            - "-c"
+          args:
+            - >-
+              alembic upgrade head &&
+              uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 1
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -75,6 +105,23 @@ spec:
             limits:
               cpu: "500m"
           env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dropper-db-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dropper-db-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: dropper-db-credentials
+                  key: database
+            - name: DROPPER_DATABASE_URL
+              value: "postgresql+psycopg://$(DB_USER):$(DB_PASSWORD)@dropper-db-rw.dropper-dev.svc.cluster.local:5432/$(DB_NAME)"
             - name: DROPPER_STORAGE_DIR
               value: /data
             - name: DROPPER_CACHE_DIR
