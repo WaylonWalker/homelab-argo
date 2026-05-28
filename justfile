@@ -114,6 +114,54 @@ magnet-smp-playit-secret-from-clipboard:
 
     echo "Created k8s/magnet-smp/magnet-smp-playit-sealed-secret.yaml"
 
+seal-thoughts-dropper-pat:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    printf '%s\n' \
+      'Open Dropper in your browser and create a personal access token.' \
+      '' \
+      'Suggested steps:' \
+      '1. Sign in to https://dropper.wayl.one' \
+      '2. Open the auth or token management page' \
+      '3. Create a PAT for Thoughts uploads' \
+      '4. Copy the PAT to your clipboard' \
+      '' \
+      'Press Enter after the PAT is on your clipboard.'
+    read -r
+
+    if command -v wl-paste >/dev/null 2>&1; then
+      clipboard_cmd=(wl-paste --no-newline)
+    elif command -v xclip >/dev/null 2>&1; then
+      clipboard_cmd=(xclip -selection clipboard -o)
+    elif command -v xsel >/dev/null 2>&1; then
+      clipboard_cmd=(xsel --clipboard --output)
+    else
+      echo "No clipboard tool found. Install wl-clipboard, xclip, or xsel." >&2
+      exit 1
+    fi
+
+    pat="$(${clipboard_cmd[@]})"
+    if [[ -z "$pat" ]]; then
+      echo "Clipboard is empty." >&2
+      exit 1
+    fi
+
+    mkdir -p private/thoughts
+    mkdir -p k8s/thoughts
+
+    printf '%s' "$pat" | kubectl create secret generic thoughts-dropper-pat \
+      --namespace thoughts \
+      --from-file=DROPPER_TOKEN=/dev/stdin \
+      --dry-run=client -o yaml > private/thoughts/thoughts-dropper-pat.yaml
+
+    kubeseal -f private/thoughts/thoughts-dropper-pat.yaml \
+      -w k8s/thoughts/sealed-thoughts-dropper-pat.yaml \
+      --namespace thoughts \
+      --name thoughts-dropper-pat
+
+    echo "Created k8s/thoughts/sealed-thoughts-dropper-pat.yaml"
+
 seal-posse-party:
     #!/usr/bin/env bash
     set -euo pipefail
