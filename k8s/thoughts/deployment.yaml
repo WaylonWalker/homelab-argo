@@ -58,11 +58,16 @@ spec:
               value: America/Chicago
             - name: DATABASE_URL
               value: sqlite:////data/database.db
+            - name: DROPPER_URL
+              value: https://dropper.wayl.one
             - name: ENV
               value: prod
           envFrom:
             - secretRef:
                 name: thoughts-secret
+            - secretRef:
+                name: thoughts-dropper-pat
+                optional: true
           resources:
             requests:
               cpu: "100m"

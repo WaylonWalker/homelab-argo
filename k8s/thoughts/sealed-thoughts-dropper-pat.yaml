@@ -1,0 +1,13 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: thoughts-dropper-pat
+  namespace: thoughts
+spec:
+  encryptedData:
+    DROPPER_TOKEN: AgAkR2qDW9uV+tV1PU8DzZHhw46y3Q8/uf9pNjshvXUQ3a80em8TGvFX3sJIgDlhUl1q5ib+hHj2U1yW4vJ/Q5Kmb4OTQEOPfL0ZepYkAeMnWPGA64QCaqGsMlhXoazCYxwl0y6LDjrDx7oiQB2jSg87GLNq5WFSNFg7li3rD0wlvK6BNPF+l3HE/3bgLwiiMTu8KKnDWX8HSTYfjtfd3Cq+gxShbcfqA+555ahE1eZKoF3s++41cnG5Y4taEBE0bBIVEykcKRKdMMuZ/tH/OinKOH/77BB2DAm1DnJOmjKUdF9cQVT532JIWzvOAYuI/piqdcGkrNxGoRA01UiEYTGH7vSdIwz7VMcXXDAwcYK2UUTeyxYT8FRIIG/OnNIpiwE6IcmuGSuIDCCwSY3NtQS0HMqR2dwIbn8mmls3/1ebmshnbw+KOp0UcPuvVOfqUTVJFhz7nQoMb+ea1FjYdb5Z8fi9w65vwanHdEacSlF4EVn6peUevj3T2XnypI/BFX9XVSPlkZteWiRQqcqmfPjGm4lUK7tDEDQGrkRho8wW5nEu7+2aboSDaQ2aMOAXzz3OFJ1ONtgYMHdzXcLbR/SZCLyOJoGvgRoWDQzLfg0EmWU6zDxm6HiBcaF1/zpzVFiOGngNGjvxa/YzNwlsZP1MPgYm033hoF6z/RwrP31ot4oR2K8UOQSqIeoGddcUC0ONIaX7dDAONr54uLF2QD9sCoP/IN49B4xV8b8bEvDsCRClNfFTQ8rOy1Ljisof9no9M7vA7fFqzw==
+  template:
+    metadata:
+      name: thoughts-dropper-pat
+      namespace: thoughts
