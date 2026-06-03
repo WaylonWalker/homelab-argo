@@ -78,7 +78,7 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.28
+        - image: registry.wayl.one/dropper:0.0.31
           name: dropper-wayl-one
           command:
             - "/bin/sh"
