@@ -102,8 +102,10 @@ spec:
           resources:
             requests:
               cpu: "200m"
+              memory: "1Gi"
             limits:
               cpu: "500m"
+              memory: "4Gi"
           env:
             - name: DB_USER
               valueFrom:
@@ -127,7 +129,7 @@ spec:
             - name: DROPPER_CACHE_DIR
               value: /cache
             - name: DROPPER_DEFAULT_MEDIA_VARIANTS
-              value: "600x,400x"
+              value: ","
           volumeMounts:
             - mountPath: /data
               name: dropper-data
