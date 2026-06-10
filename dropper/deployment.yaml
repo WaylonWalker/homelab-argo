@@ -164,7 +164,7 @@ spec:
             - name: DROPPER_CACHE_DIR
               value: /cache
             - name: DROPPER_DEFAULT_MEDIA_VARIANTS
-              value: ","
+              value: "600x,400x"
           volumeMounts:
             - mountPath: /data
               name: dropper-data
