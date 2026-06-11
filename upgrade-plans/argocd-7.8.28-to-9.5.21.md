@@ -50,6 +50,14 @@ Do not continue until all success criteria are met.
 
 ## Step 2: Add self-upgrade safety before crossing into Argo CD 3.3+
 
+Status: Complete (2026-06-11)
+
+Notes:
+- Added `ServerSideApply=true` to the self-managed `argocd` Application.
+- After enabling SSA, Argo CD `v2.14.11` hit a compare error on Kubernetes `1.35` for `Deployment.status.terminatingReplicas`.
+- Recovered the app by setting `resource.compareoptions: ignoreResourceStatusField: all`, then synced successfully.
+- Final Step 2 state: `argocd` is `Synced` and `Healthy`, and all Argo CD pods are ready.
+
 Why this matters:
 
 - Argo CD `3.3+` requires server-side apply for safe self-management because the `ApplicationSet` CRD exceeds client-side apply size limits.
@@ -77,6 +85,13 @@ Success criteria:
 Do not continue until all success criteria are met.
 
 ## Step 3: Make resource tracking behavior explicit
+
+Status: Complete (2026-06-11)
+
+Notes:
+- Added `configs.cm.application.resourceTrackingMethod: label` in Git.
+- Committed the compare-options stabilization alongside this change so the SSA recovery remains declarative.
+- Verified the self-managed `argocd` app returned to `Synced` and `Healthy` on chart `7.8.28` after sync.
 
 Why this matters:
 
