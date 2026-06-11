@@ -15,6 +15,10 @@ spec:
         global:
           domain: argocd.wayl.one
         configs:
+          cm:
+            application.resourceTrackingMethod: label
+            resource.compareoptions: |
+              ignoreResourceStatusField: all
           params:
             "server.insecure": true
         server:
