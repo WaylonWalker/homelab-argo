@@ -16,7 +16,7 @@ spec:
           domain: argocd.wayl.one
         configs:
           cm:
-            application.resourceTrackingMethod: label
+            application.resourceTrackingMethod: annotation
             resource.compareoptions: |
               ignoreResourceStatusField: all
           params:
