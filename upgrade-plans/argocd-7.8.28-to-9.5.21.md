@@ -126,6 +126,8 @@ Do not continue until all success criteria are met.
 
 ## Step 4: Upgrade through checkpoints instead of one jump
 
+Status: Complete (2026-06-11)
+
 Current checkpoint status (2026-06-11):
 - `7.9.1` is applied in Git and the Argo CD pods rolled successfully.
 - UI access and CLI login still work at this checkpoint.
@@ -196,6 +198,14 @@ Do not continue until all success criteria are met.
 
 ## Step 6: Watch for CronJob health changes on Argo CD 3.2+
 
+Status: Complete (2026-06-11)
+
+Notes:
+- Reviewed live CronJob-backed apps after reaching Argo CD `3.2+` and final target `3.4.3`.
+- Found CronJobs in live app manifests including `reader`, `waylonwalker-com`, `redis`, `dropper`, and `shots`.
+- No reviewed live application is unexpectedly `Degraded` because of CronJob health evaluation.
+- No `ignore-healthcheck` annotations were required for the currently reviewed live apps.
+
 Why this matters:
 
 - Argo CD `3.2+` adds built-in CronJob health logic.
@@ -229,6 +239,14 @@ Success criteria:
 Do not continue until all success criteria are met.
 
 ## Step 7: Deliberately switch resource tracking from labels to annotations
+
+Status: In Progress (2026-06-11)
+
+Notes:
+- Switched `application.resourceTrackingMethod` in Git from `label` to `annotation` and synced the self-managed `argocd` app.
+- Confirmed annotation tracking on Argo CD core resources such as `argocd-cm` and `argocd-server`.
+- Confirmed annotation tracking on at least one explicitly re-synced child app resource: `reader` `CronJob/reader-cronjob`.
+- A broad explicit sync pass across managed apps has started, but full restamp/orphan verification is still in progress.
 
 Why this matters:
 
