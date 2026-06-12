@@ -126,6 +126,12 @@ Do not continue until all success criteria are met.
 
 ## Step 4: Upgrade through checkpoints instead of one jump
 
+Current checkpoint status (2026-06-11):
+- `7.9.1` is applied in Git and the Argo CD pods rolled successfully.
+- UI access and CLI login still work at this checkpoint.
+- Blocked on Argo CD `v2.14.11` self-sync behavior with `ServerSideApply=true`: the `argocd-redis-secret-init` PreSync hook completes in Kubernetes but remains `Running` in Argo CD status, leaving the `argocd` app `OutOfSync`.
+- This matches a known Argo CD `2.14.x` + SSA hook bug pattern; the checkpoint is not complete yet.
+
 Why this matters:
 
 - The chart recommends a multi-step path.

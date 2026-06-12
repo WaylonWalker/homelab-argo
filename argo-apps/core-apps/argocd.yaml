@@ -24,7 +24,7 @@ spec:
         server:
           ingress:
             enabled: true
-    targetRevision: 7.9.1
+    targetRevision: 8.0.17
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
