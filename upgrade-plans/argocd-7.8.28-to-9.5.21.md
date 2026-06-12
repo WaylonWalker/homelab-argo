@@ -240,13 +240,14 @@ Do not continue until all success criteria are met.
 
 ## Step 7: Deliberately switch resource tracking from labels to annotations
 
-Status: In Progress (2026-06-11)
+Status: Complete (2026-06-11)
 
 Notes:
 - Switched `application.resourceTrackingMethod` in Git from `label` to `annotation` and synced the self-managed `argocd` app.
 - Confirmed annotation tracking on Argo CD core resources such as `argocd-cm` and `argocd-server`.
-- Confirmed annotation tracking on at least one explicitly re-synced child app resource: `reader` `CronJob/reader-cronjob`.
-- A broad explicit sync pass across managed apps has started, but full restamp/orphan verification is still in progress.
+- Confirmed annotation tracking on explicitly re-synced child app resources including `reader/reader-cronjob`, `waylonwalker-com/waylonwalker-com-cronjob`, `shot/shot-wayl-one-cleanup`, and `redis/redis-backup`.
+- Ran explicit sync passes across managed applications after the tracking change.
+- No unexpected orphaning was observed during the explicit sync pass; representative apps remained manageable and healthy.
 
 Why this matters:
 
@@ -276,6 +277,13 @@ Do not continue until all success criteria are met.
 
 ## Step 8: Review new behavior and useful features
 
+Status: Complete (2026-06-11)
+
+Notes:
+- Verified `cloudnative-pg-operator` is `Synced` and `Healthy` with useful built-in health reporting under Argo CD `3.4.3`.
+- No unexpected live app degradation was introduced by the new health or diff defaults during the upgrade.
+- Existing non-upgrade app drift remains visible in app listings (`argo-token`, `build`, `longhorn`, `system-upgrade-controller`, `waylonwalker-com`, `headlamp`, `whoami`), indicating important drift is not being silently hidden.
+
 Instructions:
 
 1. Verify CloudNativePG app health now reports correctly using Argo CD built-in health checks.
@@ -292,6 +300,13 @@ Do not continue until all success criteria are met.
 
 ## Step 9: Clean up temporary compatibility settings
 
+Status: Complete (2026-06-11)
+
+Notes:
+- Removed the temporary `resource.compareoptions: ignoreResourceStatusField: all` stabilization setting after reaching steady-state on Argo CD `3.4.3`.
+- Kept `ServerSideApply=true` on the self-managed Argo CD app.
+- Left resource tracking in the intended steady state: `annotation`.
+
 Instructions:
 
 1. Remove any temporary stabilization setting that is no longer needed.
@@ -306,6 +321,18 @@ Success criteria:
 Do not continue until all success criteria are met.
 
 ## Step 10: Final steady-state verification
+
+Status: Complete (2026-06-11)
+
+Notes:
+- Final versions verified: chart `9.5.21`, app `v3.4.3`.
+- `argocd`, `1-core-apps`, and `1-apps` are `Synced` and `Healthy` at the end of the upgrade.
+- All Argo CD pods are ready after the final reconciliation.
+- Reviewed recent `application-controller`, `server`, and `repo-server` logs.
+- Noted transient warnings during migration:
+  - temporary compare failures for `headlamp` and `whoami`
+  - repeated transient hook-state failures around `argocd-redis-secret-init`
+- Those warnings did not remain unresolved in the final Argo CD application state.
 
 Instructions:
 
