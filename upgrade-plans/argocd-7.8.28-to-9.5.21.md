@@ -134,6 +134,9 @@ Current checkpoint status (2026-06-11):
 - Per operator instruction, continued forward to `8.0.17` instead of waiting indefinitely on the incomplete `7.9.1` gate.
 - `8.0.17` completed successfully after terminating the stale `7.9.1` operation and re-running sync.
 - Verified at `8.0.17`: chart `8.0.17`, app version `v3.0.6`, `argocd` app `Synced` and `Healthy`, UI access working, CLI login working, no CRD sync errors.
+- `8.6.4` initially stalled on the same pre-sync hook family, this time with the `argocd-redis-secret-init` Job reported as `Pending deletion` even though the Job object was already gone from Kubernetes.
+- `8.6.4` completed successfully after terminating the stale operation and re-running sync.
+- Verified at `8.6.4`: chart `8.6.4`, app version `v3.1.8`, `argocd` app `Synced` and `Healthy`, UI access working, CLI login working, no CRD sync errors.
 
 Why this matters:
 
