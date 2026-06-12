@@ -137,6 +137,8 @@ Current checkpoint status (2026-06-11):
 - `8.6.4` initially stalled on the same pre-sync hook family, this time with the `argocd-redis-secret-init` Job reported as `Pending deletion` even though the Job object was already gone from Kubernetes.
 - `8.6.4` completed successfully after terminating the stale operation and re-running sync.
 - Verified at `8.6.4`: chart `8.6.4`, app version `v3.1.8`, `argocd` app `Synced` and `Healthy`, UI access working, CLI login working, no CRD sync errors.
+- `9.0.6` synced successfully on the first retry cycle after the parent app applied the new target revision.
+- Verified at `9.0.6`: chart `9.0.6`, app version `v3.1.9`, `argocd` app `Synced` and `Healthy`, UI access working, CLI login working, no CRD sync errors.
 
 Why this matters:
 
