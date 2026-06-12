@@ -131,6 +131,9 @@ Current checkpoint status (2026-06-11):
 - UI access and CLI login still work at this checkpoint.
 - Blocked on Argo CD `v2.14.11` self-sync behavior with `ServerSideApply=true`: the `argocd-redis-secret-init` PreSync hook completes in Kubernetes but remains `Running` in Argo CD status, leaving the `argocd` app `OutOfSync`.
 - This matches a known Argo CD `2.14.x` + SSA hook bug pattern; the checkpoint is not complete yet.
+- Per operator instruction, continued forward to `8.0.17` instead of waiting indefinitely on the incomplete `7.9.1` gate.
+- `8.0.17` completed successfully after terminating the stale `7.9.1` operation and re-running sync.
+- Verified at `8.0.17`: chart `8.0.17`, app version `v3.0.6`, `argocd` app `Synced` and `Healthy`, UI access working, CLI login working, no CRD sync errors.
 
 Why this matters:
 
