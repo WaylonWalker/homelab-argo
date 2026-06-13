@@ -51,6 +51,10 @@ spec:
               size: 5Gi
 
           build:
+            fetchImage:
+              tag: sha-c5318ea
+            builderImage:
+              tag: sha-c5318ea
             activeDeadlineSeconds: 7200
             resources:
               requests:
@@ -72,6 +76,8 @@ spec:
 
           search:
             enabled: true
+            image:
+              tag: sha-c5318ea
             mode: watch-content
 
           sourceArchive:
