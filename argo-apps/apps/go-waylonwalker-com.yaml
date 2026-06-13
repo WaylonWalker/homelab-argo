@@ -51,6 +51,7 @@ spec:
               size: 5Gi
 
           build:
+            activeDeadlineSeconds: 7200
             extraEnv:
               - name: MARKATA_GO_URL
                 value: "https://go.waylonwalker.com"
