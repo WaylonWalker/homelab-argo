@@ -52,7 +52,17 @@ spec:
 
           build:
             activeDeadlineSeconds: 7200
+            resources:
+              requests:
+                cpu: 100m
+                memory: 2Gi
+                ephemeral-storage: 1Gi
+              limits:
+                memory: 6Gi
+                ephemeral-storage: 4Gi
             extraEnv:
+              - name: MARKATA_GO_CONCURRENCY
+                value: "1"
               - name: MARKATA_GO_URL
                 value: "https://go.waylonwalker.com"
               - name: MARKATA_GO_SEARCH_ENDPOINT
