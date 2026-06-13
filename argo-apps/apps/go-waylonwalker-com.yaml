@@ -22,6 +22,9 @@ spec:
           nodeSelector:
             kubernetes.io/hostname: falcon3
 
+          offline:
+            enabled: false
+
           ingress:
             host: go.waylonwalker.com
             ingressClassName: traefik
