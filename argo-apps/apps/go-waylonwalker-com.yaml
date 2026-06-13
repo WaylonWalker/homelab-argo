@@ -19,6 +19,9 @@ spec:
 
           imagePullSecrets: []
 
+          nodeSelector:
+            kubernetes.io/hostname: falcon3
+
           ingress:
             host: go.waylonwalker.com
             ingressClassName: traefik
