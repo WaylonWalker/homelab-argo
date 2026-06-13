@@ -67,6 +67,8 @@ spec:
                 value: "https://go.waylonwalker.com"
               - name: MARKATA_GO_SEARCH_ENDPOINT
                 value: "https://go.waylonwalker.com/api/search"
+              - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
+                value: "https://go.waylonwalker.com/api/search"
 
           search:
             enabled: true
