@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: go-waylonwalker-com
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
+      targetRevision: HEAD
+      path: waylonwalker-com/go-waylonwalker-com
+    - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
+      targetRevision: main
+      path: helm-chart
+      helm:
+        values: |
+          project_identifier: go-waylonwalker-com
+          project_name: waylonwalker-com
+
+          imagePullSecrets: []
+
+          ingress:
+            host: go.waylonwalker.com
+            ingressClassName: traefik
+            tls:
+              enabled: true
+              secretName: go-waylonwalker-com-tls
+
+          markataEncryption:
+            secretName: markata-go-encryption
+
+          aws:
+            existingSecretName: ""
+
+          storage:
+            source:
+              mode: hostPath
+              hostPath:
+                path: /mnt/main/walkershare/waylon/vaults/go.waylonwalker.com
+                type: Directory
+            site:
+              mode: hostPath
+              hostPath:
+                path: /mnt/main/walkershare/waylon/sites/go.waylonwalker.com
+                type: DirectoryOrCreate
+            search:
+              storageClassName: longhorn
+              size: 5Gi
+
+          build:
+            extraEnv:
+              - name: MARKATA_GO_URL
+                value: "https://go.waylonwalker.com"
+              - name: MARKATA_GO_SEARCH_ENDPOINT
+                value: "https://go.waylonwalker.com/api/search"
+
+          search:
+            enabled: true
+            mode: watch-content
+
+          sourceArchive:
+            bucket: unused-in-hostpath-mode
+            location: /unused-in-hostpath-mode
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: go-waylonwalker-com-notes
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
