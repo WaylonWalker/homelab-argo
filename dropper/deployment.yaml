@@ -86,7 +86,7 @@ spec:
           args:
             - >-
               alembic upgrade head &&
-              uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 1
+              uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 2
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -96,18 +96,27 @@ spec:
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10
-            timeoutSeconds: 2
+            timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 3
+            failureThreshold: 6
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 30
           livenessProbe:
             httpGet:
               path: /health
               port: 8000
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 20
-            timeoutSeconds: 3
+            timeoutSeconds: 5
             successThreshold: 1
-            failureThreshold: 3
+            failureThreshold: 6
           resources:
             requests:
               cpu: "200m"
