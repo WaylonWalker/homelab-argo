@@ -261,7 +261,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-dns
     kompose.cmd: kompose convert -o deployment.yaml -n registry --replicas 4
     kompose.image-pull-secret: regcred
     kompose.service.expose: registry-ui.wayl.one
