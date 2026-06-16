@@ -176,9 +176,8 @@ metadata:
   namespace: forgejo
   labels:
     service: forgejo
-    # If you're using cert-manager, you can add annotations like:
-    # annotations:
-    #   cert-manager.io/cluster-issuer: letsencrypt-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
   ingressClassName: traefik
   tls:
