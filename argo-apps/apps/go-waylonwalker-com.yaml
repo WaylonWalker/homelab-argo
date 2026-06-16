@@ -55,9 +55,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-b2519f3
+              tag: sha-c127c0f
             builderImage:
-              tag: sha-b2519f3
+              tag: sha-c127c0f
             activeDeadlineSeconds: 7200
             resources:
               requests:
@@ -80,7 +80,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-b2519f3
+              tag: sha-c127c0f
             mode: watch-content
 
           sourceArchive:
