@@ -162,6 +162,73 @@ seal-thoughts-dropper-pat:
 
     echo "Created k8s/thoughts/sealed-thoughts-dropper-pat.yaml"
 
+update-cloudflare-api-token-cert-manager:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    printf '%s\n' \
+      'Create a Cloudflare API token for cert-manager DNS-01:' \
+      '' \
+      '1. Open https://dash.cloudflare.com/profile/api-tokens' \
+      '2. Click Create Token' \
+      '3. Click Create Custom Token' \
+      '4. Name it cert-manager-dns01' \
+      '5. Set permissions:' \
+      '   - Zone:DNS:Edit' \
+      '   - Zone:Zone:Read' \
+      '6. Set Zone Resources to Include -> Specific zone -> waylonwalker.com' \
+      '7. Create the token and copy it to your clipboard' \
+      '' \
+      'References:' \
+      '  - https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/' \
+      '  - https://dash.cloudflare.com/profile/api-tokens' \
+      '' \
+      'Press Enter to continue'
+    read -r
+
+    if command -v wl-paste >/dev/null 2>&1; then
+      clipboard_cmd=(wl-paste --no-newline)
+    elif command -v xclip >/dev/null 2>&1; then
+      clipboard_cmd=(xclip -selection clipboard -o)
+    elif command -v xsel >/dev/null 2>&1; then
+      clipboard_cmd=(xsel --clipboard --output)
+    elif command -v pbpaste >/dev/null 2>&1; then
+      clipboard_cmd=(pbpaste)
+    else
+      echo "No clipboard tool found. Install wl-clipboard, xclip, xsel, or use pbpaste on macOS." >&2
+      exit 1
+    fi
+
+    token="$("${clipboard_cmd[@]}")"
+    if [[ -z "$token" ]]; then
+      echo "Clipboard is empty." >&2
+      exit 1
+    fi
+
+    mkdir -p k8s/cert-manager
+    tmp_secret="$(mktemp)"
+    trap 'rm -f "$tmp_secret"' EXIT
+
+    kubectl create secret generic cloudflare-api-token-secret \
+      --namespace cert-manager \
+      --from-literal=api-token="$token" \
+      --dry-run=client -o yaml > "$tmp_secret"
+
+    kubeseal -f "$tmp_secret" \
+      -w k8s/cert-manager/cloudflare-api-token-sealed-secret.yaml \
+      --namespace cert-manager \
+      --name cloudflare-api-token-secret
+
+    git add k8s/cert-manager/cloudflare-api-token-sealed-secret.yaml
+    if git diff --cached --quiet; then
+      echo "No sealed secret changes to commit."
+      exit 0
+    fi
+
+    git commit -m "Add cert-manager Cloudflare API token"
+
+    echo "Updated and committed k8s/cert-manager/cloudflare-api-token-sealed-secret.yaml"
+
 seal-posse-party:
     #!/usr/bin/env bash
     set -euo pipefail
