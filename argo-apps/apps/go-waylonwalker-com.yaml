@@ -10,7 +10,7 @@ spec:
       targetRevision: HEAD
       path: waylonwalker-com/go-waylonwalker-com
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
-      targetRevision: main
+      targetRevision: markata/go-perf
       path: helm-chart
       helm:
         values: |
@@ -49,6 +49,12 @@ spec:
               hostPath:
                 path: /mnt/main/walkershare/waylon/sites/go.waylonwalker.com
                 type: DirectoryOrCreate
+            cache:
+              enabled: true
+              storageClassName: longhorn
+              size: 10Gi
+              accessModes:
+                - ReadWriteOnce
             search:
               storageClassName: longhorn
               size: 5Gi
@@ -59,6 +65,7 @@ spec:
             builderImage:
               tag: sha-c127c0f
             activeDeadlineSeconds: 7200
+            cacheDir: /data/cache/xdg
             resources:
               requests:
                 cpu: 100m
@@ -68,8 +75,11 @@ spec:
                 memory: 16Gi
                 ephemeral-storage: 20Gi
             extraEnv:
+              # Concurrency=1 roughly doubled warm full-build time locally.
+              # Keep this conservative for memory, but allow enough parallelism
+              # to recover most of the cached build speedup.
               - name: MARKATA_GO_CONCURRENCY
-                value: "1"
+                value: "2"
               - name: MARKATA_GO_URL
                 value: "https://go.waylonwalker.com"
               - name: MARKATA_GO_SEARCH_ENDPOINT
