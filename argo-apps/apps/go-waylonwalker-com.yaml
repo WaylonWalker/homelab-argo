@@ -63,7 +63,7 @@ spec:
             fetchImage:
               tag: sha-c127c0f
             builderImage:
-              tag: sha-c127c0f
+              tag: sha-aa5e986
             activeDeadlineSeconds: 7200
             cacheDir: /data/cache/xdg
             resources:
