@@ -63,7 +63,7 @@ spec:
             fetchImage:
               tag: sha-c127c0f
             builderImage:
-              tag: sha-c127c0f
+              tag: sha-73bf641
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
             ttlSecondsAfterFinished: 2592000
