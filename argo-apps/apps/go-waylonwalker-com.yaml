@@ -64,8 +64,16 @@ spec:
               tag: sha-c127c0f
             builderImage:
               tag: sha-aa5e986
+            successfulJobsHistoryLimit: 20
+            failedJobsHistoryLimit: 10
+            ttlSecondsAfterFinished: 2592000
             activeDeadlineSeconds: 7200
             cacheDir: /data/cache/xdg
+            notify:
+              enabled: true
+              url: https://ntfy.wayl.one/opencode
+            releases:
+              keep: 10
             resources:
               requests:
                 cpu: 100m
