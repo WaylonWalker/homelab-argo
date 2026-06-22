@@ -51,10 +51,10 @@ spec:
                 type: DirectoryOrCreate
             cache:
               enabled: true
-              storageClassName: longhorn
-              size: 10Gi
-              accessModes:
-                - ReadWriteOnce
+              mode: hostPath
+              hostPath:
+                path: /mnt/main/walkershare/waylon/cache/go.waylonwalker.com
+                type: DirectoryOrCreate
             search:
               storageClassName: longhorn
               size: 5Gi
