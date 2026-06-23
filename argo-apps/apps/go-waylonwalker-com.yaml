@@ -64,6 +64,7 @@ spec:
               tag: sha-c127c0f
             builderImage:
               tag: sha-cbef252
+            fast: true
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
             ttlSecondsAfterFinished: 2592000
