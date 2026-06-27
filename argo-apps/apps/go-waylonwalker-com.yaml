@@ -62,9 +62,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-4217a8c
+              tag: sha-87fdba9
             builderImage:
-              tag: sha-4217a8c
+              tag: sha-87fdba9
             fast: true
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -134,7 +134,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-4217a8c
+              tag: sha-87fdba9
             mode: watch-content
 
           sourceArchive:
