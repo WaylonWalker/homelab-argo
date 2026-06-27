@@ -56,14 +56,15 @@ spec:
                 path: /mnt/main/walkershare/waylon/cache/go.waylonwalker.com
                 type: DirectoryOrCreate
             search:
-              storageClassName: longhorn
+              storageClassName: hostpath
+              pvcNameSuffix: "-local"
               size: 5Gi
 
           build:
             fetchImage:
-              tag: sha-c127c0f
+              tag: sha-a095c9c
             builderImage:
-              tag: sha-cbef252
+              tag: sha-a095c9c
             fast: true
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -99,7 +100,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-c127c0f
+              tag: sha-a095c9c
             mode: watch-content
 
           sourceArchive:
