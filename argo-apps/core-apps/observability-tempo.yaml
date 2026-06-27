@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-tempo
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: tempo
+    targetRevision: 1.24.4
+    helm:
+      releaseName: tempo
+      values: |
+        tempo:
+          reportingEnabled: false
+          retention: 168h
+          metricsGenerator:
+            enabled: true
+            remoteWriteUrl: http://observability-kube-prometheus-prometheus.observability.svc.cluster.local:9090/api/v1/write
+            processor:
+              service_graphs: {}
+              span_metrics: {}
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: "0.0.0.0:4317"
+                http:
+                  endpoint: "0.0.0.0:4318"
+        persistence:
+          enabled: true
+          storageClassName: longhorn
+          size: 20Gi
+        serviceMonitor:
+          enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

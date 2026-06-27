@@ -1,0 +1,113 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 87.2.1
+    helm:
+      releaseName: observability
+      values: |
+        kubeEtcd:
+          enabled: false
+        kubeControllerManager:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+        kubeProxy:
+          enabled: false
+        grafana:
+          admin:
+            existingSecret: observability-grafana-admin
+            userKey: admin-user
+            passwordKey: admin-password
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+            hosts:
+              - grafana.wayl.one
+            tls:
+              - secretName: grafana-tls
+                hosts:
+                  - grafana.wayl.one
+          persistence:
+            enabled: true
+            type: sts
+            storageClassName: longhorn
+            accessModes:
+              - ReadWriteOnce
+            size: 10Gi
+          additionalDataSources:
+            - name: Loki
+              uid: loki
+              type: loki
+              access: proxy
+              url: http://loki-gateway.observability.svc.cluster.local
+              editable: true
+            - name: Tempo
+              uid: tempo
+              type: tempo
+              access: proxy
+              url: http://tempo.observability.svc.cluster.local:3200
+              editable: true
+              jsonData:
+                nodeGraph:
+                  enabled: true
+                serviceMap:
+                  datasourceUid: prometheus
+                tracesToLogsV2:
+                  datasourceUid: loki
+                  filterBySpanID: false
+                  filterByTraceID: true
+                  spanStartTimeShift: -1h
+                  spanEndTimeShift: 1h
+                  tags:
+                    - job
+                    - instance
+                    - pod
+                    - namespace
+                tracesToMetrics:
+                  datasourceUid: prometheus
+        alertmanager:
+          alertmanagerSpec:
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: longhorn
+                  accessModes:
+                    - ReadWriteOnce
+                  resources:
+                    requests:
+                      storage: 10Gi
+        prometheus:
+          prometheusSpec:
+            retention: 15d
+            enableRemoteWriteReceiver: true
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: longhorn
+                  accessModes:
+                    - ReadWriteOnce
+                  resources:
+                    requests:
+                      storage: 50Gi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
