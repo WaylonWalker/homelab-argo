@@ -62,9 +62,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-cfc494a
+              tag: sha-3a6d516
             builderImage:
-              tag: sha-cfc494a
+              tag: sha-3a6d516
             fast: true
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -133,7 +133,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-cfc494a
+              tag: sha-3a6d516
             mode: watch-content
 
           sourceArchive:
