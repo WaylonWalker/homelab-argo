@@ -62,9 +62,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-715b429
+              tag: sha-8c0a194
             builderImage:
-              tag: sha-715b429
+              tag: sha-8c0a194
             fast: true
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -125,7 +125,6 @@ spec:
                 every: 30m
                 enqueueBuildOnSuccess: true
                 args:
-                  - markata-go
                   - --config
                   - /data/source/markata-go.toml
                   - reader
@@ -134,7 +133,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-715b429
+              tag: sha-8c0a194
             mode: watch-content
 
           sourceArchive:
