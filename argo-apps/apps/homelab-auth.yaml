@@ -11,7 +11,7 @@ spec:
   source:
     path: k8s/homelab-auth
     repoURL: https://github.com/WaylonWalker/homelab-argo.git
-    targetRevision: HEAD
+    targetRevision: opencode-homelab-auth
   syncPolicy:
     automated:
       selfHeal: true
