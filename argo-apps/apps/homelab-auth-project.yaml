@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: homelab-auth
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Homelab auth stack
+  sourceRepos:
+    - https://github.com/WaylonWalker/homelab-argo.git
+  destinations:
+    - namespace: hlab-auth
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+    - group: ""
+      kind: Service
+    - group: apps
+      kind: Deployment
+    - group: postgresql.cnpg.io
+      kind: Cluster
+    - group: networking.k8s.io
+      kind: Ingress
+    - group: bitnami.com
+      kind: SealedSecret
+    - group: traefik.io
+      kind: Middleware

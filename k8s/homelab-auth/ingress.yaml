@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hlab-auth
+  namespace: hlab-auth
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: auth.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hlab-auth
+                port:
+                  number: 8000
+  tls:
+    - hosts:
+        - auth.wayl.one
+      secretName: auth-wayl-one-tls

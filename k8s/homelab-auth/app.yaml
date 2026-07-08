@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hlab-auth
+  namespace: hlab-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hlab-auth
+  template:
+    metadata:
+      labels:
+        app: hlab-auth
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: registry.wayl.one/hlab-auth:v0.11.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: hlab-auth-config
+            - secretRef:
+                name: hlab-auth-secrets
+          ports:
+            - containerPort: 8000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hlab-auth
+  namespace: hlab-auth
+spec:
+  selector:
+    app: hlab-auth
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

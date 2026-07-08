@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homelab-auth
+  namespace: argocd
+spec:
+  project: homelab-auth
+  destination:
+    namespace: hlab-auth
+    server: https://kubernetes.default.svc
+  source:
+    path: k8s/homelab-auth
+    repoURL: https://github.com/WaylonWalker/homelab-argo.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
