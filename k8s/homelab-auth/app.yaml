@@ -14,6 +14,8 @@ spec:
         app: hlab-auth
     spec:
       automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: cluster-regcred
       securityContext:
         seccompProfile:
           type: RuntimeDefault
