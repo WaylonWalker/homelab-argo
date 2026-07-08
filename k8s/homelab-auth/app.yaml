@@ -41,6 +41,8 @@ spec:
               port: http
           securityContext:
             runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
