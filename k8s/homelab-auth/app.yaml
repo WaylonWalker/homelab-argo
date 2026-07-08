@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: app
-          image: registry.wayl.one/hlab-auth:cddb5f7
+          image: registry.wayl.one/hlab-auth:3f1d2c8
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
