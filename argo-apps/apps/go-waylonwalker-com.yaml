@@ -62,10 +62,10 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-461fde8
+              tag: sha-3a6d516
             builderImage:
-              tag: sha-461fde8
-            fast: true
+              tag: sha-3a6d516
+            fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
             ttlSecondsAfterFinished: 2592000
@@ -97,10 +97,43 @@ spec:
               - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
                 value: "https://go.waylonwalker.com/api/search"
 
+          builderAdmin:
+            enabled: true
+            fast: false
+            mermaidMode: client
+            watch:
+              enabled: true
+              debounce: 2s
+            releases:
+              keep: 10
+            history:
+              successfulBuilds: 50
+              failedBuilds: 100
+              refreshRuns: 100
+            buildTimeoutSeconds: 7200
+            historyDir: /data/site/.builder-admin
+            resources:
+              requests:
+                cpu: 100m
+                memory: 4Gi
+                ephemeral-storage: 8Gi
+              limits:
+                memory: 16Gi
+                ephemeral-storage: 20Gi
+            refreshTasks:
+              - name: reader-update
+                every: 30m
+                enqueueBuildOnSuccess: true
+                args:
+                  - --config
+                  - /data/source/markata-go.toml
+                  - reader
+                  - update
+
           search:
             enabled: true
             image:
-              tag: sha-461fde8
+              tag: sha-3a6d516
             mode: watch-content
 
           sourceArchive:
