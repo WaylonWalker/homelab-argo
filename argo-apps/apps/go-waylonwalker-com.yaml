@@ -65,7 +65,7 @@ spec:
               tag: sha-3a6d516
             builderImage:
               tag: sha-3a6d516
-            fast: true
+            fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
             ttlSecondsAfterFinished: 2592000
@@ -99,7 +99,7 @@ spec:
 
           builderAdmin:
             enabled: true
-            fast: true
+            fast: false
             mermaidMode: client
             watch:
               enabled: true
