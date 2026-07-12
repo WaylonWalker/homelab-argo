@@ -45,25 +45,27 @@ spec:
   dnsNames:
     - gobuilder.waylonwalker.com
 ---
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: gobuilder
   namespace: go-waylonwalker-com-notes
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: go-waylonwalker-com-notes-gobuilder-strip-hlab-headers@kubernetescrd,go-waylonwalker-com-notes-gobuilder-forwardauth@kubernetescrd
 spec:
-  entryPoints:
-    - web
-    - websecure
+  ingressClassName: traefik
   tls:
-    secretName: gobuilder-waylonwalker-com-tls
-  routes:
-    - kind: Rule
-      match: Host(`gobuilder.waylonwalker.com`)
-      middlewares:
-        - name: gobuilder-strip-hlab-headers
-          namespace: go-waylonwalker-com-notes
-        - name: gobuilder-forwardauth
-          namespace: go-waylonwalker-com-notes
-      services:
-        - name: go-waylonwalker-com-notes-builder-admin
-          port: 8080
+    - hosts:
+        - gobuilder.waylonwalker.com
+      secretName: gobuilder-waylonwalker-com-tls
+  rules:
+    - host: gobuilder.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: go-waylonwalker-com-notes-builder-admin
+                port:
+                  number: 8080
