@@ -62,9 +62,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-620f383
+              tag: sha-d545367
             builderImage:
-              tag: sha-620f383
+              tag: sha-d545367
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -133,7 +133,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-620f383
+              tag: sha-d545367
             mode: watch-content
 
           sourceArchive:
