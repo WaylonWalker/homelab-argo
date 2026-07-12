@@ -62,9 +62,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-fd23f312
+              tag: sha-fd23f31
             builderImage:
-              tag: sha-fd23f312
+              tag: sha-fd23f31
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -133,7 +133,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-fd23f312
+              tag: sha-fd23f31
             mode: watch-content
 
           sourceArchive:
