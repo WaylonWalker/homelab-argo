@@ -62,9 +62,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-0d2db5c
+              tag: sha-fd23f312
             builderImage:
-              tag: sha-0d2db5c
+              tag: sha-fd23f312
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -75,7 +75,7 @@ spec:
               enabled: true
               url: https://ntfy.wayl.one/opencode
             releases:
-              keep: 10
+              keep: 25
             resources:
               requests:
                 cpu: 100m
@@ -105,7 +105,7 @@ spec:
               enabled: true
               debounce: 2s
             releases:
-              keep: 10
+              keep: 25
             history:
               successfulBuilds: 50
               failedBuilds: 100
@@ -133,7 +133,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-0d2db5c
+              tag: sha-fd23f312
             mode: watch-content
 
           sourceArchive:
