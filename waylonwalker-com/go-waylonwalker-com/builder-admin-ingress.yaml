@@ -61,7 +61,9 @@ spec:
       match: Host(`gobuilder.waylonwalker.com`)
       middlewares:
         - name: gobuilder-strip-hlab-headers
+          namespace: go-waylonwalker-com-notes
         - name: gobuilder-forwardauth
+          namespace: go-waylonwalker-com-notes
       services:
         - name: go-waylonwalker-com-notes-builder-admin
           port: 8080
