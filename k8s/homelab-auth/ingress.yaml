@@ -18,7 +18,20 @@ spec:
                 name: hlab-auth
                 port:
                   number: 8000
+    - host: auth.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hlab-auth
+                port:
+                  number: 8000
   tls:
-    - hosts:
-        - auth.wayl.one
-      secretName: auth-wayl-one-tls
+      - hosts:
+          - auth.wayl.one
+        secretName: auth-wayl-one-tls
+      - hosts:
+          - auth.waylonwalker.com
+        secretName: auth-waylonwalker-com-tls

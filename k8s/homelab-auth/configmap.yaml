@@ -15,6 +15,8 @@ data:
   HLAB_AUTH_RATE_LIMIT_SENSITIVE_WINDOW_SECONDS: "60"
   HLAB_AUTH_WEBAUTHN_RP_ID: auth.wayl.one
   HLAB_AUTH_WEBAUTHN_ALLOWED_ORIGINS: '["https://auth.wayl.one"]'
+  HLAB_AUTH_LEGACY_WEBAUTHN_RP_ID: auth.wayl.one
+  HLAB_AUTH_WEBAUTHN_RP_PROFILES: '[{"host":"auth.wayl.one","rp_id":"auth.wayl.one","origins":["https://auth.wayl.one"],"primary":true},{"host":"auth.waylonwalker.com","rp_id":"waylonwalker.com","origins":["https://auth.waylonwalker.com"],"primary":false}]'
   HLAB_AUTH_WEBAUTHN_CHALLENGE_TTL_SECONDS: "300"
   HLAB_AUTH_SESSION_COOKIE_NAME: hlab_session
   HLAB_AUTH_SESSION_IDLE_TIMEOUT_DAYS: "30"

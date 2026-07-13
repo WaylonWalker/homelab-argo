@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: app
-          image: registry.wayl.one/hlab-auth:feb6521-cross-origin-handoff-20260712
+          image: registry.wayl.one/hlab-auth:feb6521-multi-rp-20260712
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
