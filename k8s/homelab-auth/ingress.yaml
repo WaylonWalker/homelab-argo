@@ -5,6 +5,7 @@ metadata:
   namespace: hlab-auth
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
+    traefik.ingress.kubernetes.io/router.middlewares: hlab-auth-redirect-https@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
@@ -35,3 +36,13 @@ spec:
       - hosts:
           - auth.waylonwalker.com
         secretName: auth-waylonwalker-com-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: hlab-auth-redirect-https
+  namespace: hlab-auth
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
