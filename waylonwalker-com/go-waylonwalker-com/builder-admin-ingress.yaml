@@ -31,6 +31,8 @@ spec:
       - X-Hlab-Groups
       - X-Hlab-Roles
       - X-Hlab-Scopes
+    addAuthCookiesToResponse:
+      - __Host-hlab-app-session
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
