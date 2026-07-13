@@ -15,3 +15,5 @@ spec:
       - X-Hlab-Groups
       - X-Hlab-Roles
       - X-Hlab-Scopes
+    addAuthCookiesToResponse:
+      - __Host-hlab-app-session
