@@ -35,3 +35,32 @@ spec:
       - hosts:
           - auth.waylonwalker.com
         secretName: auth-waylonwalker-com-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: hlab-auth-redirect-https
+  namespace: hlab-auth
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hlab-auth-http-redirect
+  namespace: hlab-auth
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`auth.wayl.one`) || Host(`auth.waylonwalker.com`)
+      priority: 100
+      middlewares:
+        - name: hlab-auth-redirect-https
+          namespace: hlab-auth
+      services:
+        - name: hlab-auth
+          port: 8000
