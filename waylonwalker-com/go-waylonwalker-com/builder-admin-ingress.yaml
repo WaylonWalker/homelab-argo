@@ -1,39 +1,3 @@
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: gobuilder-strip-hlab-headers
-  namespace: go-waylonwalker-com-notes
-spec:
-  headers:
-    customRequestHeaders:
-      X-Hlab-User-Id: ""
-      X-Hlab-Username: ""
-      X-Hlab-Display-Name: ""
-      X-Hlab-Email: ""
-      X-Hlab-Groups: ""
-      X-Hlab-Roles: ""
-      X-Hlab-Scopes: ""
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: gobuilder-forwardauth
-  namespace: go-waylonwalker-com-notes
-spec:
-  forwardAuth:
-    address: http://hlab-auth.hlab-auth.svc.cluster.local:8000/api/v1/forward-auth
-    trustForwardHeader: false
-    authResponseHeaders:
-      - X-Hlab-User-Id
-      - X-Hlab-Username
-      - X-Hlab-Display-Name
-      - X-Hlab-Email
-      - X-Hlab-Groups
-      - X-Hlab-Roles
-      - X-Hlab-Scopes
-    addAuthCookiesToResponse:
-      - __Host-hlab-app-session
----
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -46,28 +10,3 @@ spec:
     name: letsencrypt-dns
   dnsNames:
     - gobuilder.waylonwalker.com
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: gobuilder
-  namespace: go-waylonwalker-com-notes
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: go-waylonwalker-com-notes-gobuilder-strip-hlab-headers@kubernetescrd,go-waylonwalker-com-notes-gobuilder-forwardauth@kubernetescrd
-spec:
-  ingressClassName: traefik
-  tls:
-    - hosts:
-        - gobuilder.waylonwalker.com
-      secretName: gobuilder-waylonwalker-com-tls
-  rules:
-    - host: gobuilder.waylonwalker.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: go-waylonwalker-com-notes-builder-admin
-                port:
-                  number: 8080

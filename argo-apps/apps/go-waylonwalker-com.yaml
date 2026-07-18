@@ -64,7 +64,7 @@ spec:
             fetchImage:
               tag: sha-f8b8092
             builderImage:
-              tag: sha-f8b8092
+              tag: sha-14071c0
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -100,6 +100,33 @@ spec:
           builderAdmin:
             enabled: true
             fast: false
+            auth:
+              # Traefik runs on falcon2's pod subnet; builder-admin peers run
+              # on falcon3's pod subnet during active/standby handoff.
+              trustedProxyCIDRs:
+                - 10.42.0.0/24
+                - 10.42.2.0/24
+            ingress:
+              enabled: true
+              host: gobuilder.waylonwalker.com
+              ingressClassName: traefik
+              tls:
+                enabled: true
+                secretName: gobuilder-waylonwalker-com-tls
+              auth:
+                # The in-cluster auth Service is HTTP-only. Use the existing
+                # public TLS route rather than weakening the HTTPS requirement.
+                enabled: true
+                internalUrl: https://auth.wayl.one
+                publicAuthOrigin: https://auth.wayl.one
+            networkPolicy:
+              enabled: true
+              traefikNamespace: kube-system
+              traefikNamespaceSelector:
+                kubernetes.io/metadata.name: kube-system
+              traefikPodSelector:
+                app.kubernetes.io/name: traefik
+                app.kubernetes.io/instance: traefik-kube-system
             mermaidMode: client
             watch:
               enabled: true
