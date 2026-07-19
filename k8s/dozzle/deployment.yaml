@@ -43,7 +43,7 @@ metadata:
   name: dozzle
   namespace: dozzle
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: dozzle
