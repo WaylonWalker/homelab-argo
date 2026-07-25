@@ -60,11 +60,11 @@ spec:
               pvcNameSuffix: "-local"
               size: 5Gi
 
-            build:
-              fetchImage:
-                tag: sha-f8b8092
-              builderImage:
-                tag: sha-7d0169a
+          build:
+            fetchImage:
+              tag: sha-f8b8092
+            builderImage:
+              tag: sha-7d0169a
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
