@@ -118,7 +118,9 @@ spec:
                 # receives Traefik's original protected-host headers.
                 enabled: true
                 internalUrl: http://hlab-auth.hlab-auth.svc.cluster.local:8000
-                publicAuthOrigin: https://auth.wayl.one
+                # Keep profile-picture requests same-site with gobuilder so
+                # hlab-auth's SameSite=Lax browser session is included.
+                publicAuthOrigin: https://auth.waylonwalker.com
             networkPolicy:
               enabled: true
               traefikNamespace: kube-system
