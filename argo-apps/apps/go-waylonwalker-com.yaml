@@ -114,10 +114,10 @@ spec:
                 enabled: true
                 secretName: gobuilder-waylonwalker-com-tls
               auth:
-                # The in-cluster auth Service is HTTP-only. Use the existing
-                # public TLS route rather than weakening the HTTPS requirement.
+                # ForwardAuth must call the Service directly so hlab-auth
+                # receives Traefik's original protected-host headers.
                 enabled: true
-                internalUrl: https://auth.wayl.one
+                internalUrl: http://hlab-auth.hlab-auth.svc.cluster.local:8000
                 publicAuthOrigin: https://auth.wayl.one
             networkPolicy:
               enabled: true
