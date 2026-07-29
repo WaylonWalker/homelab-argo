@@ -64,7 +64,7 @@ spec:
             fetchImage:
               tag: sha-f8b8092
             builderImage:
-              tag: sha-b983795
+              tag: sha-1bb08ce
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -136,7 +136,7 @@ spec:
             releases:
               keep: 25
             history:
-              successfulBuilds: 50
+              successfulBuilds: 60
               failedBuilds: 100
               refreshRuns: 100
             buildTimeoutSeconds: 7200
