@@ -78,7 +78,7 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.37
+        - image: registry.wayl.one/dropper:0.0.38
           name: dropper-wayl-one
           command:
             - "/bin/sh"
@@ -144,11 +144,13 @@ spec:
                 secretKeyRef:
                   name: dropper-minio-secret
                   key: AWS_REGION
+            # - name: BACKEND_CORS_ORIGINS
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: dropper-secret
+            #       key: BACKEND_CORS_ORIGINS
             - name: BACKEND_CORS_ORIGINS
-              valueFrom:
-                secretKeyRef:
-                  name: dropper-secret
-                  key: BACKEND_CORS_ORIGINS
+              value: '"https://thoughts.waylonwalker.com, https://md.waylonwalker.com, http://localhost:8000, chrome-extension://*, *"'
             - name: AWS_ENDPOINT_URL
               value: "https://minio.wayl.one"
             - name: DB_USER
@@ -189,7 +191,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production"
+              value: "deployment.environment=production,service.version=0.0.38"
           volumeMounts:
             - mountPath: /data
               name: dropper-data
