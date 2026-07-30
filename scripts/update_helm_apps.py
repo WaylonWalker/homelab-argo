@@ -11,6 +11,7 @@
 # ///
 
 from pathlib import Path
+import builtins
 import subprocess
 from typing import Any, Optional
 from io import StringIO
@@ -45,6 +46,8 @@ APPS_DIRS = [
     "argo-apps/fokais",
 ]
 
+INDEX_CACHE: dict[str, dict[str, Any]] = {}
+
 
 class ArgoApp:
     """Simple class to hold Argo CD application info"""
@@ -61,7 +64,11 @@ class ArgoApp:
         self.project = spec.get('project', 'default')
         
         # Source info
-        source = spec.get('source', {})
+        source = spec.get('source') or {}
+        if not source:
+            sources = spec.get('sources') or []
+            if isinstance(sources, builtins.list) and sources:
+                source = sources[0] or {}
         self.chart = source.get('chart')
         self.repo_url = source.get('repoURL')
         self.target_revision = source.get('targetRevision')
@@ -269,8 +276,75 @@ def get_index_url(repo_url: str) -> str:
     return url
 
 
+def fetch_chart_index(repo_url: str, verbose: bool = False) -> Optional[dict[str, Any]]:
+    """Fetch and cache a Helm chart index."""
+    index_url = get_index_url(repo_url)
+    if index_url in INDEX_CACHE:
+        return INDEX_CACHE[index_url]
+
+    try:
+        response = requests.get(index_url, timeout=30)
+        response.raise_for_status()
+        index = yaml.safe_load(response.text)
+        if isinstance(index, dict):
+            INDEX_CACHE[index_url] = index
+            return index
+    except Exception as e:
+        if verbose:
+            rprint(f"[yellow]Warning: Failed to fetch {index_url}: {e}[/yellow]")
+
+    return None
+
+
+def get_chart_releases(repo_url: str, chart_name: str, verbose: bool = False) -> list["ChartRelease"]:
+    """Return known releases for a Helm chart, newest first."""
+    index = fetch_chart_index(repo_url, verbose=verbose)
+    if not index:
+        return []
+
+    entries = index.get("entries", {}).get(chart_name, [])
+    releases = []
+    for entry in entries:
+        chart_version = entry.get("version")
+        if not chart_version:
+            continue
+
+        parsed = parse_version(chart_version)
+        if parsed.is_prerelease:
+            continue
+
+        releases.append(
+            ChartRelease(
+                version=chart_version,
+                app_version=entry.get("appVersion"),
+                created=entry.get("created"),
+            )
+        )
+
+    releases.sort(key=lambda release: release.parsed, reverse=True)
+    return releases
+
+
+def get_chart_release(repo_url: str, chart_name: str, chart_version: str, verbose: bool = False) -> Optional["ChartRelease"]:
+    """Get metadata for a specific chart version."""
+    for release in get_chart_releases(repo_url, chart_name, verbose=verbose):
+        if release.version == chart_version or release.parsed == parse_version(chart_version):
+            return release
+    return None
+
+
+def get_latest_chart_release(repo_url: str, chart_name: str, verbose: bool = False) -> Optional["ChartRelease"]:
+    """Get latest known chart release metadata."""
+    releases = get_chart_releases(repo_url, chart_name, verbose=verbose)
+    return releases[0] if releases else None
+
+
 def get_latest_chart_version(repo_url: str, chart_name: str, verbose: bool = False) -> Optional[str]:
     """Get the latest version for a chart"""
+    latest_release = get_latest_chart_release(repo_url, chart_name, verbose=verbose)
+    if latest_release:
+        return latest_release.version
+
     # Generate repo name from URL
     repo_name = get_repo_name_from_url(repo_url)
     
@@ -281,26 +355,6 @@ def get_latest_chart_version(repo_url: str, chart_name: str, verbose: bool = Fal
     
     if verbose:
         rprint(f"Looking up {chart_name} in {repo_name} ({repo_url})")
-    
-    # For GitHub release-based charts, try to get the index file directly
-    if any(url in repo_url for url in ['github.io', 'clustersecret.com']) or 'raw.githubusercontent.com' in repo_url:
-        try:
-            # Get the index file
-            index_url = get_index_url(repo_url)
-            response = requests.get(index_url)
-            if response.status_code == 200:
-                index = yaml.safe_load(response.text)
-                if chart_name in index.get('entries', {}):
-                    versions = sorted(
-                        [entry['version'] for entry in index['entries'][chart_name]],
-                        key=lambda x: parse_version(x),
-                        reverse=True
-                    )
-                    if versions:
-                        return versions[0]
-        except Exception as e:
-            if verbose:
-                rprint(f"[yellow]Warning: Failed to fetch index directly: {e}[/yellow]")
     
     # Add repo if needed (fallback to standard helm commands)
     if not add_helm_repo(repo_url, repo_name):
@@ -498,6 +552,19 @@ class VersionCheck:
     error: Optional[str] = None
 
 
+@dataclass(frozen=True)
+class ChartRelease:
+    """Metadata about a single chart release."""
+
+    version: str
+    app_version: Optional[str] = None
+    created: Optional[str] = None
+
+    @property
+    def parsed(self) -> version.Version:
+        return parse_version(self.version)
+
+
 def check_version(app: ArgoApp) -> VersionCheck:
     """Check version for a single app"""
     try:
@@ -582,6 +649,109 @@ class VersionChecker:
                         )
         
         return results
+
+
+def semver_key(ver: str) -> tuple[int, int, int]:
+    """Return a semver-like key for grouping upgrade steps."""
+    parsed = parse_version(ver)
+    release = builtins.list(parsed.release) + [0, 0, 0]
+    return release[0], release[1], release[2]
+
+
+def build_upgrade_path(current: str, target: str, available_versions: list[str]) -> list[str]:
+    """Recommend a stepwise path across minor and major versions."""
+    current_parsed = parse_version(current)
+    target_parsed = parse_version(target)
+    if current_parsed >= target_parsed:
+        return []
+
+    available = sorted(
+        {
+            ver for ver in available_versions
+            if not parse_version(ver).is_prerelease
+            and current_parsed < parse_version(ver) <= target_parsed
+        },
+        key=parse_version,
+    )
+    if not available:
+        return []
+
+    buckets: dict[tuple[int, int], str] = {}
+    for ver in available:
+        major, minor, _patch = semver_key(ver)
+        buckets[(major, minor)] = ver
+
+    current_major, current_minor, _current_patch = semver_key(current)
+    target_major, target_minor, _target_patch = semver_key(target)
+
+    path = []
+    major, minor = current_major, current_minor
+    while (major, minor) < (target_major, target_minor):
+        minor += 1
+        if minor > 99:
+            major += 1
+            minor = 0
+
+        bucket_version = buckets.get((major, minor))
+        if bucket_version:
+            path.append(bucket_version)
+
+    if not path or path[-1] != target:
+        path.append(target)
+
+    deduped = []
+    seen = set()
+    for ver in path:
+        if ver not in seen:
+            deduped.append(ver)
+            seen.add(ver)
+    return deduped
+
+
+def format_upgrade_path(path: Optional[list[str]], resolved: bool = True) -> str:
+    """Render an upgrade path compactly."""
+    if not resolved:
+        return "Unknown"
+    return " -> ".join(path) if path else "Up to date"
+
+
+def format_release_listing(releases: list["ChartRelease"], limit: int) -> str:
+    """Render the newest releases compactly."""
+    parts = []
+    for release in releases[:limit]:
+        if release.app_version:
+            parts.append(f"{release.version} ({release.app_version})")
+        else:
+            parts.append(release.version)
+    return ", ".join(parts) if parts else "None found"
+
+
+def build_audit_result(helm_app: ArgoApp, verbose: bool = False) -> dict[str, Any]:
+    """Collect audit metadata for a Helm app."""
+    releases = get_chart_releases(helm_app.repo_url, helm_app.chart, verbose=verbose)
+    current_release = get_chart_release(
+        helm_app.repo_url,
+        helm_app.chart,
+        helm_app.target_revision,
+        verbose=verbose,
+    )
+    latest_release = releases[0] if releases else None
+    target_version = latest_release.version if latest_release else helm_app.latest_version
+    upgrade_path = build_upgrade_path(
+        helm_app.target_revision,
+        target_version,
+        [release.version for release in releases],
+    ) if target_version else None
+
+    return {
+        "app": helm_app,
+        "current_release": current_release,
+        "latest_release": latest_release,
+        "releases": releases,
+        "target_version": target_version,
+        "upgrade_path": upgrade_path,
+        "resolved": bool(target_version),
+    }
 
 
 @app.command()
@@ -789,6 +959,106 @@ def check(
     else:
         rprint("[green]All apps are up to date![/green]")
         raise typer.Exit(code=0)
+
+
+@app.command()
+def audit(
+    app_name: str = typer.Option(
+        None,
+        "--app-name",
+        help="Audit a specific Helm app by name",
+    ),
+    workers: int = typer.Option(
+        4,
+        "--workers",
+        help="Number of parallel workers",
+        min=1,
+        max=8,
+    ),
+    release_limit: int = typer.Option(
+        6,
+        "--release-limit",
+        help="How many recent releases to show per app",
+        min=1,
+        max=20,
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        help="Show detailed progress",
+    ),
+):
+    """Audit Helm apps and recommend upgrade steps.
+
+    This command shows:
+    1. Current pinned chart version
+    2. Current appVersion for that pin when available
+    3. Latest chart version and appVersion
+    4. A stepwise semver upgrade path
+    5. A short list of recent releases for context
+    """
+    apps = list_all_helm_apps(verbose=verbose)
+    if app_name:
+        apps = [app for app in apps if app.name == app_name]
+        if not apps:
+            rprint(f"[red]Error: No Helm app found with name {app_name}[/red]")
+            raise typer.Exit(code=1)
+
+    summary = Table(title="Helm App Audit")
+    summary.add_column("Name")
+    summary.add_column("Chart")
+    summary.add_column("Current")
+    summary.add_column("Latest")
+    summary.add_column("Upgrade Path")
+
+    detailed_rows = []
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(build_audit_result, helm_app, verbose) for helm_app in apps]
+        for future in as_completed(futures):
+            detailed_rows.append(future.result())
+
+    detailed_rows.sort(key=lambda row: parse_version(row["target_version"] or "0.0.0"), reverse=True)
+    for row in detailed_rows:
+        helm_app = row["app"]
+        current_release = row["current_release"]
+        latest_release = row["latest_release"]
+        releases = row["releases"]
+        target_version = row["target_version"]
+        upgrade_path = row["upgrade_path"] or []
+        resolved = row["resolved"]
+
+        summary.add_row(
+            helm_app.name,
+            helm_app.chart or "",
+            helm_app.target_revision or "",
+            target_version or "Unknown",
+            format_upgrade_path(upgrade_path, resolved=resolved),
+        )
+
+    console.print(summary)
+
+    for row in detailed_rows:
+        helm_app = row["app"]
+        current_release = row["current_release"]
+        latest_release = row["latest_release"]
+        releases = row["releases"]
+        upgrade_path = row["upgrade_path"] or []
+        resolved = row["resolved"]
+        current_app_version = current_release.app_version if current_release else "Unknown"
+        latest_app_version = latest_release.app_version if latest_release else "Unknown"
+        details = Table(show_header=False, box=None, pad_edge=False)
+        details.add_row("File", str(helm_app.file))
+        details.add_row("Repo", helm_app.repo_url or "")
+        details.add_row("Current chart", helm_app.target_revision or "")
+        details.add_row("Current appVersion", current_app_version)
+        details.add_row("Latest chart", latest_release.version if latest_release else "Unknown")
+        details.add_row("Latest appVersion", latest_app_version)
+        details.add_row(
+            "Recommended path",
+            format_upgrade_path(upgrade_path, resolved=resolved),
+        )
+        details.add_row("Recent releases", format_release_listing(releases, release_limit))
+        console.print(Panel(details, title=helm_app.name, expand=False))
 
 
 @app.command()
