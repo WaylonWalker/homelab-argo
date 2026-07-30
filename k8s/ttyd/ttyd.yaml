@@ -1,0 +1,215 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tty
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ttyd
+  namespace: tty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ttyd
+  template:
+    metadata:
+      labels:
+        app: ttyd
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nextcloud-storage
+                    operator: In
+                    values:
+                      - "true"
+      containers:
+        - name: ttyd
+          # image: archlinux:latest
+          # image: docker.io/waylonwalker/devtainer-arch:0.1.4
+          image: docker.io/waylonwalker/devtainer-arch:20250816204429
+          ports:
+            - containerPort: 7681
+          command: ["ttyd"]
+          args: ["-W", "su", "-", "waylon"]
+          args: ["-W", "zsh"]
+          # command: ["/bin/sh"]
+          # args:
+          #   - -c
+          #   - |
+          #     # pacman -Sy --noconfirm base-devel ttyd zsh uv stow sudo git &&
+          #     # useradd -m waylon -s /bin/zsh &&
+          #     # usermod -aG wheel waylon &&
+          #     # echo "waylon:waylon" | chpasswd &&
+          #     # echo "waylon ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-waylon
+          #     # chmod 0440 /etc/sudoers.d/99-waylon
+          #     # # git clone https://aur.archlinux.org/paru
+          #     # ttyd -W login
+          #     # useradd -m -s /usr/bin/zsh waylon &&
+          #     # echo "waylon ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-waylon &&
+          #     # chmod 0440 /etc/sudoers.d/99-waylon &&
+          #     # su - waylon -c "git clone https://github.com/waylonwalker/devtainer" &&
+          #     # apt-get purge -y 'nvidia*' 'libnvidia*'
+          #     # sudo apt-get autoremove -y
+          #     # sudo apt-get autoclean
+          #     # sudo apt-get update
+          #     # sudo apt-get upgrade
+          #     # su - waylon -c "cd devtainer && stow zsh tmux bin git nvim"
+          #     su - waylon -c "ttyd -W zsh"
+          securityContext:
+            # runAsUser: 0 # run as root to install packages
+            runAsUser: 1000
+            runAsGroup: 1000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 7681
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          volumeMounts:
+            - name: ttyd-waylon-home
+              mountPath: /home/waylon
+            - name: tty-walkershare-git-data
+              mountPath: /git
+      volumes:
+        - name: ttyd-waylon-home
+          persistentVolumeClaim:
+            claimName: ttyd-waylon-home
+        - name: tty-walkershare-git-data
+          persistentVolumeClaim:
+            claimName: tty-walkershare-git-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ttyd-waylon-home
+  namespace: tty
+spec:
+  storageClassName: longhorn-backup
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ttyd
+  namespace: tty
+spec:
+  selector:
+    app: ttyd
+  ports:
+    - name: ttyd
+      port: 80
+      targetPort: 7681
+      protocol: TCP
+    - name: ttyd1
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+    - name: ttyd2
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+    - name: ttyd3
+      port: 8002
+      targetPort: 8002
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ttyd
+  namespace: tty
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/enable-websockets: "true"
+spec:
+  rules:
+    - host: tty.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ttyd
+                port:
+                  number: 80
+    - host: tty1.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ttyd
+                port:
+                  number: 8000
+    - host: tty2.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ttyd
+                port:
+                  number: 8001
+    - host: tty3.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ttyd
+                port:
+                  number: 8002
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-tty-walkershare-git-data
+  namespace: tty
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hostpath
+  hostPath:
+    path: /mnt/main/walkershare/waylon/git
+    type: DirectoryOrCreate
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: nextcloud-storage
+              operator: In
+              values:
+                - "true"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tty-walkershare-git-data
+  namespace: tty
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  volumeName: pv-tty-walkershare-git-data
+  resources:
+    requests:
+      storage: 10Gi
