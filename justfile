@@ -349,6 +349,33 @@ cloudflared-token:
     kubeseal -f private/cloudflared-secret.yaml -w cloudflared/cloudflared-sealed-secret.yaml --namespace cloudflared --name cloudflared-token
 
 
+update-go-image-pin:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    file="argo-apps/apps/go-waylonwalker-com.yaml"
+
+    sha=$(git ls-remote https://github.com/WaylonWalker/markata-go.git main | cut -c1-7)
+    tag="sha-$sha"
+    current=$(grep -oP 'tag: sha-\w+' "$file" | head -1 | cut -d' ' -f3)
+
+    echo "current: $current"
+    echo "latest:  $tag"
+
+    if [[ "$tag" == "$current" ]]; then
+        echo "Already up to date."
+        exit 0
+    fi
+
+    sed -i "s/$current/$tag/g" "$file"
+    echo "Updated $current -> $tag"
+
+    git add "$file"
+    if git diff --cached --quiet; then
+        echo "No changes to commit."
+        exit 0
+    fi
+    git commit -m "waylonwalker-com: update go image pin to $tag"
+
 update-system-upgrade-controller:
     #!/bin/bash
     set -euxo pipefail
