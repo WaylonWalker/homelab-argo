@@ -141,6 +141,11 @@ spec:
               refreshRuns: 100
             buildTimeoutSeconds: 7200
             historyDir: /data/site/.builder-admin
+            webhook:
+              enabled: true
+              branch: main
+              existingSecretName: builder-webhook
+              existingSecretKey: MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET
             resources:
               requests:
                 cpu: 100m
