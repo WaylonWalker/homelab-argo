@@ -4,7 +4,6 @@
     {
       "Effect": "Allow",
       "Action": [
-        "s3:GetBucketLocation",
         "s3:ListBucket"
       ],
       "Resource": "arn:aws:s3:::k8s-pages",
@@ -16,6 +15,13 @@
           ]
         }
       }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation"
+      ],
+      "Resource": "arn:aws:s3:::k8s-pages"
     },
     {
       "Effect": "Allow",
@@ -35,4 +41,3 @@
     }
   ]
 }
-
