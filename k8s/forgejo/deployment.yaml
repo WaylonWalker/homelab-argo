@@ -114,6 +114,16 @@ spec:
                 secretKeyRef:
                   name: forgejo-db-credentials
                   key: password
+            - name: FORGEJO__cors__ENABLED
+              value: "true"
+            - name: FORGEJO__cors__ALLOW_DOMAIN
+              value: "https://md.waylonwalker.com,http://localhost:8987,http://127.0.0.1:8987,http://localhost:8000,http://127.0.0.1:8000"
+            - name: FORGEJO__cors__METHODS
+              value: "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
+            - name: FORGEJO__cors__HEADERS
+              value: "Content-Type,Authorization,User-Agent"
+            - name: FORGEJO__cors__ALLOW_CREDENTIALS
+              value: "false"
           ports:
             - containerPort: 3000
               name: http
