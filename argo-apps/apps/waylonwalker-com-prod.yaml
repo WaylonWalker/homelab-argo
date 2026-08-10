@@ -44,29 +44,32 @@ spec:
 
           storage:
             source:
-              mode: hostPath
-              hostPath:
-                # Share the established content source with dev, but keep
-                # production releases and served output isolated.
-                path: /mnt/main/walkershare/waylon/vaults/go.waylonwalker.com
-                type: Directory
+              mode: pvc
+              storageClassName: longhorn
+              size: 10Gi
+              accessModes:
+                - ReadWriteMany
             site:
-              mode: hostPath
-              hostPath:
-                path: /mnt/main/walkershare/waylon/sites/waylonwalker.com
-                type: DirectoryOrCreate
+              mode: pvc
+              storageClassName: longhorn
+              size: 10Gi
+              accessModes:
+                - ReadWriteMany
             cache:
               enabled: true
-              mode: hostPath
-              hostPath:
-                path: /mnt/main/walkershare/waylon/cache/waylonwalker.com
-                type: DirectoryOrCreate
+              mode: pvc
+              storageClassName: longhorn
+              size: 10Gi
+              accessModes:
+                - ReadWriteOnce
             search:
-              storageClassName: local-path
-              pvcNameSuffix: "-local"
+              storageClassName: longhorn
               size: 5Gi
 
           build:
+            # Builder-admin owns builds after the source checkout moves to PVC.
+            # Disable the archive-based CronJob because no source archive is configured.
+            enabled: false
             fetchImage:
               tag: sha-f8b8092
             builderImage:
@@ -91,8 +94,7 @@ spec:
                 memory: 16Gi
                 ephemeral-storage: 20Gi
             extraEnv:
-              # The shared hostPath checkout is owned by UID 1000. Git 2.45
-              # rejects it as dubious unless the mounted checkout is trusted.
+              # Git 2.45 requires an explicit trust entry for the mounted checkout.
               - name: GIT_CONFIG_COUNT
                 value: "1"
               - name: GIT_CONFIG_KEY_0
@@ -166,6 +168,9 @@ spec:
             image:
               tag: sha-f8b8092
             mode: watch-content
+            # Builder-admin initializes the new PVC checkout before search starts.
+            waitForSource:
+              enabled: false
 
           sourceArchive:
             bucket: unused-in-hostpath-mode
