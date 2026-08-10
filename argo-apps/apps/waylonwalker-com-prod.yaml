@@ -48,13 +48,13 @@ spec:
               storageClassName: longhorn
               size: 10Gi
               accessModes:
-                - ReadWriteMany
+                - ReadWriteOnce
             site:
               mode: pvc
               storageClassName: longhorn
               size: 10Gi
               accessModes:
-                - ReadWriteMany
+                - ReadWriteOnce
             cache:
               enabled: true
               mode: pvc
