@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: build-waylonwalker-com-prod-tls
+  namespace: waylonwalker-com-prod-notes
+  labels:
+    environment: production
+    app.kubernetes.io/environment: production
+spec:
+  secretName: build-waylonwalker-com-prod-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-dns
+  dnsNames:
+    - build.waylonwalker.com

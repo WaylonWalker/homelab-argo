@@ -1,0 +1,173 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: waylonwalker-com-prod
+  namespace: argocd
+  labels:
+    environment: production
+    app.kubernetes.io/environment: production
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
+      targetRevision: HEAD
+      path: waylonwalker-com/waylonwalker-com-prod
+    - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
+      targetRevision: markata/go-perf
+      path: helm-chart
+      helm:
+        values: |
+          project_identifier: waylonwalker-com-prod
+          project_name: waylonwalker-com
+          environment: production
+
+          imagePullSecrets: []
+
+          nodeSelector:
+            kubernetes.io/hostname: falcon3
+
+          offline:
+            enabled: false
+
+          ingress:
+            host: new.waylonwalker.com
+            ingressClassName: traefik
+            tls:
+              enabled: true
+              secretName: waylonwalker-com-prod-tls
+
+          markataEncryption:
+            secretName: markata-go-encryption
+
+          aws:
+            existingSecretName: ""
+
+          storage:
+            source:
+              mode: hostPath
+              hostPath:
+                # Share the established content source with dev, but keep
+                # production releases and served output isolated.
+                path: /mnt/main/walkershare/waylon/vaults/go.waylonwalker.com
+                type: Directory
+            site:
+              mode: hostPath
+              hostPath:
+                path: /mnt/main/walkershare/waylon/sites/waylonwalker.com
+                type: DirectoryOrCreate
+            cache:
+              enabled: true
+              mode: hostPath
+              hostPath:
+                path: /mnt/main/walkershare/waylon/cache/waylonwalker.com
+                type: DirectoryOrCreate
+            search:
+              storageClassName: local-path
+              pvcNameSuffix: "-local"
+              size: 5Gi
+
+          build:
+            fetchImage:
+              tag: sha-f8b8092
+            builderImage:
+              tag: sha-a83b0b5
+            fast: false
+            successfulJobsHistoryLimit: 20
+            failedJobsHistoryLimit: 10
+            ttlSecondsAfterFinished: 2592000
+            activeDeadlineSeconds: 7200
+            cacheDir: /data/cache/xdg
+            notify:
+              enabled: true
+              url: https://ntfy.wayl.one/opencode
+            releases:
+              keep: 25
+            resources:
+              requests:
+                cpu: 100m
+                memory: 4Gi
+                ephemeral-storage: 8Gi
+              limits:
+                memory: 16Gi
+                ephemeral-storage: 20Gi
+            extraEnv:
+              - name: MARKATA_GO_CONCURRENCY
+                value: "2"
+              - name: MARKATA_GO_URL
+                value: "https://new.waylonwalker.com"
+              - name: MARKATA_GO_SEARCH_ENDPOINT
+                value: "https://new.waylonwalker.com/api/search"
+              - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
+                value: "https://new.waylonwalker.com/api/search"
+
+          builderAdmin:
+            enabled: true
+            fast: false
+            auth:
+              trustedProxyCIDRs:
+                - 10.42.0.0/24
+                - 10.42.2.0/24
+            ingress:
+              enabled: true
+              host: build.waylonwalker.com
+              ingressClassName: traefik
+              tls:
+                enabled: true
+                secretName: build-waylonwalker-com-prod-tls
+              auth:
+                enabled: true
+                internalUrl: http://hlab-auth.hlab-auth.svc.cluster.local:8000
+                publicAuthOrigin: https://auth.waylonwalker.com
+            networkPolicy:
+              enabled: true
+              traefikNamespace: kube-system
+              traefikNamespaceSelector:
+                kubernetes.io/metadata.name: kube-system
+              traefikPodSelector:
+                app.kubernetes.io/name: traefik
+                app.kubernetes.io/instance: traefik-kube-system
+            mermaidMode: client
+            # Dev remains the authoring/watch environment for now.
+            watch:
+              enabled: false
+              debounce: 2s
+            releases:
+              keep: 25
+            history:
+              successfulBuilds: 60
+              failedBuilds: 100
+              refreshRuns: 100
+            buildTimeoutSeconds: 7200
+            historyDir: /data/site/.builder-admin
+            webhook:
+              enabled: true
+              branch: main
+              existingSecretName: builder-webhook
+              existingSecretKey: MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET
+            resources:
+              requests:
+                cpu: 100m
+                memory: 4Gi
+                ephemeral-storage: 8Gi
+              limits:
+                memory: 16Gi
+                ephemeral-storage: 20Gi
+
+          search:
+            enabled: true
+            image:
+              tag: sha-f8b8092
+            mode: watch-content
+
+          sourceArchive:
+            bucket: unused-in-hostpath-mode
+            location: /unused-in-hostpath-mode
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: waylonwalker-com-prod-notes
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

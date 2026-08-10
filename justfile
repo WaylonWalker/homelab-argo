@@ -24,6 +24,26 @@ secret-to-sealed app env_file secret_name=(app + "-secret") namespace=app:
     just private-secret "{{app}}" "{{env_file}}" "{{secret_name}}" "{{namespace}}"
     just seal-secret "{{app}}" "{{secret_name}}" "{{namespace}}"
 
+create-waylonwalker-com-prod-builder-webhook-secret:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    namespace='waylonwalker-com-prod-notes'
+    secret_name='builder-webhook'
+    secret_key='MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET'
+
+    kubectl create namespace "$namespace" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+    if kubectl get secret "$secret_name" --namespace "$namespace" >/dev/null 2>&1; then
+      echo "Secret $secret_name already exists in $namespace; refusing to replace it."
+      exit 0
+    fi
+
+    webhook_secret="$(openssl rand -hex 32)"
+    kubectl create secret generic "$secret_name" \
+      --namespace "$namespace" \
+      --from-literal="$secret_key=$webhook_secret"
+    unset webhook_secret
+    echo "Created $secret_name in $namespace. Configure GitHub with the secret before removing it from Kubernetes."
+
 kraft-playit-secret-from-clipboard:
     #!/usr/bin/env bash
     set -euo pipefail
