@@ -91,6 +91,14 @@ spec:
                 memory: 16Gi
                 ephemeral-storage: 20Gi
             extraEnv:
+              # The shared hostPath checkout is owned by UID 1000. Git 2.45
+              # rejects it as dubious unless the mounted checkout is trusted.
+              - name: GIT_CONFIG_COUNT
+                value: "1"
+              - name: GIT_CONFIG_KEY_0
+                value: safe.directory
+              - name: GIT_CONFIG_VALUE_0
+                value: /data/source
               - name: MARKATA_GO_CONCURRENCY
                 value: "2"
               - name: MARKATA_GO_URL
