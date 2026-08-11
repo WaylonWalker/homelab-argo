@@ -1,0 +1,190 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wyattbubbylee-com-prod
+  namespace: argocd
+  labels:
+    environment: production
+    app.kubernetes.io/environment: production
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://github.com/waylonwalker/homelab-argo'
+      targetRevision: HEAD
+      path: wyattbubbylee-com/wyattbubbylee-com-prod
+    - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
+      targetRevision: markata/go-perf
+      path: helm-chart
+      helm:
+        values: |
+          project_identifier: wyattbubbylee-com-prod
+          project_name: wyattbubbylee-com
+          environment: production
+
+          imagePullSecrets: []
+
+          nodeSelector:
+            kubernetes.io/hostname: falcon3
+
+          offline:
+            enabled: false
+
+          ingress:
+            host: wyattbubbylee.com
+            extraCnames:
+              - www.wyattbubbylee.com
+            ingressClassName: traefik
+            tls:
+              enabled: true
+              secretName: wyattbubbylee-com-prod-tls
+
+          markataEncryption:
+            secretName: markata-go-encryption
+
+          aws:
+            existingSecretName: ""
+
+          storage:
+            source:
+              mode: pvc
+              storageClassName: longhorn
+              size: 10Gi
+              accessModes:
+                - ReadWriteOnce
+            site:
+              mode: pvc
+              storageClassName: longhorn
+              size: 10Gi
+              accessModes:
+                - ReadWriteOnce
+            cache:
+              enabled: true
+              mode: pvc
+              storageClassName: longhorn
+              size: 10Gi
+              accessModes:
+                - ReadWriteOnce
+            search:
+              storageClassName: longhorn
+              size: 5Gi
+
+          build:
+            # Builder-admin owns builds after the source checkout is seeded.
+            # The archive-based CronJob is disabled because no source archive is configured.
+            enabled: false
+            fetchImage:
+              tag: sha-f8b8092
+            builderImage:
+              tag: sha-a83b0b5
+            fast: false
+            cacheDir: /data/cache/xdg
+            notify:
+              enabled: true
+              url: https://ntfy.wayl.one/opencode
+            releases:
+              keep: 25
+            resources:
+              requests:
+                cpu: 100m
+                memory: 4Gi
+                ephemeral-storage: 8Gi
+              limits:
+                memory: 16Gi
+                ephemeral-storage: 20Gi
+            extraEnv:
+              - name: GIT_CONFIG_COUNT
+                value: "1"
+              - name: GIT_CONFIG_KEY_0
+                value: safe.directory
+              - name: GIT_CONFIG_VALUE_0
+                value: /data/source
+              - name: MARKATA_GO_CONCURRENCY
+                value: "2"
+              - name: MARKATA_GO_URL
+                value: "https://wyattbubbylee.com"
+              - name: MARKATA_GO_SEARCH_ENDPOINT
+                value: "https://wyattbubbylee.com/api/search"
+              - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
+                value: "https://wyattbubbylee.com/api/search"
+
+          builderAdmin:
+            enabled: true
+            fast: false
+            auth:
+              trustedProxyCIDRs:
+                - 10.42.0.0/24
+                - 10.42.2.0/24
+            ingress:
+              enabled: true
+              host: build.wyattbubbylee.com
+              ingressClassName: traefik
+              tls:
+                enabled: true
+                secretName: build-wyattbubbylee-com-prod-tls
+              auth:
+                enabled: true
+                internalUrl: http://hlab-auth.hlab-auth.svc.cluster.local:8000
+                publicAuthOrigin: https://auth.waylonwalker.com
+            networkPolicy:
+              enabled: true
+              traefikNamespace: kube-system
+              traefikNamespaceSelector:
+                kubernetes.io/metadata.name: kube-system
+              traefikPodSelector:
+                app.kubernetes.io/name: traefik
+                app.kubernetes.io/instance: traefik-kube-system
+            mermaidMode: client
+            watch:
+              enabled: false
+              debounce: 2s
+            releases:
+              keep: 25
+            history:
+              successfulBuilds: 60
+              failedBuilds: 100
+              refreshRuns: 100
+            buildTimeoutSeconds: 7200
+            historyDir: /data/site/.builder-admin
+            webhook:
+              enabled: true
+              branch: main
+              existingSecretName: builder-webhook
+              existingSecretKey: MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET
+            resources:
+              requests:
+                cpu: 100m
+                memory: 4Gi
+                ephemeral-storage: 8Gi
+              limits:
+                memory: 16Gi
+                ephemeral-storage: 20Gi
+            refreshTasks:
+              - name: reader-update
+                every: 30m
+                enqueueBuildOnSuccess: true
+                args:
+                  - --config
+                  - /data/source/markata-go.toml
+                  - reader
+                  - update
+
+          search:
+            enabled: true
+            image:
+              tag: sha-f8b8092
+            mode: watch-content
+            waitForSource:
+              enabled: false
+
+          sourceArchive:
+            bucket: unused-in-pvc-seed-mode
+            location: /unused-in-pvc-seed-mode
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: wyattbubbylee-com-prod-notes
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

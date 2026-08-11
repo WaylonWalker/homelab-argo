@@ -44,6 +44,71 @@ create-waylonwalker-com-prod-builder-webhook-secret:
     unset webhook_secret
     echo "Created $secret_name in $namespace. Configure GitHub with the secret before removing it from Kubernetes."
 
+create-wyattbubbylee-com-prod-builder-webhook-secret:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    namespace='wyattbubbylee-com-prod-notes'
+    secret_name='builder-webhook'
+    secret_key='MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET'
+
+    kubectl create namespace "$namespace" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+    if kubectl get secret "$secret_name" --namespace "$namespace" >/dev/null 2>&1; then
+      echo "Secret $secret_name already exists in $namespace; refusing to replace it."
+      exit 0
+    fi
+
+    webhook_secret="$(openssl rand -hex 32)"
+    kubectl create secret generic "$secret_name" \
+      --namespace "$namespace" \
+      --from-literal="$secret_key=$webhook_secret"
+    unset webhook_secret
+    echo "Created $secret_name in $namespace. Configure GitHub with the secret before removing it."
+
+seed-wyattbubbylee-com-prod-source:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    namespace='wyattbubbylee-com-prod-notes'
+    job_name='wyattbubbylee-com-prod-seed-source'
+    kubectl delete job "$job_name" --namespace "$namespace" --ignore-not-found --wait=true >/dev/null
+    kubectl apply -f - <<'EOF'
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: wyattbubbylee-com-prod-seed-source
+      namespace: wyattbubbylee-com-prod-notes
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 900
+      template:
+        spec:
+          nodeSelector:
+            kubernetes.io/hostname: falcon3
+          restartPolicy: Never
+          containers:
+            - name: seed
+              image: alpine/git:2.47.2
+              command: ["/bin/sh", "-ceu"]
+              args:
+                - |
+                  if test -d /data/source/.git; then
+                    echo "Source checkout already exists"
+                    exit 0
+                  fi
+                  git clone https://git.waylonwalker.com/wyatt/wyattbubbylee.com /data/source
+              volumeMounts:
+                - name: source
+                  mountPath: /data/source
+          volumes:
+            - name: source
+              persistentVolumeClaim:
+                claimName: wyattbubbylee-com-prod-notes-source-pvc
+    EOF
+    kubectl wait --for=condition=complete "job/$job_name" --namespace "$namespace" --timeout=900s
+    kubectl logs "job/$job_name" --namespace "$namespace"
+    kubectl delete job "$job_name" --namespace "$namespace" --wait=true >/dev/null
+    kubectl rollout restart deployment/wyattbubbylee-com-prod-notes-builder-admin --namespace "$namespace"
+    kubectl rollout restart deployment/wyattbubbylee-com-prod-notes-search --namespace "$namespace"
+
 kraft-playit-secret-from-clipboard:
     #!/usr/bin/env bash
     set -euo pipefail
