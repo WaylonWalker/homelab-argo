@@ -162,6 +162,15 @@ spec:
               limits:
                 memory: 16Gi
                 ephemeral-storage: 20Gi
+            refreshTasks:
+              - name: reader-update
+                every: 30m
+                enqueueBuildOnSuccess: true
+                args:
+                  - --config
+                  - /data/source/markata-go.toml
+                  - reader
+                  - update
 
           search:
             enabled: true
