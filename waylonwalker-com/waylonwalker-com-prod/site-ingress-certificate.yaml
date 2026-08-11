@@ -12,4 +12,5 @@ spec:
     kind: ClusterIssuer
     name: letsencrypt-dns
   dnsNames:
+    - waylonwalker.com
     - new.waylonwalker.com

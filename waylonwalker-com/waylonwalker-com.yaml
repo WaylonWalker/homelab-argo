@@ -3,6 +3,39 @@ kind: Namespace
 metadata:
   name: waylonwalker-com
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web
+  namespace: waylonwalker-com
+  labels:
+    app: web
+    app.kubernetes.io/instance: waylonwalker.com
+    app.kubernetes.io/name: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: old.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+    - host: goaccess.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:

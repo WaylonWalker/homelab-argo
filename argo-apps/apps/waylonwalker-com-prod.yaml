@@ -30,7 +30,9 @@ spec:
             enabled: false
 
           ingress:
-            host: new.waylonwalker.com
+            host: waylonwalker.com
+            extraCnames:
+              - new.waylonwalker.com
             ingressClassName: traefik
             tls:
               enabled: true
@@ -104,11 +106,11 @@ spec:
               - name: MARKATA_GO_CONCURRENCY
                 value: "2"
               - name: MARKATA_GO_URL
-                value: "https://new.waylonwalker.com"
+                value: "https://waylonwalker.com"
               - name: MARKATA_GO_SEARCH_ENDPOINT
-                value: "https://new.waylonwalker.com/api/search"
+                value: "https://waylonwalker.com/api/search"
               - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
-                value: "https://new.waylonwalker.com/api/search"
+                value: "https://waylonwalker.com/api/search"
 
           builderAdmin:
             enabled: true
