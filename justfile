@@ -94,6 +94,7 @@ seed-wyattbubbylee-com-prod-source:
                     echo "Source checkout already exists"
                     exit 0
                   fi
+                  rm -rf /data/source/* /data/source/.[!.]* /data/source/..?*
                   git clone https://git.waylonwalker.com/wyatt/wyattbubbylee.com /data/source
               volumeMounts:
                 - name: source
