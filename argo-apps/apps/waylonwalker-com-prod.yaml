@@ -59,9 +59,10 @@ spec:
                 - ReadWriteOnce
             cache:
               enabled: true
-              mode: pvc
-              storageClassName: longhorn
-              size: 10Gi
+              mode: hostPath
+              hostPath:
+                path: /mnt/main/walkershare/waylon/cache/waylonwalker.com
+                type: DirectoryOrCreate
               accessModes:
                 - ReadWriteOnce
             search:
@@ -73,9 +74,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-2fe15a6
+              tag: sha-bc28657
             builderImage:
-              tag: sha-2fe15a6
+              tag: sha-bc28657
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -177,7 +178,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-2fe15a6
+              tag: sha-bc28657
             mode: watch-content
             # Builder-admin initializes the new PVC checkout before search starts.
             waitForSource:
