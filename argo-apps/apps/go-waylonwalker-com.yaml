@@ -91,7 +91,7 @@ spec:
             extraEnv:
               # Keep enough parallelism for cached post restoration and asset work.
               - name: MARKATA_GO_CONCURRENCY
-                value: "8"
+                value: "16"
               - name: MARKATA_GO_URL
                 value: "https://go.waylonwalker.com"
               - name: MARKATA_GO_SEARCH_ENDPOINT

@@ -105,7 +105,7 @@ spec:
               - name: GIT_CONFIG_VALUE_0
                 value: /data/source
               - name: MARKATA_GO_CONCURRENCY
-                value: "8"
+                value: "16"
               - name: MARKATA_GO_URL
                 value: "https://waylonwalker.com"
               - name: MARKATA_GO_SEARCH_ENDPOINT
