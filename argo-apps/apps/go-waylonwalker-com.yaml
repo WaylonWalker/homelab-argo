@@ -89,11 +89,9 @@ spec:
                 memory: 16Gi
                 ephemeral-storage: 20Gi
             extraEnv:
-              # Concurrency=1 roughly doubled warm full-build time locally.
-              # Keep this conservative for memory, but allow enough parallelism
-              # to recover most of the cached build speedup.
+              # Keep enough parallelism for cached post restoration and asset work.
               - name: MARKATA_GO_CONCURRENCY
-                value: "2"
+                value: "4"
               - name: MARKATA_GO_URL
                 value: "https://go.waylonwalker.com"
               - name: MARKATA_GO_SEARCH_ENDPOINT
