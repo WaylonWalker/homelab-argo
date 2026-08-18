@@ -117,7 +117,7 @@ spec:
             - name: FORGEJO__cors__ENABLED
               value: "true"
             - name: FORGEJO__cors__ALLOW_DOMAIN
-              value: "https://md.waylonwalker.com,http://localhost:8987,http://127.0.0.1:8987,http://localhost:8000,http://127.0.0.1:8000"
+              value: "https://md.waylonwalker.com,https://md-dev.waylonwalker.com,http://localhost:8987,http://127.0.0.1:8987,http://localhost:8000,http://127.0.0.1:8000"
             - name: FORGEJO__cors__METHODS
               value: "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS"
             - name: FORGEJO__cors__HEADERS
