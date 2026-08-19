@@ -18,6 +18,8 @@ spec:
         image:
           name: opengraph
           tag: "0.3.2"
+        additionalDomains:
+          - waylonwalker.com
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: opengraph # Target namespace for deployment
