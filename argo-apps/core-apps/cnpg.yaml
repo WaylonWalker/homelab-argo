@@ -12,6 +12,11 @@ spec:
     path: cnpg
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
+  ignoreDifferences:
+    - group: postgresql.cnpg.io
+      kind: Cluster
+      jsonPointers:
+        - /status
   syncPolicy:
     automated:
       prune: true
