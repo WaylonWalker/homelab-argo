@@ -17,12 +17,13 @@ spec:
         configs:
           cm:
             application.resourceTrackingMethod: annotation
+            resource.compareoptions: ignoreResourceStatusField: all
           params:
             "server.insecure": true
         server:
           ingress:
             enabled: true
-    targetRevision: 9.5.21
+    targetRevision: 10.4.0
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
