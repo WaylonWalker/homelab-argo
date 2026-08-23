@@ -17,7 +17,7 @@ spec:
         configs:
           cm:
             application.resourceTrackingMethod: annotation
-            resource.compareoptions: ignoreResourceStatusField: all
+            resource.compareoptions: "ignoreResourceStatusField: all"
           params:
             "server.insecure": true
         server:
