@@ -29,6 +29,9 @@ spec:
         repoServer:
           nodeSelector:
             kubernetes.io/hostname: falcon1
+          extraArgs:
+            - --address
+            - 0.0.0.0
     targetRevision: 10.4.0
   destination:
     server: https://kubernetes.default.svc
