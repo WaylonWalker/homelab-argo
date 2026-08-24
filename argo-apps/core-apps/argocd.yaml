@@ -23,6 +23,12 @@ spec:
         server:
           ingress:
             enabled: true
+        controller:
+          nodeSelector:
+            kubernetes.io/hostname: falcon1
+        repoServer:
+          nodeSelector:
+            kubernetes.io/hostname: falcon1
     targetRevision: 10.4.0
   destination:
     server: https://kubernetes.default.svc
