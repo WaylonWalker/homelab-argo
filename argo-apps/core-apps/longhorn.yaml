@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: longhorn
       repoURL: https://charts.longhorn.io/
-      targetRevision: v1.10.2 # CRD schema was applied before the manager upgrade
+      targetRevision: v1.11.3 # Upgrade after the v1.10.2 engine migration
       helm:
         values: |
           preUpgradeChecker:
