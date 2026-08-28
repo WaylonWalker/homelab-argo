@@ -98,6 +98,11 @@ spec:
                 value: "https://go.waylonwalker.com/api/search"
               - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
                 value: "https://go.waylonwalker.com/api/search"
+              - name: WEBMENTION_IO_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: webmention-io
+                    key: WEBMENTION_IO_TOKEN
 
           builderAdmin:
             enabled: true
@@ -165,6 +170,14 @@ spec:
                   - /data/source/markata-go.toml
                   - reader
                   - update
+              - name: webmentions-fetch
+                every: 30m
+                enqueueBuildOnSuccess: true
+                args:
+                  - --config
+                  - /data/source/markata-go.toml
+                  - webmentions
+                  - fetch
 
           search:
             enabled: true
