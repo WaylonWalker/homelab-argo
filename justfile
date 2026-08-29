@@ -440,20 +440,30 @@ update-go-image-pin:
     set -euo pipefail
     file="argo-apps/apps/go-waylonwalker-com.yaml"
 
-    sha=$(git ls-remote https://github.com/WaylonWalker/markata-go.git main | cut -c1-7)
-    tag="sha-$sha"
-    current=$(grep -oP 'tag: sha-\w+' "$file" | head -1 | cut -d' ' -f3)
+    sha=$(git ls-remote https://github.com/WaylonWalker/markata-go.git main | cut -f1)
+    tag="sha-${sha:0:7}"
+    current=$(grep -oP 'tag: sha-\w+' "$file" | head -1 | cut -d' ' -f2)
+    current_source=$(sed -n "/repoURL: 'https:\/\/github.com\/WaylonWalker\/markata-go\.git'/,/path: helm-chart/{s/^[[:space:]]*targetRevision: //p;}" "$file")
 
-    echo "current: $current"
-    echo "latest:  $tag"
+    if [[ -z "$current" || -z "$current_source" ]]; then
+        echo "Could not read the current image or chart source pin from $file" >&2
+        exit 1
+    fi
 
-    if [[ "$tag" == "$current" ]]; then
+    echo "current image:  $current"
+    echo "latest image:   $tag"
+    echo "current source: $current_source"
+    echo "latest source:  $sha"
+
+    if [[ "$tag" == "$current" && "$sha" == "$current_source" ]]; then
         echo "Already up to date."
         exit 0
     fi
 
+    sed -i "/repoURL: 'https:\/\/github.com\/WaylonWalker\/markata-go\.git'/,/path: helm-chart/{s/targetRevision: .*/targetRevision: $sha/;}" "$file"
     sed -i "s/$current/$tag/g" "$file"
-    echo "Updated $current -> $tag"
+    echo "Updated source $current_source -> $sha"
+    echo "Updated images $current -> $tag"
 
     git add "$file"
     if git diff --cached --quiet; then
