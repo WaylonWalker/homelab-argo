@@ -29,8 +29,6 @@ spec:
         repoServer:
           nodeSelector:
             kubernetes.io/hostname: falcon1
-          hostNetwork: true
-          dnsPolicy: ClusterFirstWithHostNet
           extraArgs:
             - --address
             - 0.0.0.0
