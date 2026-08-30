@@ -34,7 +34,7 @@ spec:
           extraArgs:
             - --address
             - 0.0.0.0
-    targetRevision: 10.4.0
+    targetRevision: 10.4.2
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
