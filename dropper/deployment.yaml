@@ -150,7 +150,7 @@ spec:
             #       name: dropper-secret
             #       key: BACKEND_CORS_ORIGINS
             - name: DROPPER_BACKEND_CORS_ORIGINS
-              value: '["https://thoughts.wayl.one", "https://thoughts-dev.wayl.one", "https://md.wayl.one", "https://md-dev.wayl.one", "https://thoughts.wayl.one", "https://thoughts-dev.wayl.one", "https://md.wayl.one", "https://md-dev.wayl.one", "http://localhost:8000", "http://localhost:8987"]'
+              value: '["https://thoughts.wayl.one", "https://thoughts-dev.wayl.one", "https://md.waylonwalker.com", "https://md-dev.waylonwalker.com", "https://thoughts.wayl.one", "https://thoughts-dev.wayl.one", "https://md.waylonwalker.com", "https://md-dev.waylonwalker.com", "http://localhost:8000", "http://localhost:8987"]'
             - name: AWS_ENDPOINT_URL
               value: "https://minio.wayl.one"
             - name: DB_USER
