@@ -29,6 +29,8 @@ spec:
         repoServer:
           nodeSelector:
             kubernetes.io/hostname: falcon1
+          networkPolicy:
+            create: false
           extraArgs:
             - --address
             - 0.0.0.0
