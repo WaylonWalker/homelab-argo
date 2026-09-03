@@ -66,9 +66,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-ced1163
+              tag: sha-6e4c5b2
             builderImage:
-              tag: sha-ced1163
+              tag: sha-6e4c5b2
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -182,7 +182,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-ced1163
+              tag: sha-6e4c5b2
             mode: watch-content
 
           sourceArchive:
