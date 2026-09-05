@@ -73,7 +73,7 @@ spec:
         service: dropper-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.47
+        - image: registry.wayl.one/dropper:0.0.47-hardening-dev-20260905
           imagePullPolicy: IfNotPresent
           name: dropper-wayl-one
           command:
@@ -88,7 +88,7 @@ spec:
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /health
+              path: /readyz
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10
@@ -131,6 +131,8 @@ spec:
               value: "postgresql+psycopg://$(DB_USER):$(DB_PASSWORD)@dropper-db-rw.dropper-dev.svc.cluster.local:5432/$(DB_NAME)"
             - name: DROPPER_STORAGE_DIR
               value: /data
+            - name: DROPPER_TRUSTED_PROXY_NETWORKS
+              value: "10.42.0.0/16"
             - name: DROPPER_CACHE_DIR
               value: /cache
             - name: DROPPER_DEFAULT_MEDIA_VARIANTS
