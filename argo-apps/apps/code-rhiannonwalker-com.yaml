@@ -66,9 +66,9 @@ spec:
           build:
             enabled: false
             fetchImage:
-              tag: sha-90c0778
+              tag: sha-a5e6dc1
             builderImage:
-              tag: sha-90c0778
+              tag: sha-a5e6dc1
             fast: false
             cacheDir: /data/cache/xdg
             releases:
@@ -159,7 +159,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-90c0778
+              tag: sha-a5e6dc1
             mode: watch-content
             waitForSource:
               enabled: true
