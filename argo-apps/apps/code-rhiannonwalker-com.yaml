@@ -173,8 +173,8 @@ spec:
   syncPolicy:
     automated:
       selfHeal: true
-      # Keep the legacy rhiannonwalker namespace resources during migration.
-      # Remove them only after the new markata-go site is verified.
-      prune: false
+      # The legacy rhiannonwalker namespace resources are no longer in Git.
+      # Prune them now that the markata-go site is verified.
+      prune: true
     syncOptions:
       - CreateNamespace=true
