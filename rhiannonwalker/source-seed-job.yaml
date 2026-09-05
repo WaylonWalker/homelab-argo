@@ -67,11 +67,18 @@ spec:
                 git -C "${source_dir}" fetch --depth=1 origin main
                 git -C "${source_dir}" checkout main
                 git -C "${source_dir}" pull --ff-only origin main
-              elif [ -n "$(find "${source_dir}" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+              # A freshly formatted filesystem can contain only ext4's
+              # lost+found directory, which is not application content.
+              elif [ -n "$(find "${source_dir}" -mindepth 1 -maxdepth 1 ! -name lost+found -print -quit)" ]; then
                 echo "source PVC is non-empty but is not a Git checkout" >&2
                 exit 1
               else
-                git clone --branch main --single-branch --depth=1 "${repo}" "${source_dir}"
+                # git clone rejects a mount that contains lost+found, so
+                # initialize the checkout in place and fetch the branch.
+                git -C "${source_dir}" init
+                git -C "${source_dir}" remote add origin "${repo}"
+                git -C "${source_dir}" fetch --depth=1 origin main
+                git -C "${source_dir}" checkout -B main FETCH_HEAD
               fi
 
               test -f "${source_dir}/markata-go.toml" || {
