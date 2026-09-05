@@ -1,0 +1,143 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rhiannonwalker-com-prod-source-seed
+  namespace: rhiannonwalker-com-prod-notes
+  labels:
+    app.kubernetes.io/name: rhiannonwalker-com
+    app.kubernetes.io/component: source-seed
+    app.kubernetes.io/environment: production
+  annotations:
+    # Run as a sync hook so a failed or completed bootstrap can be retried on
+    # the next sync without an immutable completed Job blocking it. PVCs and
+    # the namespace are chart resources in the same wave and are applied first
+    # by Argo's resource ordering.
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rhiannonwalker-com
+        app.kubernetes.io/component: source-seed
+        app.kubernetes.io/environment: production
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: falcon3
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      restartPolicy: OnFailure
+      containers:
+        - name: source-seed
+          image: ghcr.io/waylonwalker/markata-go-builder:sha-90c0778
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+          command:
+            - /bin/sh
+            - -ceu
+          args:
+            - |
+              source_dir=/data/source
+              site_dir=/data/site
+              repo=https://github.com/WaylonWalker/rhiannonwalker.com.git
+
+              site_has_current=0
+              if [ -e "${site_dir}/current" ] || [ -L "${site_dir}/current" ]; then
+                site_has_current=1
+              fi
+
+              # The webhook owns source updates after the first successful
+              # bootstrap. Avoid pulling while builder-admin may be building.
+              if [ "${site_has_current}" -eq 1 ] && \
+                [ -d "${source_dir}/.git" ] && \
+                [ -f "${source_dir}/markata-go.toml" ]; then
+                echo "source and site are already initialized; leaving current release untouched"
+                touch "${source_dir}/.markata-notes-source-ready"
+                exit 0
+              fi
+
+              if [ -d "${source_dir}/.git" ]; then
+                git -C "${source_dir}" fetch --depth=1 origin main
+                git -C "${source_dir}" checkout main
+                git -C "${source_dir}" pull --ff-only origin main
+              elif [ -n "$(find "${source_dir}" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+                echo "source PVC is non-empty but is not a Git checkout" >&2
+                exit 1
+              else
+                git clone --branch main --single-branch --depth=1 "${repo}" "${source_dir}"
+              fi
+
+              test -f "${source_dir}/markata-go.toml" || {
+                echo "${repo} main does not contain markata-go.toml yet" >&2
+                exit 1
+              }
+
+              if [ "${site_has_current}" -eq 1 ]; then
+                echo "source checkout restored; current release already exists, leaving it untouched"
+                touch "${source_dir}/.markata-notes-source-ready"
+                exit 0
+              fi
+
+              mkdir -p "${site_dir}/releases" /data/cache/xdg
+              commit=$(git -C "${source_dir}" rev-parse --short HEAD)
+              release_dir="${site_dir}/releases/seed-${commit}"
+              rm -rf "${release_dir}"
+              cd "${source_dir}"
+              markata-go build --output "${release_dir}"
+              ln -sfn "releases/seed-${commit}" "${site_dir}/current.next"
+              mv -Tf "${site_dir}/current.next" "${site_dir}/current"
+              touch "${source_dir}/.markata-notes-source-ready"
+          envFrom:
+            - secretRef:
+                name: markata-go-encryption
+          env:
+            - name: GIT_TERMINAL_PROMPT
+              value: "0"
+            - name: GIT_CONFIG_COUNT
+              value: "1"
+            - name: GIT_CONFIG_KEY_0
+              value: safe.directory
+            - name: GIT_CONFIG_VALUE_0
+              value: /data/source
+            - name: MARKATA_GO_OFFLINE
+              value: "false"
+            - name: MARKATA_GO_URL
+              value: https://rhiannonwalker.com
+            - name: MARKATA_GO_SEARCH_ENDPOINT
+              value: https://rhiannonwalker.com/api/search
+            - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
+              value: https://rhiannonwalker.com/api/search
+            - name: XDG_CACHE_HOME
+              value: /data/cache/xdg
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+              ephemeral-storage: 2Gi
+            limits:
+              memory: 4Gi
+              ephemeral-storage: 8Gi
+          volumeMounts:
+            - name: source
+              mountPath: /data/source
+            - name: site
+              mountPath: /data/site
+            - name: cache
+              mountPath: /data/cache
+      volumes:
+        - name: source
+          persistentVolumeClaim:
+            claimName: rhiannonwalker-com-prod-notes-source-pvc
+        - name: site
+          persistentVolumeClaim:
+            claimName: rhiannonwalker-com-prod-notes-site-pvc
+        - name: cache
+          persistentVolumeClaim:
+            claimName: rhiannonwalker-com-prod-notes-cache-pvc

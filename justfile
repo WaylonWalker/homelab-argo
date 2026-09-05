@@ -64,6 +64,30 @@ create-wyattbubbylee-com-prod-builder-webhook-secret:
     unset webhook_secret
     echo "Created $secret_name in $namespace. Configure GitHub with the secret before removing it."
 
+create-rhiannonwalker-com-prod-builder-webhook-secret:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    namespace='rhiannonwalker-com-prod-notes'
+    secret_name='builder-webhook'
+    secret_key='MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET'
+    secret_file='private/rhiannonwalker-com-prod-builder-webhook.env'
+
+    kubectl create namespace "$namespace" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+    if kubectl get secret "$secret_name" --namespace "$namespace" >/dev/null 2>&1; then
+      echo "Secret $secret_name already exists in $namespace; refusing to replace it."
+      exit 0
+    fi
+
+    webhook_secret="$(openssl rand -hex 32)"
+    umask 077
+    mkdir -p private
+    printf '%s=%s\n' "$secret_key" "$webhook_secret" > "$secret_file"
+    kubectl create secret generic "$secret_name" \
+      --namespace "$namespace" \
+      --from-env-file="$secret_file"
+    unset webhook_secret
+    echo "Created $secret_name in $namespace. Configure GitHub with the value in $secret_file, then remove that local file."
+
 seed-wyattbubbylee-com-prod-source:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -109,6 +133,21 @@ seed-wyattbubbylee-com-prod-source:
     kubectl delete job "$job_name" --namespace "$namespace" --wait=true >/dev/null
     kubectl rollout restart deployment/wyattbubbylee-com-prod-notes-builder-admin --namespace "$namespace"
     kubectl rollout restart deployment/wyattbubbylee-com-prod-notes-search --namespace "$namespace"
+
+seed-rhiannonwalker-com-prod-source:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    namespace='rhiannonwalker-com-prod-notes'
+    job_name='rhiannonwalker-com-prod-source-seed'
+    kubectl delete job "$job_name" --namespace "$namespace" --ignore-not-found --wait=true >/dev/null
+    kubectl apply -f rhiannonwalker/source-seed-job.yaml
+    if ! kubectl wait --for=condition=complete "job/$job_name" --namespace "$namespace" --timeout=7200s; then
+      kubectl logs "job/$job_name" --namespace "$namespace" || true
+      exit 1
+    fi
+    kubectl logs "job/$job_name" --namespace "$namespace"
+    kubectl delete job "$job_name" --namespace "$namespace" --wait=true >/dev/null
+    kubectl rollout restart deployment/rhiannonwalker-com-prod-notes-search --namespace "$namespace"
 
 kraft-playit-secret-from-clipboard:
     #!/usr/bin/env bash
