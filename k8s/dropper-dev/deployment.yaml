@@ -152,7 +152,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=dev,service.version=0.0.46"
+              value: "deployment.environment=dev,service.version=0.0.47-hardening-dev-20260905"
           volumeMounts:
             - mountPath: /data
               name: dropper-data
