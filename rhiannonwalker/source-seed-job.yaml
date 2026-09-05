@@ -12,6 +12,9 @@ metadata:
     # the next sync without an immutable completed Job blocking it. PVCs and
     # the namespace are chart resources in the same wave and are applied first
     # by Argo's resource ordering.
+    # This is a migration/bootstrap hook, not a concurrent builder-admin
+    # recovery mechanism. It exits without mutation once the live release and
+    # expected source checkout are valid, and fails closed otherwise.
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
     argocd.argoproj.io/sync-wave: "0"
@@ -47,60 +50,175 @@ spec:
               source_dir=/data/source
               site_dir=/data/site
               repo=https://github.com/WaylonWalker/rhiannonwalker.com.git
+              ready_marker="${source_dir}/.markata-notes-source-ready"
+              bootstrap_marker="${source_dir}/.markata-notes-source-bootstrap"
+              current_path="${site_dir}/current"
+              release_root="${site_dir}/releases"
+
+              marker_is_safe() {
+                marker_path="$1"
+                if [ -L "${marker_path}" ] || \
+                  { [ -e "${marker_path}" ] && [ ! -f "${marker_path}" ]; }; then
+                  echo "source PVC contains an invalid marker entry" >&2
+                  return 1
+                fi
+              }
+
+              create_marker() {
+                marker_path="$1"
+                marker_is_safe "${marker_path}" || return 1
+                if [ -e "${marker_path}" ]; then
+                  return 0
+                fi
+                ( set -C; : > "${marker_path}" ) || {
+                  echo "could not create source readiness marker" >&2
+                  return 1
+                }
+              }
+
+              remove_marker() {
+                marker_path="$1"
+                marker_is_safe "${marker_path}" || return 1
+                rm -f "${marker_path}"
+              }
+
+              current_release_is_valid() {
+                [ -L "${current_path}" ] || return 1
+                [ -d "${release_root}" ] && [ ! -L "${release_root}" ] || return 1
+                current_target="$(readlink "${current_path}" 2>/dev/null)" || return 1
+                case "${current_target}" in
+                  releases/*) ;;
+                  *) return 1 ;;
+                esac
+                release_id="${current_target#releases/}"
+                case "${release_id}" in
+                  ""|.|..|*/*) return 1 ;;
+                esac
+                release_path="${release_root}/${release_id}"
+                [ -d "${release_path}" ] && [ ! -L "${release_path}" ]
+              }
 
               site_has_current=0
-              if [ -e "${site_dir}/current" ] || [ -L "${site_dir}/current" ]; then
+              if [ -e "${current_path}" ] || [ -L "${current_path}" ]; then
                 site_has_current=1
               fi
+
+              marker_is_safe "${ready_marker}"
+              marker_is_safe "${bootstrap_marker}"
 
               # The webhook owns source updates after the first successful
               # bootstrap. Avoid pulling while builder-admin may be building.
               if [ "${site_has_current}" -eq 1 ] && \
                 [ -d "${source_dir}/.git" ] && \
-                [ -f "${source_dir}/markata-go.toml" ]; then
+                [ -f "${source_dir}/markata-go.toml" ] && \
+                current_release_is_valid && \
+                git -C "${source_dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1 && \
+                [ "$(git -C "${source_dir}" remote get-url origin 2>/dev/null || true)" = "${repo}" ]; then
                 echo "source and site are already initialized; leaving current release untouched"
-                touch "${source_dir}/.markata-notes-source-ready"
+                create_marker "${ready_marker}"
                 exit 0
               fi
 
-              if [ -d "${source_dir}/.git" ]; then
-                git -C "${source_dir}" fetch --depth=1 origin main
-                git -C "${source_dir}" checkout main
-                git -C "${source_dir}" pull --ff-only origin main
+              # Do not let a stale marker start consumers while recovery or
+              # the first release is being prepared.
+              remove_marker "${ready_marker}"
+
+              if [ "${site_has_current}" -eq 1 ]; then
+                echo "site release exists but source checkout is invalid; refusing to alter the source PVC" >&2
+                exit 1
+              fi
+
               # A freshly formatted filesystem can contain only ext4's
-              # lost+found directory, which is not application content.
-              elif [ -n "$(find "${source_dir}" -mindepth 1 -maxdepth 1 ! -name lost+found -print -quit)" ]; then
+              # lost+found directory, which is not application content. Do
+              # not treat a file or symlink with that name as equivalent.
+              if { [ -e "${source_dir}/lost+found" ] || [ -L "${source_dir}/lost+found" ]; } && \
+                { [ ! -d "${source_dir}/lost+found" ] || [ -L "${source_dir}/lost+found" ]; }; then
+                echo "source PVC has an invalid lost+found entry" >&2
+                exit 1
+              fi
+
+              if [ -L "${source_dir}/.git" ]; then
+                echo "source PVC has an invalid Git metadata symlink" >&2
+                exit 1
+              fi
+
+              if [ -d "${source_dir}/.git" ]; then
+                if git -C "${source_dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+                  origin="$(git -C "${source_dir}" remote get-url origin 2>/dev/null || true)"
+                  if [ -z "${origin}" ]; then
+                    if [ ! -e "${bootstrap_marker}" ]; then
+                      echo "source PVC Git checkout has no origin remote" >&2
+                      exit 1
+                    fi
+                    git -C "${source_dir}" remote add origin "${repo}"
+                  elif [ "${origin}" != "${repo}" ]; then
+                    echo "source PVC origin does not match the configured repository" >&2
+                    exit 1
+                  fi
+                elif [ ! -e "${bootstrap_marker}" ] || \
+                  [ -n "$(find "${source_dir}" -mindepth 1 -maxdepth 1 \
+                    ! -name lost+found ! -name .git ! -name .markata-notes-source-bootstrap \
+                    -print -quit)" ]; then
+                  echo "source PVC contains an invalid Git checkout" >&2
+                  exit 1
+                else
+                  # Recover a failed initialization without deleting PVC data.
+                  git -C "${source_dir}" init
+                  git -C "${source_dir}" remote add origin "${repo}"
+                fi
+                git -C "${source_dir}" fetch --depth=1 origin main
+                git -C "${source_dir}" checkout -B main FETCH_HEAD
+              elif [ -n "$(find "${source_dir}" -mindepth 1 -maxdepth 1 \
+                ! -name lost+found ! -name .markata-notes-source-bootstrap \
+                -print -quit)" ]; then
                 echo "source PVC is non-empty but is not a Git checkout" >&2
                 exit 1
               else
-                # git clone rejects a mount that contains lost+found, so
-                # initialize the checkout in place and fetch the branch.
+                # Preserve lost+found by initializing the checkout in place.
+                create_marker "${bootstrap_marker}"
                 git -C "${source_dir}" init
                 git -C "${source_dir}" remote add origin "${repo}"
                 git -C "${source_dir}" fetch --depth=1 origin main
                 git -C "${source_dir}" checkout -B main FETCH_HEAD
               fi
+              remove_marker "${bootstrap_marker}"
 
               test -f "${source_dir}/markata-go.toml" || {
                 echo "${repo} main does not contain markata-go.toml yet" >&2
                 exit 1
               }
 
-              if [ "${site_has_current}" -eq 1 ]; then
-                echo "source checkout restored; current release already exists, leaving it untouched"
-                touch "${source_dir}/.markata-notes-source-ready"
-                exit 0
+              if [ -e "${release_root}" ] || [ -L "${release_root}" ]; then
+                [ -d "${release_root}" ] && [ ! -L "${release_root}" ] || {
+                  echo "site releases path is not a regular directory" >&2
+                  exit 1
+                }
               fi
-
-              mkdir -p "${site_dir}/releases" /data/cache/xdg
+              mkdir -p "${release_root}" /data/cache/xdg
               commit=$(git -C "${source_dir}" rev-parse --short HEAD)
-              release_dir="${site_dir}/releases/seed-${commit}"
+              release_dir="${release_root}/seed-${commit}"
               rm -rf "${release_dir}"
               cd "${source_dir}"
               markata-go build --output "${release_dir}"
-              ln -sfn "releases/seed-${commit}" "${site_dir}/current.next"
-              mv -Tf "${site_dir}/current.next" "${site_dir}/current"
-              touch "${source_dir}/.markata-notes-source-ready"
+              current_next="${site_dir}/current.next"
+              if [ -e "${current_next}" ] || [ -L "${current_next}" ]; then
+                echo "site current.next already exists; refusing to replace it" >&2
+                exit 1
+              fi
+              ln -s "releases/seed-${commit}" "${current_next}"
+              [ -L "${current_next}" ] && \
+                [ "$(readlink "${current_next}")" = "releases/seed-${commit}" ] || {
+                  echo "site current.next was not created safely" >&2
+                  rm -f "${current_next}"
+                  exit 1
+                }
+              if [ -e "${current_path}" ] || [ -L "${current_path}" ]; then
+                echo "site current appeared during bootstrap; refusing to replace it" >&2
+                rm -f "${current_next}"
+                exit 1
+              fi
+              mv -Tf "${current_next}" "${current_path}"
+              create_marker "${ready_marker}"
           envFrom:
             - secretRef:
                 name: markata-go-encryption
