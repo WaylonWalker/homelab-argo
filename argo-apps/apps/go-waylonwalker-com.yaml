@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: waylonwalker-com/go-waylonwalker-com
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
-      targetRevision: a4013239262eaf4cc82c7c083d4bfd24dfcc9b7f
+      targetRevision: markata/go-perf
       path: helm-chart
       helm:
         values: |
@@ -66,9 +66,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-a401323
+              tag: sha-3f6d824
             builderImage:
-              tag: sha-a401323
+              tag: sha-3f6d824
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -182,7 +182,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-a401323
+              tag: sha-3f6d824
             mode: watch-content
 
           sourceArchive:
