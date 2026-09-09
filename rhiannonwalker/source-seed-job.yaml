@@ -13,8 +13,7 @@ metadata:
     # the namespace are chart resources in the same wave and are applied first
     # by Argo's resource ordering.
     # This is a migration/bootstrap hook, not a concurrent builder-admin
-    # recovery mechanism. It exits without mutation once the live release and
-    # expected source checkout are valid, and fails closed otherwise.
+    # recovery mechanism.
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
     argocd.argoproj.io/sync-wave: "0"
@@ -85,15 +84,18 @@ spec:
               current_release_is_valid() {
                 [ -L "${current_path}" ] || return 1
                 [ -d "${release_root}" ] && [ ! -L "${release_root}" ] || return 1
+
                 current_target="$(readlink "${current_path}" 2>/dev/null)" || return 1
                 case "${current_target}" in
                   releases/*) ;;
                   *) return 1 ;;
                 esac
+
                 release_id="${current_target#releases/}"
                 case "${release_id}" in
                   ""|.|..|*/*) return 1 ;;
                 esac
+
                 release_path="${release_root}/${release_id}"
                 [ -d "${release_path}" ] && [ ! -L "${release_path}" ]
               }
@@ -106,15 +108,31 @@ spec:
               marker_is_safe "${ready_marker}"
               marker_is_safe "${bootstrap_marker}"
 
-              # The webhook owns source updates after the first successful
-              # bootstrap. Avoid pulling while builder-admin may be building.
+              # Reconcile an already-initialized source checkout with origin/main.
+              # Webhooks remain the fast path, but a missed webhook must not leave
+              # the persistent source PVC permanently stale.
               if [ "${site_has_current}" -eq 1 ] && \
                 [ -d "${source_dir}/.git" ] && \
                 [ -f "${source_dir}/markata-go.toml" ] && \
                 current_release_is_valid && \
                 git -C "${source_dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1 && \
                 [ "$(git -C "${source_dir}" remote get-url origin 2>/dev/null || true)" = "${repo}" ]; then
-                echo "source and site are already initialized; leaving current release untouched"
+
+                echo "source and site are already initialized; reconciling source with origin/main"
+
+                remove_marker "${ready_marker}"
+
+                git -C "${source_dir}" fetch --depth=1 origin main
+                git -C "${source_dir}" checkout -B main FETCH_HEAD
+
+                test -f "${source_dir}/markata-go.toml" || {
+                  echo "${repo} main does not contain markata-go.toml" >&2
+                  exit 1
+                }
+
+                commit="$(git -C "${source_dir}" rev-parse --short HEAD)"
+                echo "source checkout reconciled to ${commit}"
+
                 create_marker "${ready_marker}"
                 exit 0
               fi
@@ -145,6 +163,7 @@ spec:
               if [ -d "${source_dir}/.git" ]; then
                 if git -C "${source_dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
                   origin="$(git -C "${source_dir}" remote get-url origin 2>/dev/null || true)"
+
                   if [ -z "${origin}" ]; then
                     if [ ! -e "${bootstrap_marker}" ]; then
                       echo "source PVC Git checkout has no origin remote" >&2
@@ -166,6 +185,7 @@ spec:
                   git -C "${source_dir}" init
                   git -C "${source_dir}" remote add origin "${repo}"
                 fi
+
                 git -C "${source_dir}" fetch --depth=1 origin main
                 git -C "${source_dir}" checkout -B main FETCH_HEAD
               elif [ -n "$(find "${source_dir}" -mindepth 1 -maxdepth 1 \
@@ -181,6 +201,7 @@ spec:
                 git -C "${source_dir}" fetch --depth=1 origin main
                 git -C "${source_dir}" checkout -B main FETCH_HEAD
               fi
+
               remove_marker "${bootstrap_marker}"
 
               test -f "${source_dir}/markata-go.toml" || {
@@ -194,30 +215,41 @@ spec:
                   exit 1
                 }
               fi
+
               mkdir -p "${release_root}" /data/cache/xdg
+
               commit=$(git -C "${source_dir}" rev-parse --short HEAD)
               release_dir="${release_root}/seed-${commit}"
+
               rm -rf "${release_dir}"
+
               cd "${source_dir}"
               markata-go build --output "${release_dir}"
+
               current_next="${site_dir}/current.next"
+
               if [ -e "${current_next}" ] || [ -L "${current_next}" ]; then
                 echo "site current.next already exists; refusing to replace it" >&2
                 exit 1
               fi
+
               ln -s "releases/seed-${commit}" "${current_next}"
+
               [ -L "${current_next}" ] && \
                 [ "$(readlink "${current_next}")" = "releases/seed-${commit}" ] || {
                   echo "site current.next was not created safely" >&2
                   rm -f "${current_next}"
                   exit 1
                 }
+
               if [ -e "${current_path}" ] || [ -L "${current_path}" ]; then
                 echo "site current appeared during bootstrap; refusing to replace it" >&2
                 rm -f "${current_next}"
                 exit 1
               fi
+
               mv -Tf "${current_next}" "${current_path}"
+
               create_marker "${ready_marker}"
           envFrom:
             - secretRef:
