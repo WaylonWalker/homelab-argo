@@ -7,7 +7,7 @@ spec:
   instances: 3
   storage:
     size: 5Gi
-    storageClass: longhorn-production
+    storageClass: longhorn-fast-replicated
   bootstrap:
     initdb:
       database: models
