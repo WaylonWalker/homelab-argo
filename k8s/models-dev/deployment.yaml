@@ -16,6 +16,8 @@ spec:
     metadata:
       labels: *labels
     spec:
+      imagePullSecrets:
+        - name: cluster-regcred
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
