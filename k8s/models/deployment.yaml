@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: models
+  namespace: models
+  labels: &labels
+    app.kubernetes.io/name: models
+    app.kubernetes.io/instance: models
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: *labels
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      imagePullSecrets:
+        - name: cluster-regcred
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: models
+          image: registry.wayl.one/models:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: MODELS_LISTEN_ADDR
+              value: :8080
+            - name: MODELS_LIBRARY_ROOT
+              value: /library
+            - name: MODELS_AUTH_MODE
+              value: hlab
+            - name: MODELS_CSRF_MODE
+              value: header
+            - name: MODELS_MAX_UPLOAD_MB
+              value: "4096"
+            - name: MODELS_RECONCILE_SECONDS
+              value: "60"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: models-db-app
+                  key: uri
+          readinessProbe:
+            httpGet: {path: /health/ready, port: http}
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet: {path: /health/live, port: http}
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 2
+          startupProbe:
+            httpGet: {path: /health/live, port: http}
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 180
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: library
+              mountPath: /library
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: library
+          persistentVolumeClaim:
+            claimName: models-library
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: models
+  namespace: models
+spec:
+  selector:
+    app.kubernetes.io/name: models
+    app.kubernetes.io/instance: models
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

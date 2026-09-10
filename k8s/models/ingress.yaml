@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: models
+  namespace: models
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`models.waylonwalker.com`)
+      middlewares:
+        - name: models-strip-hlab
+          namespace: models
+        - name: hlab-auth-forwardauth
+          namespace: hlab-auth
+      services:
+        - name: models
+          port: 8080

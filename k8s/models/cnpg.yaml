@@ -1,0 +1,22 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: models-db
+  namespace: models
+spec:
+  instances: 3
+  storage:
+    size: 5Gi
+    storageClass: longhorn-fast-replicated
+  bootstrap:
+    initdb:
+      database: models
+      owner: models
+  monitoring:
+    enablePodMonitor: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi

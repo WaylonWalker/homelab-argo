@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: models-strip-hlab
+  namespace: models
+spec:
+  headers:
+    customRequestHeaders:
+      X-Hlab-User-Id: ""
+      X-Hlab-Username: ""
+      X-Hlab-Display-Name: ""
+      X-Hlab-Email: ""
+      X-Hlab-Groups: ""
+      X-Hlab-Roles: ""
+      X-Hlab-Scopes: ""
