@@ -55,10 +55,17 @@ spec:
             httpGet: {path: /health/ready, port: http}
             initialDelaySeconds: 3
             periodSeconds: 10
+            timeoutSeconds: 2
           livenessProbe:
             httpGet: {path: /health/live, port: http}
             initialDelaySeconds: 10
             periodSeconds: 20
+            timeoutSeconds: 2
+          startupProbe:
+            httpGet: {path: /health/live, port: http}
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 180
           resources:
             requests:
               cpu: 50m

@@ -10,10 +10,7 @@ spec:
     - kind: Rule
       match: Host(`models-dev.waylonwalker.com`)
       middlewares:
-        - name: models-dev-strip-hlab
-          namespace: models-dev
-        - name: hlab-auth-forwardauth
-          namespace: hlab-auth
+        - name: models-dev-auth
       services:
         - name: models-dev
           port: 8080
