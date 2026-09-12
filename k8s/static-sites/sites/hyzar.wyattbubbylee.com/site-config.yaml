@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: hyzar.wyattbubbylee.com
+  namespace: hyzar-wyattbubbylee-com
+  host: hyzar.wyattbubbylee.com
+  webrootPath: /mnt/main/walkershare/wyatt/sites/hyzar.wyattbubbylee.com

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: solidstack-dev
+  namespace: solidstack-dev
+  host: solidstack-dev.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/solidstack-dev.waylonwalker.com
