@@ -3,7 +3,7 @@ kind: Service
 metadata:
   annotations:
     kompose.cmd: kompose convert -o deployment.yaml -n status
-    kompose.service.expose: status.wayl.one,status.k.waylonwalker.com
+    kompose.service.expose: status.wayl.one,status-k.waylonwalker.com
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -34,7 +34,7 @@ kind: Deployment
 metadata:
   annotations:
     kompose.cmd: kompose convert -o deployment.yaml -n status
-    kompose.service.expose: status.wayl.one,status.k.waylonwalker.com
+    kompose.service.expose: status.wayl.one,status-k.waylonwalker.com
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -52,7 +52,7 @@ spec:
     metadata:
       annotations:
         kompose.cmd: kompose convert -o deployment.yaml -n status
-        kompose.service.expose: status.wayl.one,status.k.waylonwalker.com
+        kompose.service.expose: status.wayl.one,status-k.waylonwalker.com
         kompose.version: 1.31.2 (a92241f79)
         diun.enable: "true"
       creationTimestamp: null
@@ -90,7 +90,7 @@ kind: Ingress
 metadata:
   annotations:
     kompose.cmd: kompose convert -o deployment.yaml -n status
-    kompose.service.expose: status.wayl.one,status.k.waylonwalker.com
+    kompose.service.expose: status.wayl.one,status-k.waylonwalker.com
     kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
@@ -109,7 +109,7 @@ spec:
                   number: 3001
             path: /
             pathType: Prefix
-    - host: status.k.waylonwalker.com
+    - host: status-k.waylonwalker.com
       http:
         paths:
           - backend:
