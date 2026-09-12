@@ -17,9 +17,10 @@ domainFilters:
   - rhiannonwalker.com
   - wyattbubbylee.com
   - wayl.one
-# Do not remove this filter until every eligible host has a verified falcon
-# tunnel route, including hosts in zones that use another tunnel today.
-labelFilter: external-dns-canary=true
+# The canary label filter was removed to preview the full dry-run scope across
+# all Traefik Ingresses. `dry-run` stays on, so this only changes what is
+# logged. Do not remove `dry-run` until every proposed host has a verified
+# falcon tunnel route, including hosts in zones that use another tunnel today.
 managedRecordTypes:
   - CNAME
 

@@ -16,10 +16,11 @@ enable ExternalDNS writes or a broad Ingress rollout.
   `markata.dev`, `rhiannonwalker.com`, `ticklemykeys.com`, `wayl.one`,
   `waylonwalker.com`, and `wyattbubbylee.com`.
 - Registry policy: owner ID `falcon-homelab-external-dns`; TXT prefix
-  `external-dns-%{record_type}.`; source `ingress`; class `traefik`; required
-  label `external-dns-canary=true`; CNAME records only; `dry-run`; `create-only`
-  (additive-only: existing records are never updated or deleted);
-  Cloudflare records proxied.
+  `external-dns-%{record_type}.`; source `ingress`; class `traefik`; all
+  Traefik Ingresses (canary label filter removed for full dry-run preview);
+  CNAME records only; `dry-run` (still on: proposals are logged, nothing is
+  written); `create-only` (additive-only: existing records are never updated
+  or deleted); Cloudflare records proxied.
 
 The generated values include all Cloudflare zones that the token can see at
 secret-generation time. Zone-ID filters prevent automatic access to zones that
@@ -52,8 +53,9 @@ Trust, not in git. This change records approval only and makes no live
 
 1. Traefik writes the `falcon` tunnel hostname to the status of each Traefik
    Ingress. It does not copy the node IPs from the Traefik Service.
-2. The Ingress source selects a Traefik Ingress with the
-   `external-dns-canary=true` label.
+2. The Ingress source selects every Traefik Ingress. The canary label filter
+   was removed to preview the full scope; `dry-run` keeps the preview
+   write-free.
 3. ExternalDNS reads the Ingress hosts and the tunnel hostname from its status.
    It proposes an explicit CNAME for each selected host.
 4. ExternalDNS uses Cloudflare as the provider. It adds ownership TXT records
