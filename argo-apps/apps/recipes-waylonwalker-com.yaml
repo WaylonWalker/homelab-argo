@@ -13,5 +13,8 @@ spec:
     targetRevision: HEAD
     path: k8s/recipes-waylonwalker-com
   syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
     syncOptions:
       - FailOnSharedResource=true
