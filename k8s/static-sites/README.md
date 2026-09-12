@@ -13,3 +13,7 @@ host and its existing publishing workflow.
 
 The canary intentionally excludes `go.waylonwalker.com`, `waylonwalker.com`,
 and `recipes.waylonwalker.com`; those sites are already or specially managed.
+
+`recipes.waylonwalker.com` is adopted separately at `k8s/recipes-waylonwalker-com`
+because it has a builder sidecar. It is not under `sites/`, so the ApplicationSet
+does not discover it.

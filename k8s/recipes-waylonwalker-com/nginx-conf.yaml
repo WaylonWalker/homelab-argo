@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+  namespace: recipes-waylonwalker-com
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=confirm,Delete=confirm
+data:
+  default.conf: |
+    # Normalize clean URLs and map Accept header to preferred suffix
+    map $uri $clean_uri {
+        ~^(.+)/$ $1;
+        default $uri;
+    }
+
+    map "$http_accept|$uri" $preferred_suffix {
+        ~*application/markdown .md;
+        ~*text/markdown .md;
+        ~*text/plain .txt;
+        ~*application/atom\+xml /atom.xml;
+        ~*application/rss\+xml /rss.xml;
+        ~*application/json\|/archive/?$ /feed.json;
+        ~*application/json .json;
+        default "";
+    }
+
+    map $preferred_suffix $preferred_candidate {
+        "" "/__nope__";
+        default $clean_uri$preferred_suffix;
+    }
+
+    server {
+        listen 80;
+        # Ingress does the host routing; no need to hard-code domains here.
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # Gzip compression - include markdown and text
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_proxied any;
+        gzip_types text/plain text/css text/xml text/javascript text/markdown application/javascript application/xml application/json application/rss+xml application/atom+xml image/svg+xml;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+        # Some themes/plugins emit relative asset URLs like `assets/markata/...`.
+        # When requested from `/post-slug/`, browsers resolve it to
+        # `/<post-slug>/assets/markata/...`. Rewrite to the canonical root path.
+        #
+        # This must appear before the generic `\.(css|js|...)$` regex location.
+        location ~ ^/[^/]+/assets/markata/(.*)$ {
+            rewrite ^/[^/]+/assets/markata/(.*)$ /assets/markata/$1 last;
+        }
+
+        # Cache static assets
+        location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            try_files /current$uri $uri =404;
+        }
+
+        # RSS/Atom/JSON feeds - shorter cache
+        location ~* \.(xml|rss|atom|json)$ {
+            add_header Cache-Control "public, max-age=0, s-maxage=3600, stale-while-revalidate=3600, stale-if-error=86400";
+            try_files /current$uri $uri =404;
+        }
+
+        # Markdown and text files - align with HTML cache policy
+        location ~* \.md$ {
+            default_type text/markdown;
+            charset utf-8;
+            add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=86400, stale-if-error=2592000";
+            add_header Vary Accept;
+            try_files /current$uri $uri =404;
+        }
+
+        location ~* \.txt$ {
+            default_type text/plain;
+            charset utf-8;
+            add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=86400, stale-if-error=2592000";
+            add_header Vary Accept;
+            try_files /current$uri $uri =404;
+        }
+
+        location ~* \.json$ {
+            default_type application/json;
+            charset utf-8;
+            add_header Cache-Control "public, max-age=0, s-maxage=3600, stale-while-revalidate=3600, stale-if-error=86400";
+            add_header Vary Accept;
+            try_files /current$uri $uri =404;
+        }
+
+        # Archive feeds and HTML (avoid redirect loops)
+        location = /archive {
+            return 301 /archive/;
+        }
+
+        location = /archive/ {
+            add_header Vary Accept;
+            set $archive_candidate /archive$preferred_suffix;
+
+            # Prefer a negotiated feed if available; otherwise fall back.
+            try_files /current$archive_candidate $archive_candidate @archive_fallback;
+        }
+
+        location @archive_fallback {
+            # Content negotiation attempted but format unavailable (RFC 7231)
+            if ($preferred_suffix != "") {
+                return 406;
+            }
+            try_files /current/archive/index.html /archive/index.html =404;
+        }
+
+        # Content negotiation for clean URLs (no extension)
+        location ~ ^/[^.]*$ {
+            add_header Vary Accept;
+            add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=86400, stale-if-error=2592000";
+
+            # Try negotiated formats first, then fall back.
+            try_files /current$preferred_candidate $preferred_candidate @clean_fallback;
+        }
+
+        location @clean_fallback {
+            # Content negotiation attempted but format unavailable (RFC 7231)
+            if ($preferred_suffix != "") {
+                return 406;
+            }
+            try_files /current$clean_uri/index.html /current$clean_uri/ /current$clean_uri $clean_uri/index.html $clean_uri/ $clean_uri $uri/index.html $uri =404;
+        }
+
+        # Default location
+        location / {
+            add_header Cache-Control "public, max-age=0, s-maxage=60, stale-while-revalidate=86400, stale-if-error=2592000";
+            try_files /current$uri /current$uri/ /current$uri/index.html $uri $uri/ $uri/index.html =404;
+        }
+
+        # Pagefind search files
+        location /_pagefind/ {
+            try_files /current$uri $uri =404;
+        }
+        location /reader/ {
+            try_files /current$uri $uri =404;
+        }
+        location /blogroll/ {
+            try_files /current$uri $uri =404;
+        }
+
+        # Error pages
+        error_page 404 /404.html;
+        error_page 406 /406.html;
+        error_page 500 502 503 504 /50x.html;
+    }
