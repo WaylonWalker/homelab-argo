@@ -35,10 +35,17 @@ The `falcon` tunnel also has apex and wildcard routes for `aylawalker.com` and
 `fluffed-up.com`. It has explicit routes for `go.markata.dev` and
 `din.markata.dev`. No active Ingress uses `kedro.dev` or `ticklemykeys.com`.
 
-The `fokais.com` Ingress uses a separate tunnel with UUID
-`bf48defd-05c0-42e2-bc3e-03828c754a74`. Do not label a `fokais.com` Ingress for
-this ExternalDNS instance. Before removal of the label filter, either route
-`fokais.com` through `falcon` or exclude that zone from this instance.
+The `fokais.com` Ingress (`www-fokais` in namespace `www-fokais`, hosts
+`fokais.com` and `www.fokais.com`) currently uses a separate tunnel with UUID
+`bf48defd-05c0-42e2-bc3e-03828c754a74` via `fokais-cloudflared-deployment` in
+namespace `fokais-cloudflared`. Both are sourced from the external repo
+`fokais-com/argo.fokais`, not from this repo. Approved direction: migrate
+`fokais.com` to `falcon`. Until `falcon` has verified public-hostname routes
+for both hosts and the exact Cloudflare records are baselined, do not label
+any `fokais.com` Ingress for this ExternalDNS instance. Labeling will require
+a change in the external repo. Tunnel route changes live in Cloudflare Zero
+Trust, not in git. This change records approval only and makes no live
+`fokais` cutover.
 
 ## Architecture and data flow
 
