@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+  namespace: recipes-waylonwalker-com
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=confirm,Delete=confirm
+data:
+  site: recipes
+  namespace: recipes-waylonwalker-com
+  host: recipes.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/recipes.waylonwalker.com
+  vaultPath: /mnt/main/walkershare/waylon/vaults/recipes.waylonwalker.com
+  builderImage: ghcr.io/waylonwalker/markata-go-builder:latest
+  pollSeconds: "5"
+  keepReleases: "5"

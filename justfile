@@ -12,8 +12,12 @@ static-sites-validate:
         echo "${site##*/}: OK"
       fi
     done
+    kubectl kustomize k8s/recipes-waylonwalker-com >/dev/null
+    echo "recipes-waylonwalker-com: OK"
     kubectl create --dry-run=client -f argo-apps/apps/static-sites.yaml >/dev/null
     echo "static-sites ApplicationSet: OK"
+    kubectl create --dry-run=client -f argo-apps/apps/recipes-waylonwalker-com.yaml >/dev/null
+    echo "recipes-waylonwalker-com Application: OK"
 
 private-secret app env_file secret_name=(app + "-secret") namespace=app:
     #!/usr/bin/env bash
