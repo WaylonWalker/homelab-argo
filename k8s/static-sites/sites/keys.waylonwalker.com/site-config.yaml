@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: keys
+  namespace: keys
+  host: keys.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/keys.waylonwalker.com

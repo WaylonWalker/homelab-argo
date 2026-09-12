@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: themes
+  namespace: themes
+  host: themes.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/themes.waylonwalker.com
