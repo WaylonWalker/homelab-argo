@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: caps
+  namespace: caps
+  host: caps.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/caps.waylonwalker.com
