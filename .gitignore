@@ -71,6 +71,8 @@ flycheck_*.el
 *.bat
 *.cgi
 *.com
+!k8s/static-sites/sites/*.com/
+!k8s/static-sites/sites/*.com/**
 *.exe
 *.gadget
 *.jar

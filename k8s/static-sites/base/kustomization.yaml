@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - pvc.yaml
+  - ingress.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: nginx-conf
+    files:
+      - default.conf=nginx/default.conf

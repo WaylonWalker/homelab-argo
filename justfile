@@ -3,6 +3,18 @@ set dotenv-load
 default:
   @just --list
 
+static-sites-validate:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for site in k8s/static-sites/sites/*; do
+      if [[ -f "$site/kustomization.yaml" ]]; then
+        kubectl kustomize "$site" >/dev/null
+        echo "${site##*/}: OK"
+      fi
+    done
+    kubectl create --dry-run=client -f argo-apps/apps/static-sites.yaml >/dev/null
+    echo "static-sites ApplicationSet: OK"
+
 private-secret app env_file secret_name=(app + "-secret") namespace=app:
     #!/usr/bin/env bash
     set -euo pipefail

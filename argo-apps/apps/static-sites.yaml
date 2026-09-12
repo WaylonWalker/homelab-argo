@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: static-sites
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - git:
+        repoURL: https://github.com/waylonwalker/homelab-argo.git
+        revision: HEAD
+        files:
+          - path: k8s/static-sites/sites/*/site-config.yaml
+  template:
+    metadata:
+      name: static-site-{{.path.basenameNormalized}}
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/waylonwalker/homelab-argo.git
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.data.namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - FailOnSharedResource=true
+  syncPolicy:
+    preserveResourcesOnDeletion: true
