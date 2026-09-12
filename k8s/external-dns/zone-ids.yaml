@@ -1,0 +1,25 @@
+# CAUTION: Zone access does not prove falcon tunnel coverage.
+# Keep the canary label filter until every eligible host has a verified falcon route.
+domainFilters:
+  - aylawalker.com
+  - fluffed-up.com
+  - fokais.com
+  - kedro.dev
+  - markata.dev
+  - rhiannonwalker.com
+  - ticklemykeys.com
+  - wayl.one
+  - waylonwalker.com
+  - wyattbubbylee.com
+extraArgs:
+  zone-id-filter:
+    - dabd3a15fd25e1ea5264d32b752d0cd4
+    - 3c09c3c94d1ce4cc12116dd8c485222d
+    - 3b79caf76ebb1b874bb74b4509566c5f
+    - d92cc8f00025bd724d9605a5bc994085
+    - f532d87575cfae8e0d31a21e172c46ee
+    - 1942a1f39b9d99e981262eada41a76e4
+    - d2b14ca8082cf389638ce36cbfa6fcdd
+    - aa901c4786d19607bbcc6b3995e38a4c
+    - 7af5458777c2a53d51d3cd9b545f2d39
+    - 650e2a024866f3f53a94ed915eec0d8c

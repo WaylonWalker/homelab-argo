@@ -1,0 +1,44 @@
+replicaCount: 1
+
+sources:
+  - ingress
+provider:
+  name: cloudflare
+policy: upsert-only
+registry: txt
+txtOwnerId: falcon-homelab-external-dns
+txtPrefix: external-dns-%{record_type}.
+# The generated zone-ids.yaml overlay replaces this bootstrap list with every
+# Cloudflare zone that the token can see.
+domainFilters:
+  - waylonwalker.com
+  - rhiannonwalker.com
+  - wyattbubbylee.com
+  - wayl.one
+# Do not remove this filter until every eligible host has a verified falcon
+# tunnel route, including hosts in zones that use another tunnel today.
+labelFilter: external-dns-canary=true
+managedRecordTypes:
+  - CNAME
+
+extraArgs:
+  cloudflare-dns-records-per-page: '5000'
+  cloudflare-proxied: true
+  cloudflare-record-comment: Managed by ExternalDNS (falcon homelab)
+  ingress-class: traefik
+  dry-run: true
+
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: external-dns-cloudflare
+        key: api-token
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
