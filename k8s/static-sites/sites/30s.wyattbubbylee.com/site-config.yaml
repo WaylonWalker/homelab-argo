@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: 30s.wyattbubbylee.com
+  namespace: 30s-wyattbubbylee-com
+  host: 30s.wyattbubbylee.com
+  webrootPath: /mnt/main/walkershare/wyatt/sites/30s.wyattbubbylee.com
