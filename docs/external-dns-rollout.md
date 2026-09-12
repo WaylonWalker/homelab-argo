@@ -17,10 +17,9 @@ enable ExternalDNS writes or a broad Ingress rollout.
   `waylonwalker.com`, and `wyattbubbylee.com`.
 - Registry policy: owner ID `falcon-homelab-external-dns`; TXT prefix
   `external-dns-%{record_type}.`; source `ingress`; class `traefik`; all
-  Traefik Ingresses (canary label filter removed for full dry-run preview);
-  CNAME records only; `dry-run` (still on: proposals are logged, nothing is
-  written); `create-only` (additive-only: existing records are never updated
-  or deleted); Cloudflare records proxied.
+  Traefik Ingresses (canary label filter removed); CNAME records only; live
+  writes on (`dry-run` removed); `create-only` (additive-only: existing
+  records are never updated or deleted); Cloudflare records proxied.
 
 The generated values include all Cloudflare zones that the token can see at
 secret-generation time. Zone-ID filters prevent automatic access to zones that
@@ -54,16 +53,14 @@ Trust, not in git. This change records approval only and makes no live
 1. Traefik writes the `falcon` tunnel hostname to the status of each Traefik
    Ingress. It does not copy the node IPs from the Traefik Service.
 2. The Ingress source selects every Traefik Ingress. The canary label filter
-   was removed to preview the full scope; `dry-run` keeps the preview
-   write-free.
+   was removed and `dry-run` is off, so missing records are written.
 3. ExternalDNS reads the Ingress hosts and the tunnel hostname from its status.
    It proposes an explicit CNAME for each selected host.
 4. ExternalDNS uses Cloudflare as the provider. It adds ownership TXT records
    with the configured owner and prefix. It also requests proxied records.
-5. In dry-run mode ExternalDNS logs the proposed changes but does not call
-   Cloudflare to write them. `create-only` creates missing records but never
-   updates or deletes existing ones, including when an Ingress is deleted or
-   retargeted.
+5. ExternalDNS calls Cloudflare to write missing records. `create-only`
+   never updates or deletes existing ones, including when an Ingress is
+   deleted or retargeted.
 6. A client resolves the Cloudflare record, enters the existing `falcon` tunnel,
    and is forwarded by an unchanged tunnel route to Traefik. Traefik forwards
    the request to the Kubernetes Service.
@@ -175,7 +172,7 @@ kubectl apply --dry-run=server -k whoami
 Before merge, also render the actual ArgoCD application path and inspect its
 diff. Do not apply it directly if ArgoCD owns the resource.
 
-## Exact dry-run deployment checks
+## Exact deployment checks (live writes on)
 
 After the PR is synced, verify the Traefik rollout and Ingress status first:
 
@@ -204,7 +201,7 @@ kubectl get deployment external-dns -n external-dns \
   -o jsonpath='{range .spec.template.spec.containers[0].args[*]}{.}{"\n"}{end}'
 ```
 
-The arguments must show dry-run, create-only, Traefik class filtering, the
+The arguments must show create-only, no dry-run, Traefik class filtering, the
 settled owner/prefix, CNAME-only policy, all generated zones, and proxied
 Cloudflare behavior. Secret references can appear. Secret data must not appear.
 
@@ -214,30 +211,31 @@ Inspect logs for a bounded interval:
 kubectl logs -n external-dns deployment/external-dns --since=15m --timestamps
 ```
 
-### Expected dry-run log scope
+### Expected live log scope
 
-The expected proposed scope is the permanent canary only:
+Every Traefik Ingress is in scope. Expect applied `CREATE` actions only:
 
-- `external-dns-canary.wayl.one` CNAME activity, plus its ownership TXT
-  bookkeeping if the provider reports it.
 - CNAME target
   `1bdd7ce3-6476-43bc-a9e0-6e30167617e5.cfargotunnel.com` with Cloudflare proxy
-  mode enabled.
-- No writes to Cloudflare.
-- No proposed changes for unlabeled `whoami`, Excalidraw, Librespeed, or other
-  Ingresses.
-- No wildcard creation, zone apex replacement, or changes to existing tunnel
-  routes.
+  mode enabled, plus ownership TXT bookkeeping per created host.
+- The dry-run preview proposed 58 CNAMEs (50 `wayl.one` explicit-for-wildcard
+  hosts, `admin`/`edit.aylawalker.com`, `build.rhiannonwalker.com`,
+  `posseparty`/`shots-dev`/`status-k.waylonwalker.com`, and
+  `www.wyattbubbylee.com`). No `fokais.com` proposals: both hosts already have
+  explicit records.
+- No updates, no deletes, no A/AAAA records, no wildcard creation, no zone
+  apex replacement, no changes to existing tunnel routes.
 
-Unexpected hosts, deletes, A/AAAA records, or changes outside the canary are a
-stop condition. Check the label, class, source, zone filters, and exact current
-Cloudflare records before proceeding.
+Updates, deletes, A/AAAA records, or changes to existing records are a stop
+condition. Check the class, source, zone filters, and exact current Cloudflare
+records before proceeding.
 
-## First live canary change
+## First live change (done)
 
-The first live step is a separate, reviewed change that removes **only**
-`dry-run` from `k8s/external-dns/values.yaml`. Do not change the tunnel,
-`publishedService`, zone list, host labels, or write policy in that step.
+The first live step removed **only** `dry-run` from
+`k8s/external-dns/values.yaml`, together with the earlier removal of the
+canary label filter. The tunnel, `publishedService`, zone list, and
+`create-only` write policy were not changed in that step.
 
 After ArgoCD syncs that one-line change:
 
@@ -346,22 +344,23 @@ condition, even when no record was deleted.
 
 ### Remove the canary filter
 
-Remove the temporary `external-dns-canary=true` filter only after all of the
-following are true:
+The temporary `external-dns-canary=true` filter was already removed for the
+dry-run preview after all of the following held:
 
-- the permanent canary is healthy;
+- the permanent canary was healthy;
 - dry-run showed only intended records;
-- the canary live write and HTTP path passed;
-- every selected host has a matching tunnel route and exact-record baseline;
-- no unexpected ExternalDNS errors, changes, or deletes appeared; and
-- rollback ownership and Cloudflare access were tested.
+- the canary HTTP path passed;
+- no unexpected ExternalDNS errors, updates, or deletes appeared.
 
-Removing the filter is a separate approved change. It is not part of this PR.
+Going live additionally required `create-only` so existing records stay
+untouched. Hosts without a matching falcon tunnel route resolve to a tunnel
+error page until their route is added; that follow-up lives in Cloudflare
+Zero Trust, not in git.
 
 ### Proving period
 
-During the proving period, keep dry-run or the narrow label filter as the
-rollback boundary. For at least one normal operating cycle, verify the canary
+During the proving period, restoring `dry-run` or scaling ExternalDNS down is
+the rollback boundary. For at least one normal operating cycle, verify the canary
 and each selected host from an external client, inspect ExternalDNS logs after
 Ingress or certificate changes, and compare Cloudflare records with the
 baseline. Record no unexpected creates, route changes, TLS failures, or

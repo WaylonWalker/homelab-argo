@@ -17,10 +17,11 @@ domainFilters:
   - rhiannonwalker.com
   - wyattbubbylee.com
   - wayl.one
-# The canary label filter was removed to preview the full dry-run scope across
-# all Traefik Ingresses. `dry-run` stays on, so this only changes what is
-# logged. Do not remove `dry-run` until every proposed host has a verified
-# falcon tunnel route, including hosts in zones that use another tunnel today.
+# The canary label filter was removed: every Traefik Ingress is now in scope.
+# `dry-run` is off, so missing records are created for real. `create-only`
+# keeps this additive-only: existing records are never updated or deleted.
+# New hosts still need a verified falcon tunnel route to actually serve
+# traffic, including hosts in zones that use another tunnel today.
 managedRecordTypes:
   - CNAME
 
@@ -29,7 +30,6 @@ extraArgs:
   cloudflare-proxied: true
   cloudflare-record-comment: Managed by ExternalDNS (falcon homelab)
   ingress-class: traefik
-  dry-run: true
 
 env:
   - name: CF_API_TOKEN
