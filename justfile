@@ -592,3 +592,6 @@ create-redis name="":
     fi
     kubectl create secret generic redis-acl-secret --from-env-file=private/redis/.env -n redis --dry-run=client -o yaml > ../homelab-argo/private/redis/redis-acl-secret.yaml
     kubeseal -f private/redis/redis-acl-secret.yaml -w redis/sealed-redis-acl-secret.yaml --namespace redis --name redis-acl-secret
+
+external-dns-secret:
+    ./scripts/secrets/external-dns-cloudflare
