@@ -4,7 +4,9 @@ sources:
   - ingress
 provider:
   name: cloudflare
-policy: upsert-only
+# create-only is additive-only: create missing records, never update or delete
+# existing ones. Existing working DNS is left untouched.
+policy: create-only
 registry: txt
 txtOwnerId: falcon-homelab-external-dns
 txtPrefix: external-dns-%{record_type}.

@@ -17,7 +17,8 @@ enable ExternalDNS writes or a broad Ingress rollout.
   `waylonwalker.com`, and `wyattbubbylee.com`.
 - Registry policy: owner ID `falcon-homelab-external-dns`; TXT prefix
   `external-dns-%{record_type}.`; source `ingress`; class `traefik`; required
-  label `external-dns-canary=true`; CNAME records only; `dry-run`; `upsert-only`;
+  label `external-dns-canary=true`; CNAME records only; `dry-run`; `create-only`
+  (additive-only: existing records are never updated or deleted);
   Cloudflare records proxied.
 
 The generated values include all Cloudflare zones that the token can see at
@@ -58,15 +59,16 @@ Trust, not in git. This change records approval only and makes no live
 4. ExternalDNS uses Cloudflare as the provider. It adds ownership TXT records
    with the configured owner and prefix. It also requests proxied records.
 5. In dry-run mode ExternalDNS logs the proposed changes but does not call
-   Cloudflare to write them. `upsert-only` allows creates and updates but does
-   not delete records, including when an Ingress is deleted.
+   Cloudflare to write them. `create-only` creates missing records but never
+   updates or deletes existing ones, including when an Ingress is deleted or
+   retargeted.
 6. A client resolves the Cloudflare record, enters the existing `falcon` tunnel,
    and is forwarded by an unchanged tunnel route to Traefik. Traefik forwards
    the request to the Kubernetes Service.
 
 The permanent health canary is `external-dns-canary.wayl.one`, backed by the
 stateless `whoami` Service. It must remain as an operational check. It is not
-automatically deleted: `upsert-only` cannot clean it up.
+automatically deleted: `create-only` cannot clean it up.
 
 ## Discoveries and important differences
 
@@ -80,8 +82,9 @@ automatically deleted: `upsert-only` cannot clean it up.
 - The existing `whoami` Ingress has two hosts, `whoami.wayl.one` and
   `cfwhoami.wayl.one`, and is not initially labeled. Labeling it is therefore a
   two-host change, not a one-host test.
-- Query exact existing Cloudflare records before adding a label. `upsert-only`
-  still permits updates; it is not a no-overwrite mode.
+- Query exact existing Cloudflare records before adding a label. `create-only`
+  never overwrites them, but the baseline is still required to confirm the new
+  record will not shadow working DNS.
 
 ## Prerequisites and secret creation
 
@@ -160,7 +163,7 @@ Check the rendered output for the settled contract without displaying secret
 values:
 
 ```bash
-rg 'dry-run|upsert-only|traefik|external-dns-canary|waylonwalker|rhiannonwalker|wyattbubbylee|wayl.one' /tmp/external-dns-rendered.yaml
+rg 'dry-run|create-only|traefik|external-dns-canary|waylonwalker|rhiannonwalker|wyattbubbylee|wayl.one' /tmp/external-dns-rendered.yaml
 kubectl apply --dry-run=server -f argo-apps/core-apps/external-dns.yaml
 kubectl apply --dry-run=server -f argo-apps/core-apps/traefik-config.yaml
 kubectl apply --dry-run=server -k k8s/traefik-config
@@ -199,7 +202,7 @@ kubectl get deployment external-dns -n external-dns \
   -o jsonpath='{range .spec.template.spec.containers[0].args[*]}{.}{"\n"}{end}'
 ```
 
-The arguments must show dry-run, upsert-only, Traefik class filtering, the
+The arguments must show dry-run, create-only, Traefik class filtering, the
 settled owner/prefix, CNAME-only policy, all generated zones, and proxied
 Cloudflare behavior. Secret references can appear. Secret data must not appear.
 
@@ -296,9 +299,9 @@ in this order:
 3. Only then restore Traefik's publishedService behavior if that was changed by
    a later, separately approved migration.
 
-Do not rely on Ingress deletion to remove DNS: under `upsert-only`, deleting an
-   Ingress does not delete its DNS record. Remove or correct stale records with
-   an explicit, reviewed Cloudflare operation.
+Do not rely on Ingress deletion to remove DNS: under `create-only`, deleting an
+   Ingress neither deletes its DNS record nor updates a stale one. Remove or
+   correct stale records with an explicit, reviewed Cloudflare operation.
 
 ## Expanding the rollout one app at a time
 
@@ -359,12 +362,12 @@ During the proving period, keep dry-run or the narrow label filter as the
 rollback boundary. For at least one normal operating cycle, verify the canary
 and each selected host from an external client, inspect ExternalDNS logs after
 Ingress or certificate changes, and compare Cloudflare records with the
-baseline. Record no unexpected updates, route changes, TLS failures, or
+baseline. Record no unexpected creates, route changes, TLS failures, or
 application errors.
 
 ### Much later: sync mode
 
-Do not enable broad sync or remove `upsert-only` until a later change has:
+Do not enable broad sync or change `create-only` until a later change has:
 
 - a complete inventory of all Ingress hosts and exact Cloudflare records;
 - confirmed `falcon` tunnel coverage for every host, including zones that use
