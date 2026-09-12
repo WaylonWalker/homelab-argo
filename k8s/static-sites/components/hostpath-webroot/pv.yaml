@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  # This gets replaced per site to keep it unique.
+  name: site
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+  labels:
+    app.kubernetes.io/name: webroot
+    app.kubernetes.io/instance: site
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  # Keep this empty to avoid requiring a StorageClass to exist.
+  storageClassName: ""
+  hostPath:
+    # This gets replaced per site.
+    path: /mnt/share/site
+    type: DirectoryOrCreate

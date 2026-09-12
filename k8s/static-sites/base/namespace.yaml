@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: site
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=confirm,Delete=confirm
