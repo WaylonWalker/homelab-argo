@@ -1,0 +1,91 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - ../../components/hostpath-webroot
+  - site-config.yaml
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.namespace
+    targets:
+      - select:
+          kind: Namespace
+        fieldPaths:
+          - metadata.name
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - metadata.namespace
+        options:
+          create: true
+      - select:
+          kind: Service
+        fieldPaths:
+          - metadata.namespace
+        options:
+          create: true
+      - select:
+          kind: Ingress
+        fieldPaths:
+          - metadata.namespace
+        options:
+          create: true
+      - select:
+          kind: PersistentVolumeClaim
+        fieldPaths:
+          - metadata.namespace
+        options:
+          create: true
+      - select:
+          kind: ConfigMap
+          name: nginx-conf
+        fieldPaths:
+          - metadata.namespace
+        options:
+          create: true
+      - select:
+          kind: ConfigMap
+          name: site-config
+        fieldPaths:
+          - metadata.namespace
+        options:
+          create: true
+
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.host
+    targets:
+      - select:
+          kind: Ingress
+        fieldPaths:
+          - spec.rules.0.host
+
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.site
+    targets:
+      - select:
+          kind: PersistentVolume
+        fieldPaths:
+          - metadata.name
+          - metadata.labels.[app.kubernetes.io/instance]
+      - select:
+          kind: PersistentVolumeClaim
+        fieldPaths:
+          - spec.selector.matchLabels.[app.kubernetes.io/instance]
+
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.webrootPath
+    targets:
+      - select:
+          kind: PersistentVolume
+        fieldPaths:
+          - spec.hostPath.path

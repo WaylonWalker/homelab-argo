@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: emboss-dev
+  namespace: emboss-dev
+  host: emboss-dev.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/emboss-dev.waylonwalker.com

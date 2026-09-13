@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+_src_path: templates/static-site
+host: emboss-dev.waylonwalker.com
+namespace: emboss-dev
+site: emboss-dev
+webroot_path: /mnt/main/walkershare/waylon/sites/emboss-dev.waylonwalker.com
