@@ -218,7 +218,7 @@ spec:
         diun.enable: "true"
     spec:
       containers:
-        - name: redis
+        - name: postiz-redis
           image: redis:7.2
           livenessProbe:
             exec:
@@ -227,7 +227,6 @@ spec:
             failureThreshold: 3
             periodSeconds: 10
             timeoutSeconds: 3
-          name: postiz-redis
           volumeMounts:
             - mountPath: /data
               name: postiz-redis-data

@@ -35,7 +35,6 @@ spec:
           ports:
             - containerPort: 7681
           command: ["ttyd"]
-          args: ["-W", "su", "-", "waylon"]
           args: ["-W", "zsh"]
           # command: ["/bin/sh"]
           # args:

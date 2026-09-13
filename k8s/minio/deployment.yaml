@@ -76,18 +76,6 @@ spec:
           envFrom:
             - secretRef:
                 name: minio-secret
-          readinessProbe:
-            httpGet:
-              path: /minio/health/ready
-              port: 9000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /minio/health/live
-              port: 9000
-            initialDelaySeconds: 20
-            periodSeconds: 20
       restartPolicy: Always
       volumes:
         - name: minio-storage

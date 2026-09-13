@@ -88,13 +88,12 @@ metadata:
     kompose.cmd: kompose convert -n podfetch -o deployment.yaml
     kompose.service.expose: podfetch.wayl.one
     kompose.version: 1.35.0 (9532ceef3)
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: basic-auth-basic-auth@kubernetescrd
   labels:
     io.kompose.service: podfetch
   name: podfetch
   namespace: podfetch
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.middlewares: basic-auth-basic-auth@kubernetescrd
 spec:
   rules:
     - host: podfetch.wayl.one

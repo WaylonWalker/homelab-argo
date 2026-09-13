@@ -95,7 +95,7 @@
 #         # -------------------------------------------------
 #         # 4) Ingress for immich.wayl.one
 #         # -------------------------------------------------
-#         server: 
+#         server:
 #           enabled: true
 #           image:
 #             repository: ghcr.io/immich-app/immich-server

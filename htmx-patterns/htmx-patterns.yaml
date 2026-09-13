@@ -102,13 +102,12 @@ metadata:
     kompose.cmd: kompose convert --namespace htmx-patterns -o htmx-patterns.yaml
     kompose.service.expose: htmx-patterns.wayl.one
     kompose.version: 1.31.2 (a92241f79)
+    cert-manager.io/cluster-issuer: letsencrypt-prod
   creationTimestamp: null
   labels:
     io.kompose.service: htmx-patterns
   name: htmx-patterns
   namespace: htmx-patterns
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: htmx-patterns.wayl.one

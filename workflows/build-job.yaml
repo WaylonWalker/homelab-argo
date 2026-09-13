@@ -36,10 +36,6 @@ spec:
           mountPath: /kaniko/.docker
   restartPolicy: Never
   volumes:
-    - name: kaniko-secret
-      secret:
-        secretName: regcred
-  volumes:
     - name: docker-config
       projected:
         sources:

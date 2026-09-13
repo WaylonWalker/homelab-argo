@@ -261,9 +261,6 @@ spec:
           ports:
             - containerPort: 8000
               protocol: TCP
-          volumeMounts:
-            - mountPath: /config
-              name: aylawalker-config
       imagePullSecrets:
         - name: 'cluster-regcred'
       restartPolicy: Always
