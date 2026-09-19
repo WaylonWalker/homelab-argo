@@ -19,6 +19,81 @@ static-sites-validate:
     kubectl create --dry-run=client -f argo-apps/apps/recipes-waylonwalker-com.yaml >/dev/null
     echo "recipes-waylonwalker-com Application: OK"
 
+# Create Kubernetes manifests for a new Argo-managed static site.
+new-static-site site_dir="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    short_name="{{site_dir}}"
+    if [[ -z "$short_name" ]]; then
+      read -r -p "Short site name (for example, caps): " short_name
+    fi
+
+    if [[ ! "$short_name" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ ]] || (( ${#short_name} > 63 )); then
+      echo "Error: short name must be a DNS-compatible name of 1-63 lowercase characters" >&2
+      exit 1
+    fi
+
+    site_names=("$short_name" "${short_name}-dev")
+    for site_name in "${site_names[@]}"; do
+      namespace_result="$(kubectl get namespace "$site_name" --ignore-not-found -o name)"
+      if [[ -n "$namespace_result" ]]; then
+        echo "Error: namespace '$site_name' already exists" >&2
+        exit 1
+      fi
+    done
+
+    domains=(
+      aylawalker.com
+      fluffed-up.com
+      fokais.com
+      kedro.dev
+      markata.dev
+      rhiannonwalker.com
+      ticklemykeys.com
+      wayl.one
+      waylonwalker.com
+      wyattbubbylee.com
+    )
+    if ! command -v fzf >/dev/null 2>&1; then
+      echo "Error: fzf is required for the domain picker" >&2
+      exit 1
+    fi
+    if ! domain="$(printf '%s\n' "${domains[@]}" | fzf \
+      --prompt='Choose domain: ' \
+      --height=40% \
+      --layout=reverse \
+      --border)"; then
+      echo "Domain selection cancelled." >&2
+      exit 1
+    fi
+    if [[ -z "$domain" ]]; then
+      echo "Error: no domain selected" >&2
+      exit 1
+    fi
+
+    for site_name in "${site_names[@]}"; do
+      host="$site_name.$domain"
+      destination="k8s/static-sites/sites/$host"
+      if [[ -e "$destination" ]]; then
+        echo "Error: $destination already exists" >&2
+        exit 1
+      fi
+    done
+
+    for site_name in "${site_names[@]}"; do
+      host="$site_name.$domain"
+      destination="k8s/static-sites/sites/$host"
+      copier copy templates/static-site "$destination" \
+        --data "site=$site_name" \
+        --data "namespace=$site_name" \
+        --data "host=$host" \
+        --data "webroot_path=/mnt/main/walkershare/waylon/sites/$host" \
+        --defaults
+      echo "Created $destination"
+    done
+    echo "Run: just static-sites-validate"
+
 private-secret app env_file secret_name=(app + "-secret") namespace=app:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -490,32 +565,96 @@ cloudflared-token:
     kubeseal -f private/cloudflared-secret.yaml -w cloudflared/cloudflared-sealed-secret.yaml --namespace cloudflared --name cloudflared-token
 
 
-update-go-image-pin:
+update-markata-image-pin image_tag="":
     #!/usr/bin/env bash
     set -euo pipefail
-    file="argo-apps/apps/go-waylonwalker-com.yaml"
+    image_tag="{{image_tag}}"
+    image="ghcr.io/waylonwalker/markata-go-builder"
+    files=(
+      argo-apps/apps/go-waylonwalker-com.yaml
+      argo-apps/apps/waylonwalker-com-prod.yaml
+      argo-apps/apps/wyattbubbylee-com-prod.yaml
+      argo-apps/apps/rhiannonwalker-com-prod.yaml
+    )
 
-    sha=$(git ls-remote https://github.com/WaylonWalker/markata-go.git main | cut -c1-7)
-    tag="sha-$sha"
-    current=$(grep -oP 'tag: sha-\w+' "$file" | head -1 | cut -d' ' -f3)
-
-    echo "current: $current"
-    echo "latest:  $tag"
-
-    if [[ "$tag" == "$current" ]]; then
-        echo "Already up to date."
-        exit 0
+    registry_token="$(curl --fail --silent --show-error \
+      "https://ghcr.io/token?service=ghcr.io&scope=repository:waylonwalker/markata-go-builder:pull" | jq -r '.token')"
+    if [[ -z "$registry_token" || "$registry_token" == "null" ]]; then
+      echo "Could not obtain a GHCR pull token for $image." >&2
+      exit 1
     fi
 
-    sed -i "s/$current/$tag/g" "$file"
-    echo "Updated $current -> $tag"
-
-    git add "$file"
-    if git diff --cached --quiet; then
-        echo "No changes to commit."
-        exit 0
+    if [[ -z "$image_tag" ]]; then
+      latest_manifest="$(curl --fail --silent --show-error \
+        -H "Authorization: Bearer $registry_token" \
+        -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json' \
+        "https://ghcr.io/v2/waylonwalker/markata-go-builder/manifests/latest")"
+      platform_digest="$(printf '%s' "$latest_manifest" | jq -r 'first(.manifests[]? | select(.platform.os == "linux" and .platform.architecture == "amd64") | .digest) // empty')"
+      if [[ -n "$platform_digest" ]]; then
+        latest_manifest="$(curl --fail --silent --show-error \
+          -H "Authorization: Bearer $registry_token" \
+          -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
+          "https://ghcr.io/v2/waylonwalker/markata-go-builder/manifests/$platform_digest")"
+      fi
+      config_digest="$(printf '%s' "$latest_manifest" | jq -r '.config.digest // empty')"
+      if [[ -z "$config_digest" ]]; then
+        echo "Could not read the config digest for $image:latest." >&2
+        exit 1
+      fi
+      commit="$(curl --fail --location --silent --show-error \
+        -H "Authorization: Bearer $registry_token" \
+        "https://ghcr.io/v2/waylonwalker/markata-go-builder/blobs/$config_digest" | \
+        jq -r '.config.Labels["org.opencontainers.image.revision"] // empty')"
+      if [[ ! "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+        echo "Could not read a source revision from $image:latest." >&2
+        exit 1
+      fi
+      image_tag="sha-${commit:0:7}"
+      echo "Resolved $image:latest to $image_tag"
     fi
-    git commit -m "waylonwalker-com: update go image pin to $tag"
+
+    if [[ ! "$image_tag" =~ ^sha-[0-9a-f]{7,64}$ ]]; then
+      echo "Usage: just update-markata-image-pin [sha-<published-commit>]" >&2
+      exit 1
+    fi
+
+    if ! curl --fail --silent --show-error --head \
+      -H "Authorization: Bearer $registry_token" \
+      -H 'Accept: application/vnd.oci.image.index.v1+json' \
+      "https://ghcr.io/v2/waylonwalker/markata-go-builder/manifests/$image_tag" >/dev/null; then
+      echo "Image $image:$image_tag is not published yet; wait for its image workflow." >&2
+      exit 1
+    fi
+
+    for file in "${files[@]}"; do
+      tag_count="$(grep -Ec '^[[:space:]]+tag: sha-[0-9a-f]+$' "$file")"
+      if [[ "$tag_count" != 3 ]]; then
+        echo "Expected three Markata image tags in $file; found $tag_count." >&2
+        exit 1
+      fi
+    done
+
+    if ! git diff --quiet -- "${files[@]}"; then
+      echo "Markata application manifests have uncommitted changes; refusing to overwrite them." >&2
+      exit 1
+    fi
+
+    for file in "${files[@]}"; do
+      sed -i -E "s/(tag: )sha-[0-9a-f]+/\\1${image_tag}/g" "$file"
+      echo "Updated $file to $image_tag"
+    done
+
+    if git diff --quiet -- "${files[@]}"; then
+      echo "All Markata application manifests already use $image_tag."
+      exit 0
+    fi
+
+    git add -- "${files[@]}"
+    git commit -m "chore(markata): update image pin to $image_tag"
+
+# Backward-compatible alias for the original single-site recipe name.
+update-go-image-pin image_tag="":
+    just update-markata-image-pin "{{image_tag}}"
 
 update-system-upgrade-controller:
     #!/bin/bash
