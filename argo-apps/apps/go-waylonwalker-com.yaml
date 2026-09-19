@@ -185,6 +185,9 @@ spec:
               tag: sha-792d9af
             mode: watch-content
 
+          site:
+            healthPath: /blogroll/
+
           sourceArchive:
             bucket: unused-in-hostpath-mode
             location: /unused-in-hostpath-mode
