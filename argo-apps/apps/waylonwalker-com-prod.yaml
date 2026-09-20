@@ -54,7 +54,7 @@ spec:
             site:
               mode: pvc
               storageClassName: longhorn
-              size: 10Gi
+              size: 20Gi
               accessModes:
                 - ReadWriteOnce
             cache:
@@ -74,9 +74,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-792d9af
+              tag: sha-7bc6c73
             builderImage:
-              tag: sha-792d9af
+              tag: sha-7bc6c73
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -87,7 +87,7 @@ spec:
               enabled: true
               url: https://ntfy.wayl.one/opencode
             releases:
-              keep: 25
+              keep: 10
             resources:
               requests:
                 cpu: 100m
@@ -145,7 +145,7 @@ spec:
               enabled: false
               debounce: 2s
             releases:
-              keep: 25
+              keep: 10
             history:
               successfulBuilds: 60
               failedBuilds: 100
@@ -165,20 +165,14 @@ spec:
               limits:
                 memory: 16Gi
                 ephemeral-storage: 20Gi
-            refreshTasks:
-              - name: reader-update
-                every: 30m
-                enqueueBuildOnSuccess: true
-                args:
-                  - --config
-                  - /data/source/markata-go.toml
-                  - reader
-                  - update
+            # Disable automatic refresh-triggered builds during the incident.
+            # Keep builder-admin available for manual builds and history.
+            refreshTasks: []
 
           search:
             enabled: true
             image:
-              tag: sha-792d9af
+              tag: sha-7bc6c73
             mode: watch-content
             # Builder-admin initializes the new PVC checkout before search starts.
             waitForSource:
