@@ -44,20 +44,8 @@ spec:
     spec:
       nodeSelector:
         zfs-main-pool: "true"
-      initContainers:
-        - name: create-bucket
-          image: minio/mc
-          command:
-            - /bin/sh
-            - -c
-            - |
-              mc alias set local http://localhost:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" && \
-              mc mb -p local/longhorn || true
-          envFrom:
-            - secretRef:
-                name: minio-longhorn-backup-secret
       containers:
-        - image: minio/minio
+        - image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
           name: minio-longhorn-backup
           args:
             - server
@@ -87,6 +75,33 @@ spec:
               port: 9000
             initialDelaySeconds: 10
             periodSeconds: 15
+        # A sidecar can wait for MinIO because both containers share the Pod network.
+        - image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
+          name: create-bucket
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              until mc alias set local http://127.0.0.1:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null 2>&1 && \
+                mc mb --ignore-existing local/longhorn-system >/dev/null 2>&1; do
+                sleep 5
+              done
+              while sleep 60; do
+                until mc mb --ignore-existing local/longhorn-system >/dev/null 2>&1; do
+                  sleep 5
+                done
+              done
+          envFrom:
+            - secretRef:
+                name: minio-longhorn-backup-secret
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - mc ls local/longhorn-system >/dev/null 2>&1
+            periodSeconds: 5
       restartPolicy: Always
       volumes:
         - name: minio-storage-longhorn-backup

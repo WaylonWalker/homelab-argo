@@ -1,4 +1,4 @@
-apiVersion: longhorn.io/v1beta1
+apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
   name: snapshot-hourly
@@ -9,7 +9,7 @@ spec:
   retain: 24
   concurrency: 1
 ---
-apiVersion: longhorn.io/v1beta1
+apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
   name: backup-daily
@@ -19,8 +19,10 @@ spec:
   cron: "0 2 * * *"
   retain: 7
   concurrency: 1
+  groups:
+    - default
 ---
-apiVersion: longhorn.io/v1beta1
+apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
   name: backup-weekly
@@ -30,3 +32,5 @@ spec:
   cron: "0 3 * * 0"
   retain: 4
   concurrency: 1
+  groups:
+    - default
