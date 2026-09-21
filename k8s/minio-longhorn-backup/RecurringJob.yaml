@@ -19,6 +19,8 @@ spec:
   cron: "0 2 * * *"
   retain: 7
   concurrency: 1
+  groups:
+    - default
 ---
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
@@ -30,3 +32,5 @@ spec:
   cron: "0 3 * * 0"
   retain: 4
   concurrency: 1
+  groups:
+    - default
