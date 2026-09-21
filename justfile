@@ -611,3 +611,8 @@ create-redis name="":
 
 external-dns-secret:
     ./scripts/secrets/external-dns-cloudflare
+
+storage-backup-check:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    bash scripts/storage-backup-check.sh
