@@ -74,9 +74,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-792d9af
+              tag: sha-2bb9e38
             builderImage:
-              tag: sha-792d9af
+              tag: sha-2bb9e38
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -179,7 +179,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-792d9af
+              tag: sha-2bb9e38
             mode: watch-content
             # Builder-admin initializes the new PVC checkout before search starts.
             waitForSource:

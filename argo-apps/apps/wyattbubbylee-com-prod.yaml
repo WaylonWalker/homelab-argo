@@ -73,9 +73,9 @@ spec:
             # The archive-based CronJob is disabled because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-792d9af
+              tag: sha-2bb9e38
             builderImage:
-              tag: sha-792d9af
+              tag: sha-2bb9e38
             fast: false
             cacheDir: /data/cache/xdg
             notify:
@@ -171,7 +171,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-792d9af
+              tag: sha-2bb9e38
             mode: watch-content
             waitForSource:
               enabled: false
