@@ -146,7 +146,7 @@ spec:
               enabled: false
               debounce: 2s
             releases:
-              keep: 25
+              keep: 5
             history:
               successfulBuilds: 60
               failedBuilds: 100
@@ -160,7 +160,7 @@ spec:
               existingSecretKey: MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET
             resources:
               requests:
-                cpu: 100m
+                cpu: 50m
                 memory: 4Gi
                 ephemeral-storage: 8Gi
               limits:
