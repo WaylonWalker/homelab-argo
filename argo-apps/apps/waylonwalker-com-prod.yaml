@@ -54,7 +54,7 @@ spec:
             site:
               mode: pvc
               storageClassName: longhorn
-              size: 10Gi
+              size: 20Gi
               accessModes:
                 - ReadWriteOnce
             cache:
@@ -87,7 +87,8 @@ spec:
               enabled: true
               url: https://ntfy.wayl.one/opencode
             releases:
-              keep: 25
+              # Keep enough rollback history without filling the 20Gi site PVC.
+              keep: 10
             resources:
               requests:
                 cpu: 100m
