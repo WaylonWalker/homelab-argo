@@ -103,12 +103,12 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.42
+        - image: registry.wayl.one/shot-scraper-api:0.0.43
           command:
             - "/bin/bash"
             - "-c"
           args:
-            - "uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 1"
+            - "opentelemetry-instrument uvicorn shot_scraper_api.api.app:app --host 0.0.0.0 --port 5000 --workers 1"
           name: shot-wayl-one
           ports:
             - containerPort: 5000
@@ -135,6 +135,22 @@ spec:
               value: "4"
             - name: POSTPROCESS_CONCURRENCY
               value: "2"
+            - name: OTEL_SDK_DISABLED
+              value: "false"
+            - name: OTEL_SERVICE_NAME
+              value: "shots"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317"
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_METRICS_EXPORTER
+              value: "none"
+            - name: OTEL_LOGS_EXPORTER
+              value: "none"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "deployment.environment=production,service.version=0.0.43"
             - name: REDIS_URL
               value: redis://shots-redis.shot.svc.cluster.local:6379/0
             - name: AWS_ENDPOINT_URL
@@ -173,12 +189,12 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.42
+        - image: registry.wayl.one/shot-scraper-api:0.0.43
           command:
             - "/bin/bash"
             - "-c"
           args:
-            - "python -m shot_scraper_api.worker"
+            - "opentelemetry-instrument python -m shot_scraper_api.worker"
           name: shot-wayl-one-worker
           livenessProbe:
             exec:
@@ -233,6 +249,22 @@ spec:
               value: "4"
             - name: POSTPROCESS_CONCURRENCY
               value: "2"
+            - name: OTEL_SDK_DISABLED
+              value: "false"
+            - name: OTEL_SERVICE_NAME
+              value: "shots"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317"
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_METRICS_EXPORTER
+              value: "none"
+            - name: OTEL_LOGS_EXPORTER
+              value: "none"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "deployment.environment=production,service.version=0.0.43"
             - name: WORKER_HEARTBEAT_INTERVAL_SECONDS
               value: "10"
             - name: WORKER_HEARTBEAT_TIMEOUT_SECONDS
