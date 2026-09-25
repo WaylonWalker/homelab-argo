@@ -202,5 +202,5 @@ spec:
   ignoreDifferences:
     - group: ""
       kind: PersistentVolumeClaim
-      jsonPointers:
-        - /spec/volumeName
+      jqPathExpressions:
+        - .spec.volumeName
