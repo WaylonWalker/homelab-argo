@@ -3,6 +3,9 @@ kind: Certificate
 metadata:
   name: gobuilder-waylonwalker-com-tls
   namespace: go-waylonwalker-com-notes
+  labels:
+    environment: dev
+    app.kubernetes.io/environment: dev
 spec:
   secretName: gobuilder-waylonwalker-com-tls
   issuerRef:
