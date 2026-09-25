@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: wyattbubbylee-com/wyattbubbylee-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
-      targetRevision: markata/go-perf
+      targetRevision: main
       path: helm-chart
       helm:
         values: |
