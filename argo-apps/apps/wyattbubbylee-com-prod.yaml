@@ -152,7 +152,8 @@ spec:
               existingSecretKey: MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET
             resources:
               requests:
-                cpu: 100m
+                # Scheduling-only request; no CPU limit is set so builds still burst.
+                cpu: 25m
                 memory: 4Gi
                 ephemeral-storage: 8Gi
               limits:
@@ -173,6 +174,10 @@ spec:
             image:
               tag: sha-1c30168
             mode: watch-content
+            resources:
+              requests:
+                # Scheduling-only request; no CPU limit is set so indexing still bursts.
+                cpu: 25m
             waitForSource:
               enabled: false
 

@@ -275,7 +275,8 @@ spec:
               value: /data/cache/xdg
           resources:
             requests:
-              cpu: 100m
+              # Scheduling-only request; no CPU limit is set so seeding still bursts.
+              cpu: 25m
               memory: 1Gi
               ephemeral-storage: 2Gi
             limits:
