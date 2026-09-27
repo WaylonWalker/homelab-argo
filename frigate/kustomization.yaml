@@ -13,3 +13,4 @@ configMapGenerator:
       disableNameSuffixHash: true
 patches:
   - path: frigate-stability-patch.yaml
+  - path: frigate-service-monitoring-patch.yaml
