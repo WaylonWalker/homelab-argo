@@ -120,20 +120,20 @@ spec:
             summary: "Frigate recording cache is over 50% full"
             description: "The legacy /tmp/cache filesystem has exceeded 50% utilization."
         - alert: FrigateRecordingHeadroomCritical
-          expr: frigate_recording_estimated_hours_remaining{namespace="frigate"} < 6
-          for: 2m
+          expr: frigate_recording_estimated_hours_remaining{namespace="frigate"} < 0.1666667
+          for: 5m
           labels:
             severity: critical
           annotations:
-            summary: "Frigate has less than 6 hours of recording headroom"
+            summary: "Frigate has less than 10 minutes of recording headroom"
             description: "Estimated headroom is {{ $value | humanize }} hours at 9 GB/hour."
         - alert: FrigateRecordingHeadroomWarning
-          expr: frigate_recording_estimated_hours_remaining{namespace="frigate"} < 24 and frigate_recording_estimated_hours_remaining{namespace="frigate"} >= 6
-          for: 2m
+          expr: frigate_recording_estimated_hours_remaining{namespace="frigate"} < 0.5 and frigate_recording_estimated_hours_remaining{namespace="frigate"} >= 0.1666667
+          for: 15m
           labels:
             severity: warning
           annotations:
-            summary: "Frigate has less than 24 hours of recording headroom"
+            summary: "Frigate has less than 30 minutes of recording headroom"
             description: "Estimated headroom is {{ $value | humanize }} hours at 9 GB/hour."
         - alert: FrigateMonitorExporterDown
           expr: up{namespace="frigate",service="frigate-monitor"} == 0 or absent(up{namespace="frigate",service="frigate-monitor"})
@@ -183,12 +183,12 @@ spec:
     - name: frigate.kubernetes
       rules:
         - alert: FrigateContainerOOMKilled
-          expr: kube_pod_container_status_last_terminated_reason{namespace="frigate",container="frigate",reason="OOMKilled"} == 1
+          expr: (kube_pod_container_status_last_terminated_reason{namespace="frigate",container="frigate",reason="OOMKilled"} == 1) and on(namespace,pod,container) (increase(kube_pod_container_status_restarts_total{namespace="frigate",container="frigate"}[10m]) > 0)
           labels:
             severity: critical
           annotations:
             summary: "Frigate container was OOMKilled"
-            description: "The Frigate container in pod {{ $labels.pod }} was terminated for memory use."
+            description: "The Frigate container in pod {{ $labels.pod }} was terminated for memory use in the last 10 minutes."
         - alert: FrigateContainerRestarted
           expr: increase(kube_pod_container_status_restarts_total{namespace="frigate",container="frigate"}[10m]) > 0
           labels:
