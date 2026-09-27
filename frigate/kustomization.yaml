@@ -9,8 +9,6 @@ configMapGenerator:
     namespace: frigate
     files:
       - exporter.py=monitor-exporter.py
-    options:
-      disableNameSuffixHash: true
 patches:
   - path: frigate-stability-patch.yaml
   - path: frigate-service-monitoring-patch.yaml
