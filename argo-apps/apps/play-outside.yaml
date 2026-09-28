@@ -9,7 +9,7 @@ spec:
     namespace: play-outside
     server: 'https://kubernetes.default.svc'
   source:
-    path: play-outside
+    path: k8s/play-outside
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
   syncPolicy:
     automated:
