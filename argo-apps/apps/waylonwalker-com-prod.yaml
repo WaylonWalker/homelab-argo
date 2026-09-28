@@ -182,7 +182,9 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-d0f5c59
+              # The new search binary follows /data/source/.markata to /data/cache/build,
+              # but the search pod has no cache volume. Keep its known-good image.
+              tag: sha-02e59ea
             mode: watch-content
             # Builder-admin initializes the new PVC checkout before search starts.
             waitForSource:
