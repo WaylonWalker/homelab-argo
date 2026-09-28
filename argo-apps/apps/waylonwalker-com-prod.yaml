@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: waylonwalker-com/waylonwalker-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
-      targetRevision: e696311d4051aa3932cc87fbf550f6b6a5928f5d
+      targetRevision: a6ce550aa67743fe2dd503f12abb08ed66c8c042
       path: helm-chart
       helm:
         values: |
@@ -58,6 +58,7 @@ spec:
               mode: pvc
               storageClassName: longhorn-build-fast
               size: 30Gi
+              volumeName: pvc-cbc9a896-5733-4892-ab42-be4fd2946a89
               accessModes:
                 - ReadWriteOnce
             cache:

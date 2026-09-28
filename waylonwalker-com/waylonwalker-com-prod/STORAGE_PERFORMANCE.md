@@ -71,28 +71,28 @@ needs both its new image and its opt-in Helm workspace settings.
 ## Migration constraints
 
 The Helm chart mounts `waylonwalker-com-prod-notes-site-pvc` at `/data/site`
-in both the site and Builder Admin Deployments. This existing PVC uses the
+in both the site and Builder Admin Deployments. The former PVC used the
 `longhorn` StorageClass. Kubernetes does not permit an in-place change of a
 bound PVC's StorageClass. The chart has no value for a different site claim
-name. Changing `storage.site.storageClassName` alone does not migrate the PVC.
+name. Changing `storage.site.storageClassName` alone cannot migrate a PVC.
 
-The `site-pvc-fast-staging` PVC uses `longhorn-build-fast`, but it is **not**
-the live site or build volume until a completed copy and a cutover. The old
-site PVC and its releases remain the source of truth until that point. The
-`site-pre-fast-migration` Longhorn snapshot and backup completed before the
-cutover. That backup predates later site writes.
+The cutover on 2026-09-28 copied the site into the two-replica fast volume.
+The final sync completed while Builder Admin was stopped. The site claim
+`waylonwalker-com-prod-notes-site-pvc` now binds
+`pvc-cbc9a896-5733-4892-ab42-be4fd2946a89` (30 GiB,
+`longhorn-build-fast`). Both the public site and Builder Admin mount this
+claim. The old `pvc-36939c15-7ad2-42d7-a361-f7a9931a56c5` PV remains
+retained for rollback. The `site-pre-fast-migration` backup completed before
+the cutover; it predates later site writes.
 
 The fast class has two replicas, on falcon3's NVMe and falcon2's HDD. The
-falcon3 NVMe had about 107 GiB free when measured. A 30 GiB staging volume
-also reserves space on that disk. Longhorn reported **insufficient storage**
-when asked to move the old 20 GiB site replica there. Do not remove a healthy
-site replica until Longhorn confirms capacity and a completed backup.
+falcon3 NVMe had about 107 GiB free when measured. Longhorn reported
+**insufficient storage** when asked to add another 20 GiB site replica to
+that disk while the 30 GiB fast volume was already reserved there.
 
-The cutover needs a complete copy, a write freeze, a final copy, and a new
-claim bound to the staging volume. The Helm chart always uses the claim name
-`waylonwalker-com-prod-notes-site-pvc`. Keep the old Longhorn PV with the
-`Retain` reclaim policy before deleting its PVC. Rebind the fast staging PV
-to a new claim with the chart's name. Set the chart's site StorageClass and
-size to match the new PVC. This operation interrupts the public site while
-both workloads release the old volume. Do not change the site's StorageClass
-value in Argo without completing this migration.
+The chart pins the new PV with `storage.site.volumeName`. The old PV has a
+`Retain` reclaim policy. Do not delete the old PV or its Longhorn volume
+until the new site has a verified backup and enough healthy build history.
+For rollback, stop the site and Builder Admin, then rebind a `longhorn`
+claim to the retained old PV. The old PV reflects the state at cutover, not
+later releases.
