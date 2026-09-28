@@ -1,9 +1,8 @@
 # StorageClass reserved for markata build hot paths (site/build volumes).
 #
-# Why this exists: the generic `longhorn` class (3 replicas, snapshot +
-# backup recurring jobs, any disk) gated every build write on the slowest
-# replica in the cluster (a ~33 MB/s spinning disk on falcon3) and amplified
-# each write 3x over the network. Observed impact on
+# Why this exists: the generic `longhorn` class admits the slow ~33 MB/s
+# spinning disk on falcon3. The existing production site volume had two
+# replicas, one on that disk. Observed impact on
 # waylonwalker-com-prod-notes: publish_html 15m42s, css_minify 19m12s,
 # js_minify 11m53s, prepare seed-copy up to ~20m, multi-build totals >800s.
 #

@@ -115,7 +115,7 @@ spec:
                 value: "https://waylonwalker.com/api/search"
 
           builderAdmin:
-            enabled: false # TEMPORARY: quiesced for site migration to longhorn-build-fast; re-enable after.
+            enabled: true
             fast: false
             auth:
               trustedProxyCIDRs:
