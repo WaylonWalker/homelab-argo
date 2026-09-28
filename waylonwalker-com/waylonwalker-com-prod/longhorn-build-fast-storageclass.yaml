@@ -1,0 +1,35 @@
+# StorageClass reserved for markata build hot paths (site/build volumes).
+#
+# Why this exists: the generic `longhorn` class (3 replicas, snapshot +
+# backup recurring jobs, any disk) gated every build write on the slowest
+# replica in the cluster (a ~33 MB/s spinning disk on falcon3) and amplified
+# each write 3x over the network. Observed impact on
+# waylonwalker-com-prod-notes: publish_html 15m42s, css_minify 19m12s,
+# js_minify 11m53s, prepare seed-copy up to ~20m, multi-build totals >800s.
+#
+# Trade-offs, read before reusing elsewhere:
+# - 2 replicas (not 3) pinned to disks tagged `fast`. Fast enough to remove
+#   the disk bottleneck, still survives a single disk/node loss.
+# - NO recurring snapshot/backup jobs. Do not use for irreplaceable data.
+#   Site output is regenerable from the source repo; take manual Longhorn
+#   backups before migrations.
+# - Reclaim Retain so a deleted PVC never auto-wipes build history.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-build-fast
+  annotations:
+    description: "Reserved for markata build hot paths: 2 replicas on fast-tagged disks, no snapshots."
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  dataEngine: v1
+  fsType: ext4
+  numberOfReplicas: "2"
+  dataLocality: best-effort
+  diskSelector: fast
+  disableRevisionCounter: "true"
+  staleReplicaTimeout: "30"
+  unmapMarkSnapChainRemoved: ignored
