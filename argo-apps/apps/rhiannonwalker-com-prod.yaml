@@ -8,7 +8,7 @@ spec:
   sources:
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
       targetRevision: HEAD
-      path: rhiannonwalker
+      path: k8s/rhiannonwalker
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
       targetRevision: main
       path: helm-chart
