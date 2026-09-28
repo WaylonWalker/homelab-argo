@@ -33,6 +33,9 @@ spec:
               enabled: true
               secretName: rhiannonwalker-com-prod-tls
 
+          site:
+            use404Page: true
+
           markataEncryption:
             secretName: markata-go-encryption
 

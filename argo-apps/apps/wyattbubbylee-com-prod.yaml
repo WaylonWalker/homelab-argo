@@ -38,6 +38,9 @@ spec:
               enabled: true
               secretName: wyattbubbylee-com-prod-tls
 
+          site:
+            use404Page: true
+
           markataEncryption:
             secretName: markata-go-encryption
 

@@ -36,6 +36,9 @@ spec:
               enabled: true
               secretName: go-waylonwalker-com-tls
 
+          site:
+            use404Page: true
+
           markataEncryption:
             secretName: markata-go-encryption
 
