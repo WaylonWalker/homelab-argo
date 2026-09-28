@@ -53,6 +53,21 @@ investigation. It had two replicas: falcon2's root disk and falcon3's
 The benchmark for the *different* `go-waylonwalker-com-notes` site lives in
 `waylonwalker-com/go-waylonwalker-com/BUILDER_STORAGE_BENCHMARK.md`.
 
+## Effect of markata-go PR #1341
+
+[PR #1341](https://github.com/WaylonWalker/markata-go/pull/1341) adds an
+optional node-local build workspace to Builder Admin. Without this option,
+Builder Admin writes `.build-work` on the site PVC. The PR copies a completed
+workspace back to the site PVC before promotion when the two paths use
+different filesystems. It does not change the publisher or minifier code.
+
+**Impact: medium before a site-volume migration, low to medium after it.**
+Node-local workspace writes can speed up prepare and build I/O. The final
+promotion still copies all output to the site volume. The observed plugin
+durations do not isolate CPU time from I/O wait, so no speedup is guaranteed.
+The PR is draft and is not part of the production `main` image. A rollout
+needs both its new image and its opt-in Helm workspace settings.
+
 ## Migration constraints
 
 The Helm chart mounts `waylonwalker-com-prod-notes-site-pvc` at `/data/site`

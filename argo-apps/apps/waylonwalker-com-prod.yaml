@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: waylonwalker-com/waylonwalker-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
-      targetRevision: main
+      targetRevision: d0f5c592d2b91f77e52af556d84f0ea89607470d
       path: helm-chart
       helm:
         values: |
@@ -74,9 +74,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-02e59ea
+              tag: sha-d0f5c59
             builderImage:
-              tag: sha-02e59ea
+              tag: sha-d0f5c59
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -179,7 +179,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-02e59ea
+              tag: sha-d0f5c59
             mode: watch-content
             # Builder-admin initializes the new PVC checkout before search starts.
             waitForSource:
