@@ -203,6 +203,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
   # The source PVC is provisioned out-of-band storage; Argo must not try to
   # patch the provisioner-assigned volumeName on the live claim.
   ignoreDifferences:
