@@ -36,9 +36,6 @@ spec:
               enabled: true
               secretName: go-waylonwalker-com-tls
 
-          site:
-            use404Page: true
-
           markataEncryption:
             secretName: markata-go-encryption
 
@@ -195,6 +192,7 @@ spec:
 
           site:
             healthPath: /blogroll/
+            use404Page: true
 
           sourceArchive:
             bucket: unused-in-hostpath-mode
