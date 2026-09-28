@@ -28,6 +28,19 @@ In a disposable PVC on falcon3, a 256 MiB direct write took 5.54 seconds
 PVC on falcon3 NVMe wrote the same amount in 1.83 seconds (139.8 MB/s).
 The one-replica result is **not** the durability of `longhorn-build-fast`.
 
+After cutover, the production Builder Admin wrote 2,000 files of 4 KiB each
+on each mount with `benchmark-builder-storage.sh`. The test used one shell
+loop per mount, not direct I/O. Results:
+
+| Mount | 2,000-file write | File rate | Notes |
+| --- | ---: | ---: | --- |
+| `/data/site` (two-replica fast Longhorn) | 8.779s | 227.8 files/s | Live build and release volume. |
+| `/tmp` (container overlay) | 8.657s | 231.0 files/s | Ephemeral. |
+| `/data/cache` (ZFS) | 8.092s | 247.2 files/s | Persistent Markata cache. |
+
+The shell loop, directory creation, and `cp` overhead limit this test. These
+results do not show a large difference among mounts for this small workload.
+
 A test of 2,000 files of 4 KiB each, followed by `sync`, took 5 seconds on
 the two-replica PVC. Direct host paths took 4 seconds on falcon2's IronWolf,
 16 seconds on falcon3's NVMe in one run, and 4 seconds on falcon3's ZFS pool.
@@ -50,6 +63,13 @@ at 11m53s. The site PVC had 19 GiB used out of 20 GiB (96%) during the
 investigation. It had two replicas: falcon2's root disk and falcon3's
 `wd3tb` HDD. The log does not prove that all elapsed time was disk wait.
 
+The first production builds after cutover were scheduled refreshes. The
+record at 04:25 UTC took 304 seconds. The 12 refresh builds from 06:04 to
+11:34 UTC took 98 to 256 seconds, with build phases from 46 to 96 seconds.
+Earlier refresh records on the original volume include 764 and 973 seconds. A manual
+full build after cutover was not measured. Differences in source changes and
+cache state prevent a controlled before/after speedup claim.
+
 The benchmark for the *different* `go-waylonwalker-com-notes` site lives in
 `waylonwalker-com/go-waylonwalker-com/BUILDER_STORAGE_BENCHMARK.md`.
 
@@ -65,8 +85,11 @@ different filesystems. It does not change the publisher or minifier code.
 Node-local workspace writes can speed up prepare and build I/O. The final
 promotion still copies all output to the site volume. The observed plugin
 durations do not isolate CPU time from I/O wait, so no speedup is guaranteed.
-The PR is draft and is not part of the production `main` image. A rollout
-needs both its new image and its opt-in Helm workspace settings.
+PR #1341 merged on 2026-09-28. The deployed `sha-6540c44` image includes
+the workspace feature, but `builderAdmin.workspace.enabled` is still false.
+To use the feature, configure its Helm workspace mount and work directory.
+Measure a comparable full build before and after enabling it. A node-local
+workspace still needs a complete promotion copy onto the site PVC.
 
 ## Migration constraints
 
@@ -83,7 +106,9 @@ The final sync completed while Builder Admin was stopped. The site claim
 `longhorn-build-fast`). Both the public site and Builder Admin mount this
 claim. The old `pvc-36939c15-7ad2-42d7-a361-f7a9931a56c5` PV remains
 retained for rollback. The `site-pre-fast-migration` backup completed before
-the cutover; it predates later site writes.
+the cutover; it predates later site writes. The
+`site-post-fast-migration` backup of the new PV completed after cutover.
+No restore test was run.
 
 The fast class has two replicas, on falcon3's NVMe and falcon2's HDD. The
 falcon3 NVMe had about 107 GiB free when measured. Longhorn reported
@@ -92,7 +117,30 @@ that disk while the 30 GiB fast volume was already reserved there.
 
 The chart pins the new PV with `storage.site.volumeName`. The old PV has a
 `Retain` reclaim policy. Do not delete the old PV or its Longhorn volume
-until the new site has a verified backup and enough healthy build history.
-For rollback, stop the site and Builder Admin, then rebind a `longhorn`
-claim to the retained old PV. The old PV reflects the state at cutover, not
-later releases.
+until the new site has a restore-tested backup and enough healthy build history.
+The old PV reflects the state at cutover, not later releases.
+
+### Rollback outline
+
+1. Stop Builder Admin and the site Deployment. Turn off automated sync for
+   the child Argo Application before you change the claims.
+2. Set the fast PV reclaim policy to `Retain`. Delete the current site PVC,
+   but keep both the fast PV and the Longhorn volume.
+3. Remove the claim reference from the retained old PV. Create the site PVC
+   with `storageClassName: longhorn`, `size: 20Gi`, and `volumeName` set to
+   `pvc-36939c15-7ad2-42d7-a361-f7a9931a56c5`.
+4. Update `storage.site.storageClassName`, `storage.site.size`, and
+   `storage.site.volumeName` together in the Argo Application. Restore
+   automated sync, the site, and Builder Admin.
+5. Check the `current` symlink and the public site. The old PV does not
+   contain releases or authoring history created after the cutover.
+
+Do not use this outline as an automatic rollback script. Confirm the
+replica health, backup state, and active claim names before each step.
+
+At the post-cutover check, falcon3's NVMe had about 85 GiB free. Longhorn
+reported the fast disk as **not schedulable** under the live 20% minimum-free
+setting. Both replicas were healthy, but Longhorn cannot place a replacement
+NVMe replica on that disk until space is freed. Keep the old PV and backup
+until the NVMe has enough headroom for replica recovery. Do not lower the
+minimum-free setting to hide this disk-pressure warning.
