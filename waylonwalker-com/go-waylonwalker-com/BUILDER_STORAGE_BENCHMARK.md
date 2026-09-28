@@ -20,7 +20,7 @@ The deployment is pinned to `falcon3`. Source, site output, and the persistent M
 Run from a workstation with cluster access:
 
 ```bash
-./waylonwalker-com/go-waylonwalker-com/benchmark-builder-storage.sh
+bash ./waylonwalker-com/go-waylonwalker-com/benchmark-builder-storage.sh
 ```
 
 The script runs inside the live Builder Admin container but only writes disposable benchmark directories. It compares `/data/site`, `/tmp`, and `/data/cache` when present and prints filesystem/mount identity first.
@@ -29,7 +29,7 @@ Useful overrides:
 
 ```bash
 FILES=7000 BYTES_PER_FILE=32768 \
-  ./waylonwalker-com/go-waylonwalker-com/benchmark-builder-storage.sh
+  bash ./waylonwalker-com/go-waylonwalker-com/benchmark-builder-storage.sh
 ```
 
 Record the output in #37. A large `/tmp` versus `/data/site` difference is evidence for moving Builder Admin's transient `.build-work` to node-local storage once markata-go#1338 lands.
