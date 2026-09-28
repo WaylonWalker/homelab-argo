@@ -11,7 +11,7 @@ spec:
   sources:
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
       targetRevision: HEAD
-      path: waylonwalker-com/go-waylonwalker-com
+      path: k8s/waylonwalker-com/go-waylonwalker-com
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
       targetRevision: main
       path: helm-chart
