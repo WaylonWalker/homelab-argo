@@ -66,9 +66,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-02e59ea
+              tag: sha-6540c44
             builderImage:
-              tag: sha-02e59ea
+              tag: sha-6540c44
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -183,7 +183,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-02e59ea
+              tag: sha-6540c44
             mode: watch-content
             resources:
               requests:
