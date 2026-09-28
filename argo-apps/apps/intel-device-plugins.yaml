@@ -9,7 +9,7 @@ spec:
     namespace: intel-device-plugins
     server: 'https://kubernetes.default.svc'
   source:
-    path: intel-device-plugins/gpu_plugin
+    path: k8s/intel-device-plugins/gpu_plugin
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:
