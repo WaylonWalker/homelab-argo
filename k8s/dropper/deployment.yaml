@@ -127,6 +127,8 @@ spec:
           env:
             - name: DROPPER_BASE_URL
               value: "https://dropper.waylonwalker.com/"
+            - name: DROPPER_TRUSTED_PROXY_NETWORKS
+              value: "10.42.0.0/24,10.42.2.0/24,10.42.3.0/24"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -191,7 +193,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.48"
+              value: "deployment.environment=production,service.version=0.0.49"
           volumeMounts:
             - mountPath: /data
               name: dropper-data
