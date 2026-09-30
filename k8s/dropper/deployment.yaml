@@ -78,7 +78,7 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.51
+        - image: registry.wayl.one/dropper:0.0.52
           name: dropper-wayl-one
           command:
             - "/bin/sh"
@@ -120,10 +120,10 @@ spec:
           resources:
             requests:
               cpu: "200m"
-              memory: "1Gi"
+              memory: "2Gi"
             limits:
               cpu: "1000m"
-              memory: "4Gi"
+              memory: "6Gi"
           env:
             - name: DROPPER_BASE_URL
               value: "https://dropper.waylonwalker.com/"
@@ -195,7 +195,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.49"
+              value: "deployment.environment=production,service.version=0.0.52"
           volumeMounts:
             - mountPath: /data
               name: dropper-data
