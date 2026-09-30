@@ -119,10 +119,10 @@ spec:
             failureThreshold: 6
           resources:
             requests:
-              cpu: "200m"
+              cpu: "500m"
               memory: "2Gi"
             limits:
-              cpu: "1000m"
+              cpu: "1500m"
               memory: "6Gi"
           env:
             - name: DROPPER_BASE_URL
