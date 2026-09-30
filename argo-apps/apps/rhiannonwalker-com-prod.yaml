@@ -69,9 +69,9 @@ spec:
           build:
             enabled: false
             fetchImage:
-              tag: sha-f89f221
+              tag: sha-bdd0a64
             builderImage:
-              tag: sha-f89f221
+              tag: sha-bdd0a64
             fast: false
             cacheDir: /data/cache/xdg
             releases:
@@ -163,7 +163,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-f89f221
+              tag: sha-bdd0a64
             mode: watch-content
             resources:
               requests:
