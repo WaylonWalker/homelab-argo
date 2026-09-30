@@ -129,8 +129,6 @@ spec:
               value: "https://dropper.waylonwalker.com/"
             - name: DROPPER_TRUSTED_PROXY_NETWORKS
               value: "10.42.0.0/24,10.42.2.0/24,10.42.3.0/24"
-            - name: DROPPER_TRANSFORM_RATE_LIMIT_REQUESTS
-              value: "300"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
