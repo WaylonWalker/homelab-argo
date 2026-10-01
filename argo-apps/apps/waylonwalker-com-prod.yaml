@@ -146,14 +146,11 @@ spec:
                 app.kubernetes.io/name: traefik
                 app.kubernetes.io/instance: traefik-kube-system
             mermaidMode: client
+            # Output stays on the release PVC for atomic rename promotion.
+            # Cache remains on node-local NVMe; cross-filesystem publication
+            # of the 3.4 GiB workspace was slower in production measurements.
             workspace:
-              enabled: true
-              mode: hostPath
-              mountPath: /data/work
-              workDir: /data/work/build
-              hostPath:
-                path: /var/lib/markata-go/waylonwalker-com-prod/workspace
-                type: DirectoryOrCreate
+              enabled: false
             # Dev remains the authoring/watch environment for now.
             watch:
               enabled: false
