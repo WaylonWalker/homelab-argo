@@ -185,6 +185,8 @@ spec:
             image:
               tag: sha-bdd0a64
             mode: watch-content
+            localCache:
+              enabled: true
             resources:
               requests:
                 # Scheduling-only request; no CPU limit is set so indexing still bursts.
