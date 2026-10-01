@@ -78,7 +78,7 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.52
+        - image: registry.wayl.one/dropper:0.0.53
           name: dropper-wayl-one
           command:
             - "/bin/sh"
@@ -195,7 +195,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.52"
+              value: "deployment.environment=production,service.version=0.0.53"
           volumeMounts:
             - mountPath: /data
               name: dropper-data
