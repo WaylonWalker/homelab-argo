@@ -79,9 +79,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-2c36c82
+              tag: sha-21cc258
             builderImage:
-              tag: sha-2c36c82
+              tag: sha-21cc258
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -192,7 +192,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-2c36c82
+              tag: sha-21cc258
             mode: watch-content
             # Source cache symlinks target /data/cache; keep search's cache pod-local.
             localCache:
