@@ -56,6 +56,7 @@ spec:
             cache:
               enabled: true
               mode: hostPath
+              storageClassName: longhorn
               hostPath:
                 path: /mnt/main/walkershare/waylon/cache/go.waylonwalker.com
                 type: DirectoryOrCreate
