@@ -178,7 +178,7 @@ spec:
                 ephemeral-storage: 20Gi
             refreshTasks:
               - name: reader-update
-                every: 5m
+                every: 30m
                 enqueueBuildOnSuccess: true
                 args:
                   - --config
