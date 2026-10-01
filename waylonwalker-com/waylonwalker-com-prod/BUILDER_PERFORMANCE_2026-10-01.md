@@ -62,3 +62,9 @@ The cross-filesystem trial also exposed an existing publisher defect: `MkdirTemp
 Permanent permission correction: [engine PR #1485](https://github.com/WaylonWalker/markata-go/pull/1485), [passing CI](https://github.com/WaylonWalker/markata-go/actions/runs/36861643461), and [published image](https://github.com/WaylonWalker/markata-go/actions/runs/36861549636), tag `sha-1222dae`. Local full tests and lint pass. Test fixtures verify root mode `0755` for rename, fallback copy, and direct staged copy while retaining a child file mode of `0640`.
 
 A sample of 60 retained consecutive successful jobs on `sha-21cc258` had median prepare 181.556 s, engine build 27.491 s, promote 0.020 s, and total 208.805 s. Full-job range was 98.118–321.193 s. This documents both the engine improvement and the remaining preparation bottleneck. These successful publication records predate final serving-permission validation; see that correction above.
+
+## Final image publication proof
+
+Image `sha-1222dae` completed scheduled job `build-1790858021916742543` and made release `20261001T124144Z-waylonwalker-com-prod-notes-builder-admin-7c684b64d6-bcst5` live. Timings: prepare 267.013 s, engine build 167.209 s, promotion 0.240 s, total 434.464 s. This first-image/content-transition build performed full rendering and is not a warm benchmark. The release root was verified `0755` without the temporary guard, and public serving remained healthy.
+
+The temporary permission guard exited with the old container. Final deployment keeps all builder/fetch/search image tags coordinated. Retained releases remain on the two-replica PVC. Cache remains persistent on NVMe, with approximately 120 GiB available on that filesystem. The restoration change returns reader refresh to 30 minutes.
