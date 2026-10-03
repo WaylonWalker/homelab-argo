@@ -40,6 +40,11 @@ class FakeAPI:
 
 
 class CleanupTests(unittest.TestCase):
+    def test_default_removes_all_terminal_pods_and_preserves_active_pods(self):
+        api = FakeAPI([pod(0), pod(1, 'Succeeded'), pod(2, 'Running'), pod(3, 'Pending')])
+        self.assertEqual(module.cleanup(api), 2)
+        self.assertEqual(set(api.deleted), {'pod-0000', 'pod-0001'})
+
     def test_keeps_newest_across_terminal_phases_and_excludes_other_pods(self):
         pods = [pod(i, 'Succeeded' if i % 2 else 'Failed') for i in range(30)]
         pods += [pod(40, 'Running'), pod(41, 'Pending')]
