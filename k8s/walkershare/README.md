@@ -11,7 +11,8 @@ The shared PV retains `/mnt/main/walkershare`; the two Filebrowser claims keep
 their existing Longhorn storage classes. No data copy or storage migration is
 part of this recovery. TLS certificates remain managed by cert-manager.
 
-Render with `kubectl kustomize k8s/walkershare`. This directory has no active
-Argo Application yet. Adoption needs a separate review of hostPath node affinity,
-backup coverage, and pruning policy. Applying an old share.yaml would recreate
+Render with `kubectl kustomize k8s/walkershare`. The `walkershare` Argo Application uses manual
+sync and has no automatic pruning. Server dry-run confirms all three pod
+templates match live state. HostPath node affinity and backup coverage still
+need operational review. Applying an old share.yaml would recreate
 obsolete credentials and workloads; use these reconciled manifests instead.
