@@ -20,8 +20,9 @@ domainFilters:
 # The canary label filter was removed: every Traefik Ingress is now in scope.
 # `dry-run` is off, so missing records are created for real. `create-only`
 # keeps this additive-only: existing records are never updated or deleted.
-# New hosts still need a verified falcon tunnel route to actually serve
-# traffic, including hosts in zones that use another tunnel today.
+# Falcon sends unmatched HTTP hostnames to Traefik. A new subdomain in a
+# configured zone needs only a Traefik Ingress with no conflicting DNS record.
+# Existing records remain unchanged under create-only, including fokais.com.
 managedRecordTypes:
   - CNAME
 
