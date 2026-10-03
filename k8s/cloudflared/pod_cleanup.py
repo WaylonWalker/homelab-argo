@@ -71,7 +71,7 @@ class API:
         return result
 
 
-def cleanup(api, keep=20, dry_run=False):
+def cleanup(api, keep=0, dry_run=False):
     selected = candidates(api.pods(), keep)
     deleted = 0
     for pod in selected:
@@ -96,9 +96,9 @@ def cleanup(api, keep=20, dry_run=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--keep", type=int, default=20)
+    parser.add_argument("--keep", type=int, default=0)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    if not 1 <= args.keep <= 1000:
-        parser.error("keep must be between 1 and 1000")
+    if not 0 <= args.keep <= 1000:
+        parser.error("keep must be between 0 and 1000")
     cleanup(API(), args.keep, args.dry_run)
