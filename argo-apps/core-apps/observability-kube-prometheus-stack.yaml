@@ -78,6 +78,59 @@ spec:
                 tracesToMetrics:
                   datasourceUid: prometheus
         alertmanager:
+          config:
+            global:
+              resolve_timeout: 5m
+            inhibit_rules:
+              - source_matchers:
+                  - 'severity = critical'
+                target_matchers:
+                  - 'severity =~ warning|info'
+                equal:
+                  - namespace
+                  - alertname
+              - source_matchers:
+                  - 'severity = warning'
+                target_matchers:
+                  - 'severity = info'
+                equal:
+                  - namespace
+                  - alertname
+              - source_matchers:
+                  - 'alertname = InfoInhibitor'
+                target_matchers:
+                  - 'severity = info'
+                equal:
+                  - namespace
+              - target_matchers:
+                  - 'alertname = InfoInhibitor'
+            route:
+              group_by:
+                - namespace
+                - alertname
+              group_wait: 30s
+              group_interval: 5m
+              repeat_interval: 12h
+              receiver: 'null'
+              routes:
+                - receiver: 'null'
+                  matchers:
+                    - 'alertname = Watchdog'
+                - receiver: ntfy-frigate
+                  matchers:
+                    - 'namespace = frigate'
+                  group_wait: 15s
+                  repeat_interval: 2h
+            receivers:
+              - name: 'null'
+              - name: ntfy-frigate
+                webhook_configs:
+                  # ntfy 2.11 supports generic JSON-body templates (`tpl=1`) but
+                  # predates the newer built-in `template=alertmanager` preset.
+                  - url: 'http://ntfy.ntfy.svc.cluster.local/frigate-alerts?tpl=1&t=%5B%7B%7B.status%7D%7D%5D%20%7B%7B.commonLabels.alertname%7D%7D&m=%7B%7B.commonAnnotations.summary%7D%7D%0A%7B%7B.commonAnnotations.description%7D%7D'
+                    send_resolved: true
+            templates:
+              - /etc/alertmanager/config/*.tmpl
           alertmanagerSpec:
             storage:
               volumeClaimTemplate:

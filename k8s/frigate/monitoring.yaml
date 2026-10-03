@@ -1,0 +1,246 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frigate-monitor
+  namespace: frigate
+  labels:
+    app.kubernetes.io/name: frigate-monitor
+spec:
+  selector:
+    service: frigate
+  ports:
+    - name: metrics
+      port: 9101
+      targetPort: metrics
+      protocol: TCP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: frigate-native
+  namespace: observability
+  labels:
+    release: observability
+spec:
+  namespaceSelector:
+    matchNames: [frigate]
+  selector:
+    matchLabels:
+      service: frigate
+  endpoints:
+    - port: unauthenticated-ui
+      path: /api/metrics
+      interval: 15s
+      scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: frigate-monitor
+  namespace: observability
+  labels:
+    release: observability
+spec:
+  namespaceSelector:
+    matchNames: [frigate]
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frigate-monitor
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: frigate-durability
+  namespace: observability
+  labels:
+    release: observability
+spec:
+  groups:
+    - name: frigate.recording
+      rules:
+        - alert: FrigateRecordingStaleCritical
+          expr: frigate_recording_age_seconds{namespace="frigate"} > 300 or frigate_recording_age_seconds{namespace="frigate"} == 0
+          for: 30s
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate recording is stale for {{ $labels.camera }}"
+            description: "The newest persistent recording row for {{ $labels.camera }} is older than 5 minutes or no row exists."
+        - alert: FrigateRecordingStaleWarning
+          expr: frigate_recording_age_seconds{namespace="frigate"} > 120 and frigate_recording_age_seconds{namespace="frigate"} <= 300
+          for: 30s
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate recording is falling behind for {{ $labels.camera }}"
+            description: "The newest persistent recording row for {{ $labels.camera }} is older than 2 minutes."
+        - alert: FrigateRecordingFileMissing
+          expr: frigate_recording_file_exists{namespace="frigate"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate latest recording file is missing for {{ $labels.camera }}"
+            description: "The newest database row for {{ $labels.camera }} references an absent or empty persistent recording file."
+        - alert: FrigateCacheSegmentStaleCritical
+          expr: frigate_cache_oldest_segment_age_seconds{namespace="frigate"} > 300
+          for: 30s
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate cache segment is over 5 minutes old"
+            description: "The oldest nonzero camera segment in /tmp/cache is {{ $value | humanizeDuration }} old."
+        - alert: FrigateCacheSegmentStaleWarning
+          expr: frigate_cache_oldest_segment_age_seconds{namespace="frigate"} > 120 and frigate_cache_oldest_segment_age_seconds{namespace="frigate"} <= 300
+          for: 30s
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate cache segment is over 2 minutes old"
+            description: "The oldest nonzero camera segment in /tmp/cache is {{ $value | humanizeDuration }} old."
+        - alert: FrigateCacheUtilizationCritical
+          expr: frigate_cache_used_bytes{namespace="frigate"} / frigate_cache_capacity_bytes{namespace="frigate"} > 0.75
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate recording cache is over 75% full"
+            description: "The legacy /tmp/cache filesystem has exceeded 75% utilization."
+        - alert: FrigateCacheUtilizationWarning
+          expr: frigate_cache_used_bytes{namespace="frigate"} / frigate_cache_capacity_bytes{namespace="frigate"} > 0.50 and frigate_cache_used_bytes{namespace="frigate"} / frigate_cache_capacity_bytes{namespace="frigate"} <= 0.75
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate recording cache is over 50% full"
+            description: "The legacy /tmp/cache filesystem has exceeded 50% utilization."
+        - alert: FrigateRecordingHeadroomCritical
+          expr: frigate_recording_estimated_hours_remaining{namespace="frigate"} < 0.1666667
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate has less than 10 minutes of recording headroom"
+            description: "Estimated headroom is {{ $value | humanize }} hours at 9 GB/hour."
+        - alert: FrigateRecordingHeadroomWarning
+          expr: frigate_recording_estimated_hours_remaining{namespace="frigate"} < 0.5 and frigate_recording_estimated_hours_remaining{namespace="frigate"} >= 0.1666667
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate has less than 30 minutes of recording headroom"
+            description: "Estimated headroom is {{ $value | humanize }} hours at 9 GB/hour."
+        - alert: FrigateMonitorExporterDown
+          expr: up{namespace="frigate",service="frigate-monitor"} == 0 or absent(up{namespace="frigate",service="frigate-monitor"})
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate durability exporter is unavailable"
+            description: "Prometheus cannot scrape recording DB, cache, storage, and log health metrics."
+        - alert: FrigateMonitorReadError
+          expr: frigate_monitor_scrape_error{namespace="frigate"} == 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate monitoring exporter cannot read recording state"
+            description: "The exporter cannot read its mounted database, cache, or recording filesystem."
+        - alert: FrigateLogCollectorStale
+          expr: time() - frigate_log_collector_last_success_timestamp_seconds{namespace="frigate"} > 120
+          for: 30s
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate log monitoring has stopped advancing"
+            description: "The exporter has not read Frigate pod logs successfully in over 2 minutes."
+        - alert: FrigateRecordingPipelineLogError
+          expr: increase(frigate_log_events_total{namespace="frigate",pattern=~"enospc|recording_behind|unprocessed_segments|no_new_segments|database_error"}[10m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate reported a recording pipeline or database error"
+            description: "Frigate emitted a matching error log in the last 10 minutes ({{ $labels.pattern }})."
+        - alert: FrigateRecordingWatchdogLog
+          expr: increase(frigate_log_events_total{namespace="frigate",pattern="recording_watchdog"}[10m]) > 0
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate recording watchdog reported an error"
+            description: "Frigate emitted a recording watchdog log in the last 10 minutes."
+        - alert: FrigateFrontDoorbellRtsp404
+          expr: increase(frigate_log_events_total{namespace="frigate",pattern="front_doorbell_rtsp_404"}[10m]) > 0
+          labels:
+            severity: warning
+          annotations:
+            summary: "Front doorbell camera returned an RTSP 404"
+            description: "Frigate logged a front-doorbell RTSP/DESCRIBE 404 in the last 10 minutes."
+    - name: frigate.kubernetes
+      rules:
+        - alert: FrigateContainerOOMKilled
+          expr: (kube_pod_container_status_last_terminated_reason{namespace="frigate",container="frigate",reason="OOMKilled"} == 1) and on(namespace,pod,container) (increase(kube_pod_container_status_restarts_total{namespace="frigate",container="frigate"}[10m]) > 0)
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate container was OOMKilled"
+            description: "The Frigate container in pod {{ $labels.pod }} was terminated for memory use in the last 10 minutes."
+        - alert: FrigateContainerRestarted
+          expr: increase(kube_pod_container_status_restarts_total{namespace="frigate",container="frigate"}[10m]) > 0
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate container restarted"
+            description: "Frigate container {{ $labels.pod }} restarted in the last 10 minutes."
+        - alert: FrigateContainerMemoryHigh
+          expr: container_memory_working_set_bytes{namespace="frigate",container="frigate"} / on (namespace,pod,container) kube_pod_container_resource_limits{namespace="frigate",container="frigate",resource="memory",unit="byte"} > 0.80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Frigate memory working set exceeds 80% of its limit"
+            description: "Pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of its memory limit."
+        - alert: FrigateContainerMemoryCritical
+          expr: container_memory_working_set_bytes{namespace="frigate",container="frigate"} / on (namespace,pod,container) kube_pod_container_resource_limits{namespace="frigate",container="frigate",resource="memory",unit="byte"} > 0.90
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frigate memory working set exceeds 90% of its limit"
+            description: "Pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of its memory limit."
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frigate-durability-dashboard
+  namespace: observability
+  labels:
+    grafana_dashboard: "1"
+data:
+  frigate-durability.json: |
+    {
+      "uid": "frigate-durability",
+      "title": "Frigate Recording Durability",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "15s",
+      "time": {"from": "now-6h", "to": "now"},
+      "panels": [
+        {"id":1,"title":"Recording age by camera","type":"timeseries","gridPos":{"x":0,"y":0,"w":12,"h":8},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_recording_age_seconds{namespace=\"frigate\"}","legendFormat":"{{camera}}"}],"fieldConfig":{"defaults":{"unit":"s"}}},
+        {"id":2,"title":"Oldest cache segment age","type":"timeseries","gridPos":{"x":12,"y":0,"w":12,"h":8},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_cache_oldest_segment_age_seconds{namespace=\"frigate\"}","legendFormat":"oldest"}],"fieldConfig":{"defaults":{"unit":"s"}}},
+        {"id":3,"title":"Cache used / available","type":"timeseries","gridPos":{"x":0,"y":8,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_cache_used_bytes{namespace=\"frigate\"}","legendFormat":"used"},{"expr":"frigate_cache_available_bytes{namespace=\"frigate\"}","legendFormat":"available"}],"fieldConfig":{"defaults":{"unit":"bytes"}}},
+        {"id":4,"title":"Cache utilization","type":"timeseries","gridPos":{"x":8,"y":8,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_cache_used_bytes{namespace=\"frigate\"} / frigate_cache_capacity_bytes{namespace=\"frigate\"}","legendFormat":"used"}],"fieldConfig":{"defaults":{"unit":"percentunit","min":0,"max":1}}},
+        {"id":5,"title":"Cache camera MP4s","type":"stat","gridPos":{"x":16,"y":8,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_cache_recording_mp4_count{namespace=\"frigate\"}","legendFormat":"segments"}]},
+        {"id":6,"title":"Recording filesystem free bytes","type":"timeseries","gridPos":{"x":0,"y":15,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_recording_filesystem_available_bytes{namespace=\"frigate\"}","legendFormat":"free"}],"fieldConfig":{"defaults":{"unit":"bytes"}}},
+        {"id":7,"title":"Estimated recording hours remaining","type":"timeseries","gridPos":{"x":8,"y":15,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_recording_estimated_hours_remaining{namespace=\"frigate\"}","legendFormat":"hours at 9 GB/h"}],"fieldConfig":{"defaults":{"unit":"h"}}},
+        {"id":8,"title":"Container working set","type":"timeseries","gridPos":{"x":16,"y":15,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"container_memory_working_set_bytes{namespace=\"frigate\",container=\"frigate\"}","legendFormat":"working set"}],"fieldConfig":{"defaults":{"unit":"bytes"}}},
+        {"id":9,"title":"Memory request / limit","type":"timeseries","gridPos":{"x":0,"y":22,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"kube_pod_container_resource_requests{namespace=\"frigate\",container=\"frigate\",resource=\"memory\",unit=\"byte\"}","legendFormat":"request"},{"expr":"kube_pod_container_resource_limits{namespace=\"frigate\",container=\"frigate\",resource=\"memory\",unit=\"byte\"}","legendFormat":"limit"}],"fieldConfig":{"defaults":{"unit":"bytes"}}},
+        {"id":10,"title":"Restart count","type":"timeseries","gridPos":{"x":8,"y":22,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"kube_pod_container_status_restarts_total{namespace=\"frigate\",container=\"frigate\"}","legendFormat":"{{pod}}"}]},
+        {"id":11,"title":"OOMKilled state","type":"stat","gridPos":{"x":16,"y":22,"w":8,"h":7},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"sum(kube_pod_container_status_last_terminated_reason{namespace=\"frigate\",container=\"frigate\",reason=\"OOMKilled\"}) or vector(0)","legendFormat":"OOMKilled"}]},
+        {"id":12,"title":"Camera and process FPS","type":"timeseries","gridPos":{"x":0,"y":29,"w":24,"h":8},"datasource":{"type":"prometheus","uid":"prometheus"},"targets":[{"expr":"frigate_camera_fps{namespace=\"frigate\"}","legendFormat":"camera {{camera_name}}"},{"expr":"frigate_process_fps{namespace=\"frigate\"}","legendFormat":"process {{camera_name}}"}],"fieldConfig":{"defaults":{"unit":"fps"}}}
+      ]
+    }

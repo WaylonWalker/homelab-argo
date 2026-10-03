@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - frigate.yaml
+  - monitoring-rbac.yaml
+  - monitoring.yaml
+configMapGenerator:
+  - name: frigate-monitor-exporter
+    namespace: frigate
+    files:
+      - exporter.py=monitor-exporter.py
+patches:
+  - path: frigate-stability-patch.yaml
+  - path: frigate-service-monitoring-patch.yaml

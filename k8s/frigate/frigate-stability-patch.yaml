@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frigate
+  namespace: frigate
+spec:
+  template:
+    spec:
+      serviceAccountName: frigate-monitor
+      automountServiceAccountToken: false
+      containers:
+        - name: frigate
+          # Frigate 0.18.0-77a66e7; pin the exact image proven healthy during recovery.
+          image: ghcr.io/blakeblackshear/frigate@sha256:9678a83a76e4730ac7d9ea7428370e32ae656d6b312aaad30d6c69f3fef14d35
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: "1"
+            limits:
+              memory: 6Gi
+              cpu: "2"
+        - name: frigate-monitor
+          # Reuse the already-pinned Frigate image: it contains Python + sqlite3 and avoids
+          # introducing another mutable runtime image solely for the exporter.
+          image: ghcr.io/blakeblackshear/frigate@sha256:9678a83a76e4730ac7d9ea7428370e32ae656d6b312aaad30d6c69f3fef14d35
+          command: ["python3", "/opt/frigate-monitor/exporter.py"]
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: FRIGATE_MONITOR_CAMERAS
+              value: anns-corner,driveway,freezer,front-door,garage,office,utility-room-cam,front-doorbell
+          ports:
+            - name: metrics
+              containerPort: 9101
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: monitor-exporter
+              mountPath: /opt/frigate-monitor/exporter.py
+              subPath: exporter.py
+              readOnly: true
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: storage
+              mountPath: /media/frigate
+              readOnly: true
+            - name: frigate-temp
+              mountPath: /tmp/cache
+              readOnly: true
+            - name: kube-api-access
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
+      volumes:
+        - name: monitor-exporter
+          configMap:
+            name: frigate-monitor-exporter
+            defaultMode: 0444
+        - name: kube-api-access
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  expirationSeconds: 3600
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
