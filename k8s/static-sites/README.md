@@ -29,8 +29,9 @@ copier copy templates/static-site k8s/static-sites/sites/example.waylonwalker.co
   --defaults
 ```
 
-ExternalDNS creates DNS records. A Cloudflare Tunnel route must also accept
-the hostname. Check that route before expecting the new site to be reachable.
+ExternalDNS creates DNS records. The falcon tunnel sends unmatched HTTP hosts
+to Traefik, so a new subdomain in a configured zone needs no separate tunnel
+route. Existing DNS records keep their current targets under create-only.
 
 The hostPath content stays outside this repository. The manifests only mount
 the existing hostPath into nginx, so the site content remains managed by the

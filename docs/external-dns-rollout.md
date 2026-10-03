@@ -1,7 +1,12 @@
 # ExternalDNS rollout runbook
 
-This runbook covers the controlled rollout of ExternalDNS. This PR does not
-enable ExternalDNS writes or a broad Ingress rollout.
+This document records the original rollout. For the current behavior, see
+[Automatic DNS through falcon](automatic-dns.md).
+
+On 2026-10-02, the `falcon` tunnel catch-all rule changed from
+`http_status:404` to `http://traefik.kube-system.svc.cluster.local:80`.
+ExternalDNS already creates DNS records for new Traefik Ingress hosts.
+The route checks and rollout steps below describe the earlier configuration.
 
 ## Settled contract
 

@@ -1,5 +1,5 @@
-# CAUTION: Zone access does not prove falcon tunnel coverage.
-# Keep the canary label filter until every eligible host has a verified falcon route.
+# These are the zones available to ExternalDNS. New subdomains with no existing
+# record use the falcon tunnel. Existing records stay unchanged under create-only.
 domainFilters:
   - aylawalker.com
   - fluffed-up.com
