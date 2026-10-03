@@ -1,0 +1,148 @@
+{
+  "namespace": "waylonwalker-com-prod-notes",
+  "deployed_commit": "9c80f15c9019ddfb40de0cbde01fc6229df563d9",
+  "image": {
+    "tag": "sha-9c80f15",
+    "status": 200,
+    "digest": "sha256:e6e5c120304457a966ead8ea6894e3fe2325574f6987ab622ad63e3db70cadce"
+  },
+  "builds": [
+    {
+      "id": "build-1791054467306830397",
+      "status": "success",
+      "trigger_type": "manual-ui",
+      "started_at": "2026-10-03T19:07:47.333489606Z",
+      "finished_at": "2026-10-03T19:15:14.303676739Z",
+      "prepare_ms": 30,
+      "build_ms": 46854,
+      "promote_ms": 400085,
+      "prune_ms": 83945,
+      "total_ms": 446970,
+      "release_id": "20261003T190834Z-waylonwalker-com-prod-notes-builder-admin-6c9f9cd449-p4k6w",
+      "became_live": true
+    },
+    {
+      "id": "build-1791055191154062859",
+      "status": "success",
+      "trigger_type": "manual-ui",
+      "started_at": "2026-10-03T19:19:51.182877651Z",
+      "finished_at": "2026-10-03T19:20:34.867184248Z",
+      "prepare_ms": 28,
+      "build_ms": 36103,
+      "promote_ms": 7552,
+      "prune_ms": 91723,
+      "total_ms": 43684,
+      "release_id": "20261003T192027Z-waylonwalker-com-prod-notes-builder-admin-6c9f9cd449-p4k6w",
+      "became_live": true
+    },
+    {
+      "id": "build-1791055280190122174",
+      "status": "success",
+      "trigger_type": "manual-ui",
+      "started_at": "2026-10-03T19:21:20.309926713Z",
+      "finished_at": "2026-10-03T19:22:30.363174975Z",
+      "prepare_ms": 75,
+      "build_ms": 49841,
+      "promote_ms": 20135,
+      "prune_ms": 82256,
+      "total_ms": 70053,
+      "release_id": "20261003T192210Z-waylonwalker-com-prod-notes-builder-admin-6c9f9cd449-p4k6w",
+      "became_live": true
+    },
+    {
+      "id": "build-1791055397226271965",
+      "status": "success",
+      "trigger_type": "manual-ui",
+      "started_at": "2026-10-03T19:23:17.24242543Z",
+      "finished_at": "2026-10-03T19:24:19.291592259Z",
+      "prepare_ms": 7,
+      "build_ms": 45003,
+      "promote_ms": 17037,
+      "prune_ms": 64581,
+      "total_ms": 62049,
+      "release_id": "20261003T192402Z-waylonwalker-com-prod-notes-builder-admin-6c9f9cd449-p4k6w",
+      "became_live": true
+    }
+  ],
+  "publication_logs": {
+    "build-1791055191154062859": [
+      "2026/10/03 19:20:02 [templates] Phase 1a classify: 3521 cacheable, 0 need render (took 174.852625ms)",
+      "2026/10/03 19:20:04 [templates] Phase 1b batch restore: took 1.530971671s, 0 now need render",
+      "2026/10/03 19:20:04 [templates] Phase 2 render: took 961ns",
+      "2026/10/03 19:20:04 [templates] took 1.938254718s",
+      "2026/10/03 19:20:07 [publish_feeds] Incremental: 420 feeds skipped, 0 rebuilt",
+      "2026/10/03 19:20:07 [publish_feeds] took 226.293675ms",
+      "2026/10/03 19:20:23 [build_cache] Incremental build: 3519 skipped, 1 rebuilt",
+      "incremental publication: linked_files=34031 copied_files=13 copied_bytes=228370805 compared_bytes=276140586 cached_source_hashes=30848 cached_release_hashes=34044 manifest_saved=true"
+    ],
+    "build-1791055280190122174": [
+      "2026/10/03 19:21:29 [build_cache] Invalidated 1 changed posts and 0 dependent posts",
+      "2026/10/03 19:21:35 [templates] Phase 1a classify: 3520 cacheable, 1 need render (took 226.070183ms)",
+      "2026/10/03 19:21:37 [templates] Phase 1b batch restore: took 1.387878202s, 1 now need render",
+      "2026/10/03 19:21:37 [templates] Phase 2 render: took 31.650772ms",
+      "2026/10/03 19:21:37 [templates] took 1.906491725s",
+      "2026/10/03 19:22:00 [publish_feeds] Incremental: 413 feeds skipped, 7 rebuilt",
+      "2026/10/03 19:22:00 [publish_feeds] took 19.588267295s",
+      "2026/10/03 19:22:06 [build_cache] Incremental build: 3518 skipped, 2 rebuilt",
+      "incremental publication: linked_files=34017 copied_files=27 copied_bytes=326198470 compared_bytes=920318962 cached_source_hashes=30318 cached_release_hashes=34030 manifest_saved=true"
+    ]
+  },
+  "historical_proof": {
+    "release_id": "20261003T190834Z-waylonwalker-com-prod-notes-builder-admin-6c9f9cd449-p4k6w",
+    "entries": 54817,
+    "bytes": 3396464787,
+    "historical_release_unchanged": true,
+    "linked_to_current_files": 34017,
+    "workspace_shared_files": 0,
+    "verification_seconds": 205.60003205761313
+  },
+  "public_checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 137812,
+      "seconds": 0.085
+    },
+    {
+      "path": "/reader/",
+      "status": 200,
+      "bytes": 147129,
+      "seconds": 0.106
+    },
+    {
+      "path": "/blogroll/",
+      "status": 200,
+      "bytes": 203701,
+      "seconds": 0.12
+    },
+    {
+      "path": "/d3-day-5/",
+      "status": 200,
+      "bytes": 418802,
+      "seconds": 0.083
+    },
+    {
+      "path": "/api/search?q=python",
+      "status": 200,
+      "bytes": 7139,
+      "seconds": 0.048
+    },
+    {
+      "asset": "/css/variables.08e33724.css",
+      "status": 200,
+      "bytes": 3723
+    },
+    {
+      "asset": "/js/palette-switcher.b69367b1.js",
+      "status": 200,
+      "bytes": 33578
+    }
+  ],
+  "source_restoration": {
+    "source_restored": true,
+    "sha256": "526c7cd680f8d6e491203e5d9d9d2db5f79722f3b2edf8af38597c325c5be1a5"
+  },
+  "argo_sync": "Synced",
+  "argo_health": "Healthy",
+  "manifest_mode": "0600"
+}
