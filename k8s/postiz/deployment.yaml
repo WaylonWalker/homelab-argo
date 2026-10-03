@@ -8,6 +8,8 @@ kind: Cluster
 metadata:
   name: postiz-db
   namespace: postiz
+  annotations:
+    cnpg.io/hibernation: "on"
 spec:
   instances: 1
   storage:
@@ -63,7 +65,7 @@ metadata:
   name: postiz
   namespace: postiz
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       service: postiz
@@ -202,7 +204,7 @@ metadata:
   name: postiz-redis
   namespace: postiz
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       service: postiz-redis
