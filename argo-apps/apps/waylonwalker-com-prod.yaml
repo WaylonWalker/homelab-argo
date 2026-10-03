@@ -79,9 +79,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-ad352b5
+              tag: sha-e74e35b
             builderImage:
-              tag: sha-ad352b5
+              tag: sha-e74e35b
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -146,9 +146,9 @@ spec:
                 app.kubernetes.io/name: traefik
                 app.kubernetes.io/instance: traefik-kube-system
             mermaidMode: client
-            # Output stays on the release PVC for atomic rename promotion.
-            # Cache remains on node-local NVMe; cross-filesystem publication
-            # of the 3.4 GiB workspace was slower in production measurements.
+            # Retain an independent workspace on the release PVC.
+            # Incremental staging links unchanged immutable release files.
+            # Cache remains on node-local NVMe.
             workspace:
               enabled: false
             # Dev remains the authoring/watch environment for now.
@@ -189,7 +189,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-ad352b5
+              tag: sha-e74e35b
             mode: watch-content
             # Source cache symlinks target /data/cache; keep search's cache pod-local.
             localCache:
