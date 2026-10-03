@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: walkershare
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/waylonwalker/homelab-argo
+    targetRevision: HEAD
+    path: k8s/walkershare
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: walkershare
+  # Adopt the existing workloads without automatic pruning of retained data.
+  # Syncs remain manual while storage ownership and backup coverage are reviewed.
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  ignoreDifferences:
+    - group: ""
+      kind: PersistentVolumeClaim
+      jqPathExpressions:
+        - .spec.volumeName
+    - group: ""
+      kind: PersistentVolume
+      jqPathExpressions:
+        - .spec.claimRef

@@ -15,6 +15,8 @@ spec:
             jobEnabled: false
           defaultSettings:
             allow-recurring-job-while-volume-detached: true
+          # Keep the backup target in this Helm source. Do not add a second
+          # manually managed longhorn-system Setting for the same values.
           defaultBackupStore:
             backupTarget: s3://longhorn-system@us-east-1/
             backupTargetCredentialSecret: minio-longhorn-backup-secret

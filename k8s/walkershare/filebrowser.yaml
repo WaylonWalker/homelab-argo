@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filebrowser
+  namespace: walkershare
+  labels:
+    app.kubernetes.io/component: web
+    app.kubernetes.io/name: filebrowser
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: filebrowser
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: filebrowser
+    spec:
+      containers:
+      - image: docker.io/filebrowser/filebrowser:v2.33.10
+        imagePullPolicy: IfNotPresent
+        name: filebrowser
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /tls
+          name: tls
+          readOnly: true
+        - mountPath: /srv
+          name: walkershare-data
+        - mountPath: /config
+          name: config
+        - mountPath: /database
+          name: database
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        walkershare: 'true'
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: tls
+        secret:
+          defaultMode: 420
+          secretName: files-wayl-one-tls
+      - name: walkershare-data
+        persistentVolumeClaim:
+          claimName: walkershare-pvc
+      - name: config
+        persistentVolumeClaim:
+          claimName: filebrowser-config
+      - name: database
+        persistentVolumeClaim:
+          claimName: filebrowser-database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filebrowser
+  namespace: walkershare
+  labels:
+    app.kubernetes.io/name: filebrowser
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: filebrowser
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: filebrowser
+  namespace: walkershare
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: files.wayl.one
+    http:
+      paths:
+      - backend:
+          service:
+            name: filebrowser
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - files.wayl.one
+    secretName: files-wayl-one-tls
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: filebrowser-config
+  namespace: walkershare
+  annotations:
+    volume.beta.kubernetes.io/storage-provisioner: driver.longhorn.io
+    volume.kubernetes.io/storage-provisioner: driver.longhorn.io
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: filebrowser-database
+  namespace: walkershare
+  annotations:
+    volume.beta.kubernetes.io/storage-provisioner: driver.longhorn.io
+    volume.kubernetes.io/storage-provisioner: driver.longhorn.io
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: longhorn

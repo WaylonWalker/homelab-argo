@@ -691,6 +691,11 @@ spec:
                     address:
                       description: Address defines the authentication server address.
                       type: string
+                    addAuthCookiesToResponse:
+                      description: AddAuthCookiesToResponse defines the list of cookies to copy from the authentication server response to the client response.
+                      items:
+                        type: string
+                      type: array
                     authRequestHeaders:
                       description: AuthRequestHeaders defines the list of the headers to copy from the request to the authentication server. If not set or empty then all request headers are passed.
                       items:
@@ -2395,6 +2400,11 @@ spec:
                     address:
                       description: Address defines the authentication server address.
                       type: string
+                    addAuthCookiesToResponse:
+                      description: AddAuthCookiesToResponse defines the list of cookies to copy from the authentication server response to the client response.
+                      items:
+                        type: string
+                      type: array
                     authRequestHeaders:
                       description: AuthRequestHeaders defines the list of the headers to copy from the request to the authentication server. If not set or empty then all request headers are passed.
                       items:

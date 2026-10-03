@@ -330,6 +330,124 @@ magnet-smp-playit-secret-from-clipboard:
 
     echo "Created k8s/magnet-smp/magnet-smp-playit-sealed-secret.yaml"
 
+# Add a markata-go secret value from your clipboard to the selected
+# deployment's sealed secret. Copy only the value (no KEY= prefix), then run:
+#   just markata-encryption-from-clipboard
+# Or skip the picker:
+#   just markata-encryption-from-clipboard rhiannonwalker
+markata-encryption-from-clipboard deployment="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    deployments=(
+      "rhiannonwalker|k8s/rhiannonwalker/markata-go-encryption-sealed-secret.yaml|rhiannonwalker-com-prod-notes"
+      "waylonwalker|k8s/waylonwalker-com/waylonwalker-com-prod/markata-go-encryption-sealed-secret.yaml|waylonwalker-com-prod-notes"
+      "go-waylonwalker|k8s/waylonwalker-com/go-waylonwalker-com/markata-go-encryption-sealed-secret.yaml|go-waylonwalker-com-notes"
+      "wyattbubbylee|k8s/wyattbubbylee-com/wyattbubbylee-com-prod/markata-go-encryption-sealed-secret.yaml|wyattbubbylee-com-prod-notes"
+    )
+
+    selection="{{deployment}}"
+    if [[ -z "$selection" ]]; then
+      if ! command -v fzf >/dev/null 2>&1; then
+        echo "Error: fzf is required for the deployment picker (or pass a deployment id directly)" >&2
+        exit 1
+      fi
+      if ! selection="$(printf '%s\n' "${deployments[@]}" | fzf \
+        --prompt='Choose markata-go deployment: ' \
+        --height=40% \
+        --layout=reverse \
+        --border)"; then
+        echo "Deployment selection cancelled." >&2
+        exit 1
+      fi
+    fi
+
+    out_file=""
+    namespace=""
+    for entry in "${deployments[@]}"; do
+      id="${entry%%|*}"
+      if [[ "$selection" == "$id" || "$selection" == "$entry" ]]; then
+        rest="${entry#*|}"
+        out_file="${rest%%|*}"
+        namespace="${rest##*|}"
+        break
+      fi
+    done
+    if [[ -z "$out_file" ]]; then
+      echo "Error: unknown deployment '$selection' (expected one of: rhiannonwalker waylonwalker go-waylonwalker wyattbubbylee)" >&2
+      exit 1
+    fi
+
+    read -r -p "Is this for _DEFAULT? [Y/n] " use_default
+    if [[ "$use_default" == "" || "$use_default" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+      secret_key="MARKATA_GO_ENCRYPTION_KEY_DEFAULT"
+    else
+      read -r -p "Encryption key name (for example PORTFOLIO): " key_name
+      key_name="$(printf '%s' "$key_name" | tr '[:lower:]' '[:upper:]' | sed -E 's/[^A-Z0-9]+/_/g; s/^_+//; s/_+$//')"
+      key_name="${key_name#MARKATA_GO_ENCRYPTION_KEY_}"
+      key_name="${key_name#MARKATA_GO_}"
+      if [[ -z "$key_name" ]]; then
+        echo "Error: encryption key name cannot be empty" >&2
+        exit 1
+      fi
+      secret_key="MARKATA_GO_ENCRYPTION_KEY_${key_name}"
+    fi
+
+    if command -v wl-paste >/dev/null 2>&1; then
+      password="$(wl-paste --no-newline)"
+    elif command -v xclip >/dev/null 2>&1; then
+      password="$(xclip -selection clipboard -o)"
+    elif command -v xsel >/dev/null 2>&1; then
+      password="$(xsel --clipboard --output)"
+    else
+      echo "No clipboard tool found. Install wl-clipboard, xclip, or xsel." >&2
+      exit 1
+    fi
+    password="${password%$'\n'}"
+    if [[ -z "$password" ]]; then
+      echo "Error: clipboard is empty" >&2
+      exit 1
+    fi
+    if [[ "$secret_key" == "MARKATA_GO_ENCRYPTION_KEY_DEFAULT" ]] && ((${#password} < 14)); then
+      echo "Error: password is shorter than the 14-char markata-go minimum; refusing to seal it" >&2
+      exit 1
+    fi
+
+    printf 'About to update %s in %s (namespace %s) with the clipboard value.\n' \
+      "$secret_key" "$out_file" "$namespace"
+    read -r -p "Continue? [y/N] " confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+      echo "Aborted; sealed secret unchanged." >&2
+      exit 1
+    fi
+
+    umask 077
+    tmp_env="$(mktemp)"
+    trap 'rm -f "$tmp_env" "$tmp_env.yaml"' EXIT
+    printf '%s' "$password" > "$tmp_env"
+    chmod 600 "$tmp_env"
+    password=""
+
+    kubectl create secret generic markata-go-encryption \
+      --namespace "$namespace" \
+      --from-file="$secret_key=$tmp_env" \
+      --dry-run=client -o yaml > "$tmp_env.yaml"
+
+    if [[ -f "$out_file" ]]; then
+      kubeseal --merge-into "$out_file" \
+        -f "$tmp_env.yaml" \
+        --namespace "$namespace" \
+        --name markata-go-encryption
+    else
+      kubeseal -f "$tmp_env.yaml" \
+        -w "$out_file" \
+        --namespace "$namespace" \
+        --name markata-go-encryption
+    fi
+
+    echo "Sealed $out_file"
+    echo "Review with git diff, then commit and push; ArgoCD syncs the Secret."
+
 seal-thoughts-dropper-pat:
     #!/usr/bin/env bash
     set -euo pipefail
