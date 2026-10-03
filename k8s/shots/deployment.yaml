@@ -204,13 +204,13 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pgrep
-                - -f
-                - shot_scraper_api.worker
+                - python
+                - -m
+                - shot_scraper_api.worker_health
             initialDelaySeconds: 45
             periodSeconds: 10
             failureThreshold: 6
-            timeoutSeconds: 5
+            timeoutSeconds: 15
           readinessProbe:
             exec:
               command:
