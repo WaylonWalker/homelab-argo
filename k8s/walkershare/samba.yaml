@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: samba
+  namespace: walkershare
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: samba
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: samba
+    spec:
+      containers:
+      - args:
+        - -u
+        - waylon;waylon
+        - -u
+        - rhiannon;rhiannon
+        - -u
+        - wyatt;wyatt
+        - -u
+        - ayla;ayla
+        - -s
+        - public;/walkershare/public;yes;no;no;all;none
+        - -s
+        - waylon;/walkershare/waylon;no;no;no;waylon
+        - -s
+        - rhiannon;/walkershare/rhiannon;no;no;no;rhiannon
+        - -s
+        - wyatt;/walkershare/wyatt;no;no;no;wyatt
+        - -s
+        - ayla;/walkershare/ayla;no;no;no;ayla
+        - -s
+        - parents;/walkershare/parents;no;no;no;waylon,rhiannon
+        - -p
+        env:
+        - name: PERMISSIONS
+          value: '0777'
+        - name: USERID
+          value: '1000'
+        - name: GROUPID
+          value: '1000'
+        image: andyzhangx/samba:win-fix
+        imagePullPolicy: IfNotPresent
+        name: samba
+        ports:
+        - containerPort: 445
+          protocol: TCP
+        - containerPort: 139
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /walkershare
+          name: walkershare
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        walkershare: 'true'
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: walkershare
+        persistentVolumeClaim:
+          claimName: walkershare-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: samba
+  namespace: walkershare
+spec:
+  allocateLoadBalancerNodePorts: true
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ports:
+  - name: smb
+    nodePort: 30472
+    port: 445
+    protocol: TCP
+    targetPort: 445
+  - name: netbios
+    nodePort: 32306
+    port: 139
+    protocol: TCP
+    targetPort: 139
+  selector:
+    app: samba
+  sessionAffinity: None
+  type: LoadBalancer
