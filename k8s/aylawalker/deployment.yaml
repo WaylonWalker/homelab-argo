@@ -42,6 +42,8 @@ spec:
         network/code-server-default: "true"
         service: code-server
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: falcon3
       initContainers:
         - name: fix-permissions
           image: busybox
@@ -210,6 +212,8 @@ spec:
       labels:
         service: admin
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: falcon3
       initContainers:
         - name: fix-permissions
           image: busybox
