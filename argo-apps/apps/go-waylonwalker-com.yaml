@@ -83,7 +83,7 @@ spec:
               keep: 25
             resources:
               requests:
-                cpu: 100m
+                cpu: 25m
                 memory: 4Gi
                 ephemeral-storage: 8Gi
               limits:
