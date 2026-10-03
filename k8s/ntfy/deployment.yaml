@@ -75,7 +75,9 @@ spec:
           livenessProbe:
             exec:
               command:
-                - wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '"healthy"\s*:\s*true' || exit 1
+                - /bin/sh
+                - -ec
+                - wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eq '"healthy"[[:space:]]*:[[:space:]]*true'
             failureThreshold: 3
             initialDelaySeconds: 40
             periodSeconds: 60
