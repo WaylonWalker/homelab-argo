@@ -9,7 +9,7 @@ spec:
     namespace: excalidraw
     server: 'https://kubernetes.default.svc'
   source:
-    path: excalidraw
+    path: k8s/excalidraw
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
   syncPolicy:
     automated:

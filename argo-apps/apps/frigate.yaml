@@ -9,7 +9,7 @@ spec:
     namespace: frigate
     server: 'https://kubernetes.default.svc'
   source:
-    path: frigate
+    path: k8s/frigate
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

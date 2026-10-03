@@ -9,7 +9,7 @@ spec:
     namespace: installer
     server: 'https://kubernetes.default.svc'
   source:
-    path: installer
+    path: k8s/installer
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
   syncPolicy:
     automated:

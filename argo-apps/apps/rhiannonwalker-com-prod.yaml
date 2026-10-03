@@ -8,7 +8,7 @@ spec:
   sources:
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
       targetRevision: HEAD
-      path: rhiannonwalker
+      path: k8s/rhiannonwalker
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
       targetRevision: main
       path: helm-chart
@@ -32,6 +32,9 @@ spec:
             tls:
               enabled: true
               secretName: rhiannonwalker-com-prod-tls
+
+          site:
+            use404Page: true
 
           markataEncryption:
             secretName: markata-go-encryption
@@ -66,9 +69,9 @@ spec:
           build:
             enabled: false
             fetchImage:
-              tag: sha-02e59ea
+              tag: sha-bdd0a64
             builderImage:
-              tag: sha-02e59ea
+              tag: sha-bdd0a64
             fast: false
             cacheDir: /data/cache/xdg
             releases:
@@ -160,7 +163,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-02e59ea
+              tag: sha-bdd0a64
             mode: watch-content
             resources:
               requests:

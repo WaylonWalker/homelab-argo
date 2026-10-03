@@ -9,7 +9,7 @@ spec:
     namespace: cloudflared
     server: 'https://kubernetes.default.svc'
   source:
-    path: cloudflared
+    path: k8s/cloudflared
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

@@ -9,7 +9,7 @@ spec:
     namespace: status
     server: 'https://kubernetes.default.svc'
   source:
-    path: status
+    path: k8s/status
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

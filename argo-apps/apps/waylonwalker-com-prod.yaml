@@ -11,9 +11,9 @@ spec:
   sources:
     - repoURL: 'https://github.com/waylonwalker/homelab-argo'
       targetRevision: HEAD
-      path: waylonwalker-com/waylonwalker-com-prod
+      path: k8s/waylonwalker-com/waylonwalker-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
-      targetRevision: main
+      targetRevision: a6ce550aa67743fe2dd503f12abb08ed66c8c042
       path: helm-chart
       helm:
         values: |
@@ -38,6 +38,9 @@ spec:
               enabled: true
               secretName: waylonwalker-com-prod-tls
 
+          site:
+            use404Page: true
+
           markataEncryption:
             secretName: markata-go-encryption
 
@@ -53,15 +56,17 @@ spec:
                 - ReadWriteOnce
             site:
               mode: pvc
-              storageClassName: longhorn
-              size: 20Gi
+              storageClassName: longhorn-build-fast
+              size: 30Gi
+              volumeName: pvc-cbc9a896-5733-4892-ab42-be4fd2946a89
               accessModes:
                 - ReadWriteOnce
             cache:
               enabled: true
               mode: hostPath
+              storageClassName: longhorn
               hostPath:
-                path: /mnt/main/walkershare/waylon/cache/waylonwalker.com
+                path: /var/lib/markata-go/waylonwalker-com-prod/cache
                 type: DirectoryOrCreate
               accessModes:
                 - ReadWriteOnce
@@ -74,9 +79,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-02e59ea
+              tag: sha-1222dae
             builderImage:
-              tag: sha-02e59ea
+              tag: sha-1222dae
             fast: false
             successfulJobsHistoryLimit: 20
             failedJobsHistoryLimit: 10
@@ -87,7 +92,7 @@ spec:
               enabled: true
               url: https://ntfy.wayl.one/opencode
             releases:
-              # Keep enough rollback history without filling the 20Gi site PVC.
+              # Keep enough rollback history without filling the 30Gi site PVC.
               keep: 10
             resources:
               requests:
@@ -141,6 +146,11 @@ spec:
                 app.kubernetes.io/name: traefik
                 app.kubernetes.io/instance: traefik-kube-system
             mermaidMode: client
+            # Output stays on the release PVC for atomic rename promotion.
+            # Cache remains on node-local NVMe; cross-filesystem publication
+            # of the 3.4 GiB workspace was slower in production measurements.
+            workspace:
+              enabled: false
             # Dev remains the authoring/watch environment for now.
             watch:
               enabled: false
@@ -179,8 +189,11 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-02e59ea
+              tag: sha-1222dae
             mode: watch-content
+            # Source cache symlinks target /data/cache; keep search's cache pod-local.
+            localCache:
+              enabled: true
             # Builder-admin initializes the new PVC checkout before search starts.
             waitForSource:
               enabled: false
@@ -197,6 +210,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
   # The source PVC is provisioned out-of-band storage; Argo must not try to
   # patch the provisioner-assigned volumeName on the live claim.
   ignoreDifferences:

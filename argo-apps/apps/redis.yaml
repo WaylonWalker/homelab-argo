@@ -9,7 +9,7 @@ spec:
     namespace: redis
     server: 'https://kubernetes.default.svc'
   source:
-    path: redis
+    path: k8s/redis
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

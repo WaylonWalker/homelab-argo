@@ -9,7 +9,7 @@ spec:
     namespace: waylonwalker-com
     server: 'https://kubernetes.default.svc'
   source:
-    path: waylonwalker-com
+    path: k8s/waylonwalker-com
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

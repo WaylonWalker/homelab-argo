@@ -9,7 +9,7 @@ spec:
     namespace: ntfy
     server: 'https://kubernetes.default.svc'
   source:
-    path: ntfy
+    path: k8s/ntfy
     repoURL: 'https://github.com/waylonwalker/homelab-argo'
     targetRevision: HEAD
   syncPolicy:

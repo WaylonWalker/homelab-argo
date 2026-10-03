@@ -78,7 +78,7 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.43
+        - image: registry.wayl.one/dropper:0.0.54
           name: dropper-wayl-one
           command:
             - "/bin/sh"
@@ -120,13 +120,17 @@ spec:
           resources:
             requests:
               cpu: "200m"
-              memory: "1Gi"
+              memory: "2Gi"
             limits:
-              cpu: "1000m"
-              memory: "4Gi"
+              cpu: "1500m"
+              memory: "6Gi"
           env:
             - name: DROPPER_BASE_URL
               value: "https://dropper.waylonwalker.com/"
+            - name: DROPPER_TRUSTED_PROXY_NETWORKS
+              value: "10.42.0.0/24,10.42.2.0/24,10.42.3.0/24"
+            - name: DROPPER_IMAGE_TRANSFORM_RATE_LIMIT_REQUESTS
+              value: "120"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -191,7 +195,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.43"
+              value: "deployment.environment=production,service.version=0.0.54"
           volumeMounts:
             - mountPath: /data
               name: dropper-data
