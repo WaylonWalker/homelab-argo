@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: "voice-reverse"
+  namespace: "voice-reverse"
+  host: "voice-reverse.waylonwalker.com"
+  webrootPath: "/mnt/main/walkershare/waylon/sites/voice-reverse.waylonwalker.com"

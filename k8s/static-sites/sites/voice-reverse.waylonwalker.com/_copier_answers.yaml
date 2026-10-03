@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+_src_path: templates/static-site
+host: voice-reverse.waylonwalker.com
+namespace: voice-reverse
+site: voice-reverse
+webroot_path: /mnt/main/walkershare/waylon/sites/voice-reverse.waylonwalker.com
