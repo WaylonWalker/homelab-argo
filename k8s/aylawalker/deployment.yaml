@@ -29,7 +29,7 @@ metadata:
   name: code-server
   namespace: aylawalker
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       service: code-server
@@ -200,7 +200,7 @@ metadata:
   name: admin
   namespace: aylawalker
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       service: admin
