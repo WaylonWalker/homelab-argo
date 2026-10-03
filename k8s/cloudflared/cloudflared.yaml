@@ -7,6 +7,7 @@ metadata:
   namespace: cloudflared
 spec:
   replicas: 6
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       pod: cloudflared
@@ -30,8 +31,6 @@ spec:
                       values:
                         - cloudflared
                 topologyKey: kubernetes.io/hostname
-      tolerations:
-        - operator: "Exists"
       containers:
         - command:
             - cloudflared
