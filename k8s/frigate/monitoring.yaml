@@ -197,7 +197,7 @@ spec:
             summary: "Frigate container restarted"
             description: "Frigate container {{ $labels.pod }} restarted in the last 10 minutes."
         - alert: FrigateContainerMemoryHigh
-          expr: container_memory_working_set_bytes{namespace="frigate",container="frigate"} / on (namespace,pod,container) kube_pod_container_resource_limits{namespace="frigate",container="frigate",resource="memory",unit="byte"} > 0.80
+          expr: max by (namespace, pod, container) (container_memory_working_set_bytes{namespace="frigate",container="frigate"}) / on (namespace,pod,container) max by (namespace, pod, container) (kube_pod_container_resource_limits{namespace="frigate",container="frigate",resource="memory",unit="byte"}) > 0.80
           for: 5m
           labels:
             severity: warning
@@ -205,7 +205,7 @@ spec:
             summary: "Frigate memory working set exceeds 80% of its limit"
             description: "Pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of its memory limit."
         - alert: FrigateContainerMemoryCritical
-          expr: container_memory_working_set_bytes{namespace="frigate",container="frigate"} / on (namespace,pod,container) kube_pod_container_resource_limits{namespace="frigate",container="frigate",resource="memory",unit="byte"} > 0.90
+          expr: max by (namespace, pod, container) (container_memory_working_set_bytes{namespace="frigate",container="frigate"}) / on (namespace,pod,container) max by (namespace, pod, container) (kube_pod_container_resource_limits{namespace="frigate",container="frigate",resource="memory",unit="byte"}) > 0.90
           for: 2m
           labels:
             severity: critical
