@@ -1,0 +1,44 @@
+# Historical proposal only; outside Argo sources. Not approved for production claims.
+# These classes are additive. They do not change existing PVCs.
+#
+# Do not assign a class to an existing PVC in the same change that creates it.
+# A PVC storageClassName is immutable after binding.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-critical
+  labels:
+    storage.wayl.one/tier: critical
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"
+  dataLocality: disabled
+  replicaSoftAntiAffinity: disabled
+  replicaDiskSoftAntiAffinity: disabled
+  recurringJobSelector: >-
+    [{"name":"backup-daily","isGroup":false},
+     {"name":"backup-weekly","isGroup":false}]
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-ha
+  labels:
+    storage.wayl.one/tier: ha
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "3"
+  staleReplicaTimeout: "2880"
+  dataLocality: disabled
+  replicaSoftAntiAffinity: disabled
+  replicaDiskSoftAntiAffinity: disabled
+  recurringJobSelector: >-
+    [{"name":"backup-daily","isGroup":false},
+     {"name":"backup-weekly","isGroup":false}]
