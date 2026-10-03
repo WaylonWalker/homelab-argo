@@ -16,3 +16,8 @@ sync and has no automatic pruning. Server dry-run confirms all three pod
 templates match live state. HostPath node affinity and backup coverage still
 need operational review. Applying an old share.yaml would recreate
 obsolete credentials and workloads; use these reconciled manifests instead.
+
+The existing `samba-auth` Secret must be annotated as managed before the first
+sync. Its data is sealed unchanged. Owner references are disabled so deleting
+the SealedSecret cannot garbage-collect the application credential.
+See [Sealed Secrets ownership documentation](https://github.com/bitnami/sealed-secrets#managing-existing-secrets).
