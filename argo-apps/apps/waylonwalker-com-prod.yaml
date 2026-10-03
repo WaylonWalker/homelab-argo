@@ -83,9 +83,9 @@ spec:
             builderImage:
               tag: sha-1222dae
             fast: false
-            successfulJobsHistoryLimit: 20
-            failedJobsHistoryLimit: 10
-            ttlSecondsAfterFinished: 2592000
+            successfulJobsHistoryLimit: 3
+            failedJobsHistoryLimit: 3
+            ttlSecondsAfterFinished: 604800
             activeDeadlineSeconds: 7200
             cacheDir: /data/cache/xdg
             notify:
