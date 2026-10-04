@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+_src_path: templates/static-site
+host: stl-text-dev.waylonwalker.com
+namespace: stl-text-dev
+site: stl-text-dev
+webroot_path: /mnt/main/walkershare/waylon/sites/stl-text-dev.waylonwalker.com
