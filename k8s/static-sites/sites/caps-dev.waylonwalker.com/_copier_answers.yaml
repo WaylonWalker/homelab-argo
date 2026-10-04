@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+_src_path: templates/static-site
+host: caps-dev.waylonwalker.com
+namespace: caps-dev
+site: caps-dev
+webroot_path: /mnt/main/walkershare/waylon/sites/caps-dev.waylonwalker.com
