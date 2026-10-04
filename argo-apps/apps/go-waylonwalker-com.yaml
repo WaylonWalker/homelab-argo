@@ -67,9 +67,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-ad352b5
+              tag: sha-73c4f60
             builderImage:
-              tag: sha-ad352b5
+              tag: sha-73c4f60
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -184,7 +184,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-ad352b5
+              tag: sha-73c4f60
             mode: watch-content
             localCache:
               enabled: true
