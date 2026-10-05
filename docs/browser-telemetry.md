@@ -90,8 +90,45 @@ feature design and preview rules.
 
 ## Rollout and inventory
 
-The first static-site canaries are `caps-dev`, `emboss-dev`, `strip-dev`, and
-`voice-reverse-dev`. Production and remaining static-site hosts stay disabled
-until that canary cohort passes. See
+The `caps-dev`, `emboss-dev`, `strip-dev`, and `voice-reverse-dev` canaries passed in Chromium on 2026-10-05. Their production counterparts passed a Chromium exception check in Loki. The shared static-site platform is enabled for its other first-party browser sites, and the shared `k8s-pages` chart now enables its first-party utility sites. Both paths keep a per-site opt-out. See
 [`browser-telemetry-inventory.md`](browser-telemetry-inventory.md) for live
 host ownership, application family, and current status.
+
+
+## Validation and Grafana queries
+
+The development cohort passed in Chromium on 2026-10-05. Each host loaded with HTTP 200, received one synthetic exception, and reported its stable app name with `environment=development` and `version=unknown`. A production exception from Caps arrived with `environment=production`. The event and related browser spans are available in Loki and Tempo. Blocking `telemetry.wayl.one` still left Strip loaded with HTTP 200.
+
+Use these queries in Grafana Explore:
+
+```logql
+{source="browser"} | json | kind="exception"
+{source="browser"} | json | app_name="caps" | app_environment="development" | kind="exception"
+{source="browser"} | json | page_url=~".*caps-dev\.waylonwalker\.com.*"
+```
+
+In Tempo, filter spans by `service.name="caps"`,
+`deployment.environment.name="development"`, and `service.version="unknown"`.
+The Loki record includes `app_name`, `app_environment`, `app_version`, and
+`page_url` as JSON fields. These stay out of Loki stream labels to avoid
+high-cardinality label growth.
+
+Useful Prometheus queries:
+
+```promql
+rate(faro_receiver_events_total[5m])
+faro_receiver_exceptions_total
+faro_receiver_logs_total
+faro_receiver_rate_limiter_requests_total{allowed="false"}
+faro_receiver_sourcemap_downloads_total{http_status!="200"}
+loki_write_dropped_entries_total
+loki_write_batch_retries_total
+otelcol_exporter_send_failed_spans_total
+```
+
+On 2026-10-05, `up{service="alloy"}` was `1`; Faro receiver metrics were
+visible through the Alloy ServiceMonitor. The receiver recorded synthetic
+exceptions from all four development sites and production Caps. Loki dropped
+entries and batch retries were zero. Source-map downloads from all four dev
+hosts returned HTTP 200. Tempo contained browser spans with matching app,
+environment, and version attributes.

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-reverse-proxy-config
+  namespace: {{ .Values.namespace }}
+data:
+  default.conf: |-
+    {{ include "nginx.configmap.content" . | nindent 4 }}

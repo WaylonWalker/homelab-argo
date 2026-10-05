@@ -1,0 +1,6 @@
+apiVersion: v2
+name: k8s-pages
+description: A Helm chart for an NGINX reverse proxy with configurable sites hosted from minio object storage
+type: application
+version: 2.0.0
+appVersion: "1.0"

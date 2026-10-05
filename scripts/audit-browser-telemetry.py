@@ -90,6 +90,8 @@ def main() -> int:
         or "needs validation" in value[0].lower()
         or "pending review" in value[1].lower()
         or "pending host-level mapping" in value[1].lower()
+        or "source mapping pending" in value[1].lower()
+        or "unlocated" in value[0].lower()
     )
 
     for namespace, name, host in new_routes:
