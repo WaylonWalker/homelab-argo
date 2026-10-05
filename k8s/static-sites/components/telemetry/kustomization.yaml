@@ -1,0 +1,48 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.TELEMETRY_ENABLED
+    targets:
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - spec.template.metadata.annotations.[telemetry.wayl.one/enabled]
+        options:
+          create: true
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.TELEMETRY_APP_NAME
+    targets:
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - spec.template.metadata.annotations.[telemetry.wayl.one/app]
+        options:
+          create: true
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.TELEMETRY_ENVIRONMENT
+    targets:
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - spec.template.metadata.annotations.[telemetry.wayl.one/environment]
+        options:
+          create: true
+  - source:
+      kind: ConfigMap
+      name: site-config
+      fieldPath: data.TELEMETRY_VERSION
+    targets:
+      - select:
+          kind: Deployment
+        fieldPaths:
+          - spec.template.metadata.annotations.[telemetry.wayl.one/version]
+        options:
+          create: true

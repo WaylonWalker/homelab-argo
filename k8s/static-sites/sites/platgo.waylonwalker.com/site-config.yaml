@@ -14,3 +14,7 @@ data:
   # builderImage: ghcr.io/waylonwalker/markata-go-builder:latest
   # pollSeconds: "5"
   # keepReleases: "5"
+  TELEMETRY_ENABLED: "false"
+  TELEMETRY_APP_NAME: "platgo.waylonwalker.com"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"

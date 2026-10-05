@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+
+configMapGenerator:
+  - name: telemetry-bootstrap-assets
+    files:
+      - faro-bootstrap.js=assets/faro-bootstrap.js
+      - faro-client.js=assets/faro-client.js
+      - default.conf=nginx/default.conf

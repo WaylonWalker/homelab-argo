@@ -1,0 +1,16 @@
+{
+  "name": "@waylonwalker/telemetry-bootstrap",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/faro-bootstrap.ts --bundle --format=iife --target=es2020 --minify --outfile=assets/faro-bootstrap.js && esbuild src/client.ts --bundle --format=esm --target=es2020 --minify --outfile=assets/faro-client.js"
+  },
+  "dependencies": {
+    "@grafana/faro-web-sdk": "2.12.1",
+    "@grafana/faro-web-tracing": "2.12.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}

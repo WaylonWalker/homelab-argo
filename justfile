@@ -84,11 +84,20 @@ new-static-site site_dir="":
     for site_name in "${site_names[@]}"; do
       host="$site_name.$domain"
       destination="k8s/static-sites/sites/$host"
+      telemetry_app_name="${site_name%-dev}"
+      telemetry_environment="production"
+      if [[ "$site_name" == *-dev ]]; then
+        telemetry_environment="development"
+      fi
       copier copy templates/static-site "$destination" \
         --data "site=$site_name" \
         --data "namespace=$site_name" \
         --data "host=$host" \
         --data "webroot_path=/mnt/main/walkershare/waylon/sites/$host" \
+        --data "telemetry_enabled=true" \
+        --data "telemetry_app_name=$telemetry_app_name" \
+        --data "telemetry_environment=$telemetry_environment" \
+        --data "telemetry_version=unknown" \
         --defaults
       echo "Created $destination"
     done

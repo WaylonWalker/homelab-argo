@@ -14,4 +14,4 @@ generatorOptions:
 configMapGenerator:
   - name: nginx-conf
     files:
-      - default.conf=nginx/default.conf
+      - default.conf.template=nginx/default.conf

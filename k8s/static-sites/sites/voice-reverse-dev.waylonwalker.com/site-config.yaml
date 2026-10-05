@@ -7,3 +7,7 @@ data:
   namespace: "voice-reverse-dev"
   host: "voice-reverse-dev.waylonwalker.com"
   webrootPath: "/mnt/main/walkershare/waylon/sites/voice-reverse-dev.waylonwalker.com"
+  TELEMETRY_ENABLED: "true"
+  TELEMETRY_APP_NAME: "voice-reverse"
+  TELEMETRY_ENVIRONMENT: "development"
+  TELEMETRY_VERSION: "unknown"

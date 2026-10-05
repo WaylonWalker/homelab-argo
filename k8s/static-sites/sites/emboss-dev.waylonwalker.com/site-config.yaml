@@ -7,3 +7,7 @@ data:
   namespace: emboss-dev
   host: emboss-dev.waylonwalker.com
   webrootPath: /mnt/main/walkershare/waylon/sites/emboss-dev.waylonwalker.com
+  TELEMETRY_ENABLED: "true"
+  TELEMETRY_APP_NAME: "emboss"
+  TELEMETRY_ENVIRONMENT: "development"
+  TELEMETRY_VERSION: "unknown"

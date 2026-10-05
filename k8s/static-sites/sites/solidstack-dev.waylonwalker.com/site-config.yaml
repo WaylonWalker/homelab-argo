@@ -7,3 +7,7 @@ data:
   namespace: solidstack-dev
   host: solidstack-dev.waylonwalker.com
   webrootPath: /mnt/main/walkershare/waylon/sites/solidstack-dev.waylonwalker.com
+  TELEMETRY_ENABLED: "false"
+  TELEMETRY_APP_NAME: "solidstack"
+  TELEMETRY_ENVIRONMENT: "development"
+  TELEMETRY_VERSION: "unknown"

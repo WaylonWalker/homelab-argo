@@ -7,3 +7,7 @@ data:
   namespace: 30s-wyattbubbylee-com
   host: 30s.wyattbubbylee.com
   webrootPath: /mnt/main/walkershare/wyatt/sites/30s.wyattbubbylee.com
+  TELEMETRY_ENABLED: "false"
+  TELEMETRY_APP_NAME: "30s.wyattbubbylee.com"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"

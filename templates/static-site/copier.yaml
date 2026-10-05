@@ -11,3 +11,19 @@ host:
 webroot_path:
   type: str
   help: Host path containing the static site files
+telemetry_enabled:
+  type: str
+  default: "true"
+  help: Inject shared Faro browser telemetry (true or false)
+telemetry_app_name:
+  type: str
+  default: ""
+  help: Stable Faro app.name shared by production and development sites
+telemetry_environment:
+  type: str
+  default: production
+  help: Faro environment (production, preview, or development)
+telemetry_version:
+  type: str
+  default: unknown
+  help: Release version or git SHA; use unknown until publishing provides one

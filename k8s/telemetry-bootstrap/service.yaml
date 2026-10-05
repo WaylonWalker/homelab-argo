@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: telemetry-bootstrap
+  labels:
+    app.kubernetes.io/name: telemetry-bootstrap
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: telemetry-bootstrap
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

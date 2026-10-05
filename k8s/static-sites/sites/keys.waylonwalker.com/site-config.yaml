@@ -7,3 +7,7 @@ data:
   namespace: keys
   host: keys.waylonwalker.com
   webrootPath: /mnt/main/walkershare/waylon/sites/keys.waylonwalker.com
+  TELEMETRY_ENABLED: "false"
+  TELEMETRY_APP_NAME: "keys"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"

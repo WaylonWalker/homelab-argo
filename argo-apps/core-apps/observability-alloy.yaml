@@ -45,6 +45,10 @@ spec:
                   max_allowed_payload_size = "1MiB"
                   cors_allowed_origins = [
                     "https://*.wayl.one",
+                    "https://*.waylonwalker.com",
+                    "https://*.wyattbubbylee.com",
+                    "https://*.rhiannonwalker.com",
+                    "https://*.markata.dev",
                     "https://waylonwalker.com",
                     "https://www.waylonwalker.com",
                     "https://rhiannonwalker.com",
@@ -71,6 +75,10 @@ spec:
                   // origins. Move source maps to a private MinIO location later.
                   download_from_origins = [
                     "https://*.wayl.one",
+                    "https://*.waylonwalker.com",
+                    "https://*.wyattbubbylee.com",
+                    "https://*.rhiannonwalker.com",
+                    "https://*.markata.dev",
                     "https://waylonwalker.com",
                     "https://www.waylonwalker.com",
                     "https://rhiannonwalker.com",
@@ -120,6 +128,21 @@ spec:
           path: /
           pathType: Prefix
           faroPort: 12347
+          extraPaths:
+            - path: /assets/faro-bootstrap.js
+              pathType: Exact
+              backend:
+                service:
+                  name: telemetry-bootstrap
+                  port:
+                    number: 8080
+            - path: /assets/faro-client.js
+              pathType: Exact
+              backend:
+                service:
+                  name: telemetry-bootstrap
+                  port:
+                    number: 8080
           hosts:
             - telemetry.wayl.one
           annotations:
