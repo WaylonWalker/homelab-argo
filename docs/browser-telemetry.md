@@ -70,8 +70,9 @@ Use logs for technical events only. Do not include user text or input. The
 shared helper captures errors, unhandled rejections, performance, Web Vitals,
 page views, and browser traces. It removes query strings and fragments from
 URLs. It redacts common credential patterns. It adds trace headers only to
-Waylon-owned domains. On localhost, telemetry stays off unless the app passes
-`allowLocalhost: true` to `setupFaro`.
+Waylon-owned domains. On localhost, telemetry stays off unless a caller passes
+`allowLocalhost: true` to `setupFaro` or adds `data-faro-local="true"` to the
+bootstrap script tag.
 
 ## FastAPI HTML applications
 
@@ -97,7 +98,7 @@ host ownership, application family, and current status.
 
 ## Validation and Grafana queries
 
-The development cohort passed in Chromium on 2026-10-05. Each host loaded with HTTP 200, received one synthetic exception, and reported its stable app name with `environment=development` and `version=unknown`. A production exception from Caps arrived with `environment=production`. The separate `k8s-pages` dev site `dev.rhiannonwalker.com` also reported an exception as `rhiannonwalker-com` with `environment=development`. The event and related browser spans are available in Loki and Tempo. The Chromium trace `583825302997bf05df6359d2aa888ace` was retrieved from Tempo with `service.name=caps`, `deployment.environment.name=development`, and `service.version=unknown`. Blocking `telemetry.wayl.one` still left Strip loaded with HTTP 200.
+The development cohort passed in Chromium on 2026-10-05. Each host loaded with HTTP 200, received one synthetic exception, and reported its stable app name with `environment=development` and `version=unknown`. A production exception from Caps arrived with `environment=production`. The separate `k8s-pages` dev site `dev.rhiannonwalker.com` also reported an exception as `rhiannonwalker-com` with `environment=development`. The event and related browser spans are available in Loki and Tempo. The ESM helper imported from `/assets/faro-client.js` in Chromium and exposed `setupFaro` as a function. The Chromium trace `583825302997bf05df6359d2aa888ace` was retrieved from Tempo with `service.name=caps`, `deployment.environment.name=development`, and `service.version=unknown`. Blocking `telemetry.wayl.one` still left Strip loaded with HTTP 200.
 
 Use these queries in Grafana Explore:
 
@@ -133,7 +134,7 @@ otelcol_exporter_send_failed_spans_total
 ```
 
 On 2026-10-05, `up{service="alloy"}` was `1`; Faro receiver metrics were
-visible through the Alloy ServiceMonitor. The receiver recorded synthetic
+visible through the Alloy ServiceMonitor. The public receiver returned 405 for `GET /collect`; `/metrics` returned 404. The observability namespace exposed only the Alloy and Grafana ingresses, with Loki and Tempo remaining cluster-internal. The receiver recorded synthetic
 exceptions from all four shared static-site development sites, production Caps,
 and `dev.rhiannonwalker.com` through the `k8s-pages` family. Loki dropped
 entries and batch retries were zero. Source-map downloads from all four dev
