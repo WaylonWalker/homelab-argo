@@ -7,7 +7,7 @@ data:
   namespace: hyzar-wyattbubbylee-com
   host: hyzar.wyattbubbylee.com
   webrootPath: /mnt/main/walkershare/wyatt/sites/hyzar.wyattbubbylee.com
-  TELEMETRY_ENABLED: "disabled"
+  TELEMETRY_ENABLED: "enabled"
   TELEMETRY_APP_NAME: "hyzar.wyattbubbylee.com"
   TELEMETRY_ENVIRONMENT: "production"
   TELEMETRY_VERSION: "unknown"

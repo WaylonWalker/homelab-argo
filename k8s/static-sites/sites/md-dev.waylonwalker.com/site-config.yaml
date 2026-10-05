@@ -7,7 +7,7 @@ data:
   namespace: md-dev
   host: md-dev.waylonwalker.com
   webrootPath: /mnt/main/walkershare/waylon/sites/md-dev.waylonwalker.com
-  TELEMETRY_ENABLED: "disabled"
+  TELEMETRY_ENABLED: "enabled"
   TELEMETRY_APP_NAME: "md"
   TELEMETRY_ENVIRONMENT: "development"
   TELEMETRY_VERSION: "unknown"
