@@ -1,0 +1,145 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-alloy
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: alloy
+    targetRevision: 1.13.0
+    helm:
+      releaseName: alloy
+      values: |
+        controller:
+          type: deployment
+          replicas: 1
+
+        # Faro is the only externally routed port. The chart's HTTP/metrics
+        # port remains available only through the in-cluster ClusterIP Service.
+        alloy:
+          enableReporting: false
+          listenAddr: 0.0.0.0
+          listenPort: 12345
+          extraPorts:
+            - name: faro
+              port: 12347
+              targetPort: 12347
+              protocol: TCP
+          configMap:
+            content: |
+              faro.receiver "browser" {
+                log_format = "json"
+
+                extra_log_labels = {
+                  source = "browser",
+                }
+
+                server {
+                  listen_address           = "0.0.0.0"
+                  listen_port              = 12347
+                  max_allowed_payload_size = "1MiB"
+                  cors_allowed_origins = [
+                    "https://*.wayl.one",
+                    "https://waylonwalker.com",
+                    "https://www.waylonwalker.com",
+                    "https://rhiannonwalker.com",
+                    "https://www.rhiannonwalker.com",
+                    "https://wyattbubbylee.com",
+                    "https://www.wyattbubbylee.com",
+                    "https://caps.waylonwalker.com",
+                    "https://emboss.waylonwalker.com",
+                    "http://localhost:*",
+                    "http://127.0.0.1:*",
+                  ]
+
+                  rate_limiting {
+                    enabled    = true
+                    strategy   = "per_app"
+                    rate       = 20
+                    burst_size = 50
+                  }
+                }
+
+                sourcemaps {
+                  download = true
+                  // Limit browser-directed source map requests to known app
+                  // origins. Move source maps to a private MinIO location later.
+                  download_from_origins = [
+                    "https://*.wayl.one",
+                    "https://waylonwalker.com",
+                    "https://www.waylonwalker.com",
+                    "https://rhiannonwalker.com",
+                    "https://www.rhiannonwalker.com",
+                    "https://wyattbubbylee.com",
+                    "https://www.wyattbubbylee.com",
+                    "https://caps.waylonwalker.com",
+                    "https://emboss.waylonwalker.com",
+                  ]
+                }
+
+                output {
+                  logs   = [loki.write.browser.receiver]
+                  traces = [otelcol.exporter.otlp.tempo.input]
+                }
+              }
+
+              loki.write "browser" {
+                endpoint {
+                  url = "http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push"
+                }
+              }
+
+              otelcol.exporter.otlp "tempo" {
+                client {
+                  endpoint = "tempo.observability.svc.cluster.local:4317"
+
+                  tls {
+                    insecure = true
+                  }
+                }
+              }
+
+        rbac:
+          create: false
+
+        service:
+          enabled: true
+          type: ClusterIP
+
+        serviceMonitor:
+          enabled: true
+
+        ingress:
+          enabled: true
+          ingressClassName: traefik
+          path: /
+          pathType: Prefix
+          faroPort: 12347
+          hosts:
+            - telemetry.wayl.one
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+          tls:
+            - secretName: telemetry-tls
+              hosts:
+                - telemetry.wayl.one
+
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
