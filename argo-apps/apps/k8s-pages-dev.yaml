@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/waylonwalker/k8s-pages.git'
+    repoURL: https://github.com/WaylonWalker/homelab-argo.git
     targetRevision: HEAD # Adjust if you need a specific branch, tag, or commit.
-    path: helm-chart # For example, if the chart root is at the repository’s root, use '.'
+    path: k8s/k8s-pages/helm-chart
     helm:
       # Instead of valueFiles, paste the contents of your values file inline here.
       # You can copy the content from:
@@ -31,6 +31,11 @@ spec:
             minioHost: "minio.wayl.one"
             # Error Page
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: k8s-pages
+              environment: development
+              version: unknown
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: mypages # Target namespace where resources will be deployed.

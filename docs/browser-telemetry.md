@@ -10,7 +10,7 @@ New sites from `templates/static-site` enable telemetry by default. The
 Copier template writes these keys into `site-config.yaml`:
 
 ```yaml
-  TELEMETRY_ENABLED: "true"
+  TELEMETRY_ENABLED: "enabled"
   TELEMETRY_APP_NAME: caps
   TELEMETRY_ENVIRONMENT: production
   TELEMETRY_VERSION: unknown
@@ -20,7 +20,7 @@ Use the same `TELEMETRY_APP_NAME` for production and development. Set the
 environment to `production`, `preview`, or `development`. Use a Git SHA or
 release value when the publisher provides one. Otherwise, use `unknown`.
 
-To disable telemetry for one site, set `TELEMETRY_ENABLED` to `"false"`.
+To disable telemetry for one site, set `TELEMETRY_ENABLED` to `"disabled"`.
 The Nginx template injects the bootstrap only into `text/html` responses that
 contain `</head>`. Nginx scans the response before it applies gzip. The filter
 runs once for each response. It does not change JavaScript, CSS, images, or
@@ -97,7 +97,7 @@ host ownership, application family, and current status.
 
 ## Validation and Grafana queries
 
-The development cohort passed in Chromium on 2026-10-05. Each host loaded with HTTP 200, received one synthetic exception, and reported its stable app name with `environment=development` and `version=unknown`. A production exception from Caps arrived with `environment=production`. The event and related browser spans are available in Loki and Tempo. Blocking `telemetry.wayl.one` still left Strip loaded with HTTP 200.
+The development cohort passed in Chromium on 2026-10-05. Each host loaded with HTTP 200, received one synthetic exception, and reported its stable app name with `environment=development` and `version=unknown`. A production exception from Caps arrived with `environment=production`. The separate `k8s-pages` dev site `dev.rhiannonwalker.com` also reported an exception as `rhiannonwalker-com` with `environment=development`. The event and related browser spans are available in Loki and Tempo. The Chromium trace `583825302997bf05df6359d2aa888ace` was retrieved from Tempo with `service.name=caps`, `deployment.environment.name=development`, and `service.version=unknown`. Blocking `telemetry.wayl.one` still left Strip loaded with HTTP 200.
 
 Use these queries in Grafana Explore:
 
@@ -112,6 +112,12 @@ In Tempo, filter spans by `service.name="caps"`,
 The Loki record includes `app_name`, `app_environment`, `app_version`, and
 `page_url` as JSON fields. These stay out of Loki stream labels to avoid
 high-cardinality label growth.
+
+Use this Loki query to compare the canary applications by app and environment:
+
+```logql
+sum by (app_name, app_environment) (count_over_time({source="browser"} | json | kind="exception" [1h]))
+```
 
 Useful Prometheus queries:
 
@@ -128,7 +134,8 @@ otelcol_exporter_send_failed_spans_total
 
 On 2026-10-05, `up{service="alloy"}` was `1`; Faro receiver metrics were
 visible through the Alloy ServiceMonitor. The receiver recorded synthetic
-exceptions from all four development sites and production Caps. Loki dropped
+exceptions from all four shared static-site development sites, production Caps,
+and `dev.rhiannonwalker.com` through the `k8s-pages` family. Loki dropped
 entries and batch retries were zero. Source-map downloads from all four dev
-hosts returned HTTP 200. Tempo contained browser spans with matching app,
+hosts returned HTTP 200. The Nginx checks confirmed one injection for a repeated `</head>`, no injection when `<head>` is absent, no changes to JavaScript or text assets, and working gzip. Live `k8s-pages` responses were `text/html` without a CSP header; disabled sites remained unchanged. Tempo contained browser spans with matching app,
 environment, and version attributes.
