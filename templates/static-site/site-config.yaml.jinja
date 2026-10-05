@@ -7,7 +7,7 @@ data:
   namespace: {{ namespace | to_json }}
   host: {{ host | to_json }}
   webrootPath: {{ webroot_path | to_json }}
-  TELEMETRY_ENABLED: {{ telemetry_enabled | to_json }}
+  TELEMETRY_ENABLED: {{ ("enabled" if telemetry_enabled | lower == "true" else "disabled") | to_json }}
   TELEMETRY_APP_NAME: {{ (telemetry_app_name or (site | replace('-dev', ''))) | to_json }}
   TELEMETRY_ENVIRONMENT: {{ telemetry_environment | to_json }}
   TELEMETRY_VERSION: {{ telemetry_version | to_json }}

@@ -7,7 +7,7 @@ data:
   namespace: caps-dev
   host: caps-dev.waylonwalker.com
   webrootPath: /mnt/main/walkershare/waylon/sites/caps-dev.waylonwalker.com
-  TELEMETRY_ENABLED: "true"
+  TELEMETRY_ENABLED: "enabled"
   TELEMETRY_APP_NAME: "caps"
   TELEMETRY_ENVIRONMENT: "development"
   TELEMETRY_VERSION: "unknown"

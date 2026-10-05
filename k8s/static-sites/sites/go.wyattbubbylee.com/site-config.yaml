@@ -7,7 +7,7 @@ data:
   namespace: go-wyattbubbylee-com
   host: go.wyattbubbylee.com
   webrootPath: /mnt/main/walkershare/wyatt/sites/go.wyattbubbylee.com
-  TELEMETRY_ENABLED: "false"
+  TELEMETRY_ENABLED: "disabled"
   TELEMETRY_APP_NAME: "go.wyattbubbylee.com"
   TELEMETRY_ENVIRONMENT: "production"
   TELEMETRY_VERSION: "unknown"

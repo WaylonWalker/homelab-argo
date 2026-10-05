@@ -7,7 +7,7 @@ data:
   namespace: din
   host: din.markata.dev
   webrootPath: /mnt/main/walkershare/waylon/sites/din.markata.dev
-  TELEMETRY_ENABLED: "false"
+  TELEMETRY_ENABLED: "disabled"
   TELEMETRY_APP_NAME: "din"
   TELEMETRY_ENVIRONMENT: "production"
   TELEMETRY_VERSION: "unknown"
