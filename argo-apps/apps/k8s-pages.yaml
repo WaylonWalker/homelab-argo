@@ -33,6 +33,11 @@ spec:
             minioHost: "minio.wayl.one"
             # Error Page
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: k8s-pages
+              environment: production
+              version: unknown
           - name: config-editor
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -41,6 +46,11 @@ spec:
             minioHost: "minio.wayl.one"
             # Error Page
             errorPage: "/404.html"
+            telemetry:
+              enabled: false
+              appName: config-editor
+              environment: production
+              version: unknown
           - name: tic-tac-toe
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -48,6 +58,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: tic-tac-toe
+              environment: production
+              version: unknown
           - name: wwdev
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -55,6 +70,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: wwdev
+              environment: development
+              version: unknown
           - name: rhiannonwalker-dev
             subdomain: dev
             host: rhiannonwalker.com
@@ -63,6 +83,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: rhiannonwalker-com
+              environment: development
+              version: unknown
           - name: html-share
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -70,6 +95,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: false
+              appName: html-share
+              environment: production
+              version: unknown
           - name: ninesui
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -77,6 +107,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: ninesui
+              environment: production
+              version: unknown
           - name: ninesui
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -84,6 +119,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: ninesui
+              environment: production
+              version: unknown
           - name: stopwatch
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -91,6 +131,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: stopwatch
+              environment: production
+              version: unknown
           - name: stopwatch
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -98,6 +143,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: stopwatch
+              environment: production
+              version: unknown
           - name: clock
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -105,6 +155,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: clock
+              environment: production
+              version: unknown
           - name: clock
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -112,6 +167,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: clock
+              environment: production
+              version: unknown
           - name: timer
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -119,6 +179,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: timer
+              environment: production
+              version: unknown
           - name: timer
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -126,6 +191,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: timer
+              environment: production
+              version: unknown
           - name: dice
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -133,6 +203,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: dice
+              environment: production
+              version: unknown
           - name: dice
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -140,6 +215,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: dice
+              environment: production
+              version: unknown
           - name: uuid
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -147,6 +227,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: uuid
+              environment: production
+              version: unknown
           - name: uuid
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -154,6 +239,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: uuid
+              environment: production
+              version: unknown
           - name: b64
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -161,6 +251,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: b64
+              environment: production
+              version: unknown
           - name: b64
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -168,6 +263,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: b64
+              environment: production
+              version: unknown
           - name: search
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -175,6 +275,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: search
+              environment: production
+              version: unknown
           - name: search
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -182,6 +287,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: search
+              environment: production
+              version: unknown
           # - name: fluffed-up
           #   apex: true
           #   host: fluffed-up.com
@@ -198,6 +308,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: false
+              appName: aylawalker
+              environment: production
+              version: unknown
           - name: qrcode
             host: wayl.one
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -205,6 +320,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: qrcode
+              environment: production
+              version: unknown
           - name: qrcode
             host: waylonwalker.com
             # URL to which the proxy_pass should direct traffic. (Include protocol and path)
@@ -212,6 +332,11 @@ spec:
             # The host header to set when proxying.
             minioHost: "minio.wayl.one"
             errorPage: "/404.html"
+            telemetry:
+              enabled: true
+              appName: qrcode
+              environment: production
+              version: unknown
   destination:
     server: "https://kubernetes.default.svc"
     namespace: mypages # Target namespace where resources will be deployed.
