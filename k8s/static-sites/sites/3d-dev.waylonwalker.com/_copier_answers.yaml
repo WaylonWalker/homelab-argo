@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+_src_path: templates/static-site
+host: 3d-dev.waylonwalker.com
+namespace: 3d-dev
+site: 3d-dev
+webroot_path: /mnt/main/walkershare/waylon/sites/3d-dev.waylonwalker.com

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: 3d-dev
+  namespace: 3d-dev
+  host: 3d-dev.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/3d-dev.waylonwalker.com
+  TELEMETRY_ENABLED: "enabled"
+  TELEMETRY_APP_NAME: "3d-workshop"
+  TELEMETRY_ENVIRONMENT: "development"
+  TELEMETRY_VERSION: "unknown"
