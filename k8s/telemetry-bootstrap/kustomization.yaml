@@ -8,6 +8,7 @@ resources:
 configMapGenerator:
   - name: telemetry-bootstrap-assets
     files:
+      - faro-bootstrap.0807bf7fa55c.js=assets/faro-bootstrap.0807bf7fa55c.js
       - faro-bootstrap.js=assets/faro-bootstrap.js
       - faro-client.js=assets/faro-client.js
       - default.conf=nginx/default.conf

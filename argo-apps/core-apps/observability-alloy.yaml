@@ -129,6 +129,13 @@ spec:
           pathType: Prefix
           faroPort: 12347
           extraPaths:
+            - path: /assets/faro-bootstrap.0807bf7fa55c.js
+              pathType: Exact
+              backend:
+                service:
+                  name: telemetry-bootstrap
+                  port:
+                    number: 8080
             - path: /assets/faro-bootstrap.js
               pathType: Exact
               backend:
