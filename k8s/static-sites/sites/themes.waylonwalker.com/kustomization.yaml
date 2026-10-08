@@ -113,3 +113,11 @@ patches:
       - op: add
         path: /spec/template/metadata/annotations/themes.waylonwalker.com~1headers-revision
         value: "2026-10-08-v1"
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/httpGet/httpHeaders/0/value
+        value: text/html
+      - op: add
+        path: /spec/template/spec/containers/0/readinessProbe/httpGet/httpHeaders/-
+        value:
+          name: X-Forwarded-Proto
+          value: https
