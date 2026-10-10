@@ -1,0 +1,20 @@
+image:
+  repository: registry.wayl.one/article-listener
+  tag: "7cea871-202610101017"
+  pullPolicy: IfNotPresent
+imagePullSecrets:
+  - name: regcred
+ingress:
+  host: listen.wayl.one
+  className: traefik
+persistence:
+  storageClass: longhorn
+  size: 12Gi
+nodeName: ""
+resources:
+  requests:
+    cpu: 500m
+    memory: 2Gi
+  limits:
+    cpu: "4"
+    memory: 8Gi
