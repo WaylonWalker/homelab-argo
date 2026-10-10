@@ -33,6 +33,8 @@ spec:
               value: {{ .Values.ingress.auth.enabled | quote }}
             - name: HLAB_AUTH_ORIGIN
               value: {{ .Values.ingress.auth.publicOrigin | quote }}
+            - name: HLAB_REQUIRED_SCOPE
+              value: {{ .Values.ingress.auth.requiredScope | quote }}
             {{- else }}
             - name: APP_PASSWORD
               valueFrom:

@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/article-listener
-  tag: "7cea871-20261010154247"
+  tag: "auth-scope-202610101132"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
@@ -10,9 +10,10 @@ ingress:
     - listen.wayl.one
   className: traefik
   auth:
-    enabled: false
+    enabled: true
     address: http://hlab-auth.hlab-auth.svc.cluster.local:8000/api/v1/forward-auth
     publicOrigin: https://auth.waylonwalker.com
+    requiredScope: article-listener:access
 persistence:
   storageClass: longhorn
   size: 12Gi
