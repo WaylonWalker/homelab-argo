@@ -4,14 +4,20 @@ metadata:
   name: article-listener
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
+    {{- if .Values.ingress.auth.enabled }}
+    traefik.ingress.kubernetes.io/router.middlewares: article-listener-article-listener-auth@kubernetescrd
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className | quote }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host | quote }}
+        {{- range .Values.ingress.hosts }}
+        - {{ . | quote }}
+        {{- end }}
       secretName: article-listener-cert-tls
   rules:
-    - host: {{ .Values.ingress.host | quote }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . | quote }}
       http:
         paths:
           - path: /
@@ -20,3 +26,4 @@ spec:
               service:
                 name: article-listener
                 port: {name: http}
+    {{- end }}

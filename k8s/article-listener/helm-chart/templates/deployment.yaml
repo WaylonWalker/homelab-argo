@@ -28,11 +28,18 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            {{- if .Values.ingress.auth.enabled }}
+            - name: HLAB_AUTH_REQUIRED
+              value: {{ .Values.ingress.auth.enabled | quote }}
+            - name: HLAB_AUTH_ORIGIN
+              value: {{ .Values.ingress.auth.publicOrigin | quote }}
+            {{- else }}
             - name: APP_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: article-listener-auth
                   key: APP_PASSWORD
+            {{- end }}
             - name: DATA_DIR
               value: /data
             - name: COOKIE_SECURE
