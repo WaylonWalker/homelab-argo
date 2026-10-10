@@ -30,7 +30,7 @@ spec:
           env:
             {{- if .Values.ingress.auth.enabled }}
             - name: HLAB_AUTH_REQUIRED
-              value: {{ .Values.ingress.auth.enabled | quote }}
+              value: "1"
             - name: HLAB_AUTH_ORIGIN
               value: {{ .Values.ingress.auth.publicOrigin | quote }}
             - name: HLAB_REQUIRED_SCOPE
