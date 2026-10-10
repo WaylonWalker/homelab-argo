@@ -4,6 +4,7 @@ metadata:
   name: article-listener
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
+    external-dns.alpha.kubernetes.io/hostname: {{ join "," .Values.ingress.hosts | quote }}
     {{- if .Values.ingress.auth.enabled }}
     traefik.ingress.kubernetes.io/router.middlewares: article-listener-article-listener-auth@kubernetescrd
     {{- end }}
