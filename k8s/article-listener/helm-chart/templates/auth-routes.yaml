@@ -11,18 +11,7 @@ spec:
   routes:
     {{- range .Values.ingress.hosts }}
     - kind: Rule
-      match: >-
-        Host(`{{ . }}`) &&
-        (
-          Path(`/login`) ||
-          Path(`/logout`) ||
-          Path(`/api/session`) ||
-          PathPrefix(`/api/session/articles/`) ||
-          (
-            PathPrefix(`/api/articles`) &&
-            (Method(`POST`) || Method(`PUT`) || Method(`PATCH`) || Method(`DELETE`))
-          )
-        )
+      match: "Host(`{{ . }}`) && (Path(`/login`) || Path(`/logout`) || Path(`/api/session`) || PathPrefix(`/api/session/articles/`) || (PathPrefix(`/api/articles`) && (Method(`POST`) || Method(`PUT`) || Method(`PATCH`) || Method(`DELETE`))))"
       priority: 1000
       middlewares:
         - name: article-listener-auth
