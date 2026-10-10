@@ -20,7 +20,7 @@ dropper:
   secretKey: DROPPER_PAT
 resources:
   requests:
-    cpu: 1
+    cpu: 500m
     memory: 3Gi
   limits:
     cpu: "4"
