@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/article-listener
-  tag: "9de528c-hlabauth-public-20261010"
+  tag: "431382a-20261010235332"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
