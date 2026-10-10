@@ -78,4 +78,5 @@ spec:
               drop: [ALL]
       volumes:
         - name: data
-          persistentVolumeClaim: {claimName: brainrot-data}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.claimName | default "brainrot-data" }}

@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "ab7004b-20261010201906"
+  tag: "501cb74-20261010202936"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
@@ -15,6 +15,14 @@ ingress:
 persistence:
   storageClass: longhorn-backup
   size: 100Gi
+  claimName: brainrot-data-local
+  local:
+    enabled: true
+    path: /mnt/main/brainrot/data
+    nodeName: falcon3
+  preserveLegacyClaim: true
+  legacyStorageClass: longhorn-backup
+  legacySize: 100Gi
 dropper:
   existingSecret: brainrot-dropper
   secretKey: DROPPER_PAT

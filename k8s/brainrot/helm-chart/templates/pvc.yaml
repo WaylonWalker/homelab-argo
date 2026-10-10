@@ -1,3 +1,38 @@
+{{- if .Values.persistence.local.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: brainrot-data-local
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size | quote }}
+  accessModes: [ReadWriteOnce]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: brainrot-local
+  local:
+    path: {{ .Values.persistence.local.path | quote }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: [{{ .Values.persistence.local.nodeName | quote }}]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.persistence.claimName | default "brainrot-data" }}
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: brainrot-local
+  volumeName: brainrot-data-local
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size | quote }}
+{{- else }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -8,3 +43,19 @@ spec:
   resources:
     requests:
       storage: {{ .Values.persistence.size | quote }}
+{{- end }}
+{{- if .Values.persistence.preserveLegacyClaim }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: brainrot-data
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: {{ .Values.persistence.legacyStorageClass | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.legacySize | quote }}
+{{- end }}
