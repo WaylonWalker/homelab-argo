@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: stl-text
+  namespace: stl-text
+  host: stl-text.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/stl-text.waylonwalker.com
+  TELEMETRY_ENABLED: "enabled"
+  TELEMETRY_APP_NAME: "stl-text"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"
