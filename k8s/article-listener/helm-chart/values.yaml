@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/article-listener
-  tag: "auth-scope-202610101132"
+  tag: "kokoro-spacy-20261010165000"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
