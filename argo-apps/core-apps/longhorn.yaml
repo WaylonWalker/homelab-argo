@@ -15,6 +15,7 @@ spec:
             jobEnabled: false
           defaultSettings:
             allow-recurring-job-while-volume-detached: true
+            storageOverProvisioningPercentage: 120
           # Keep the backup target in this Helm source. Do not add a second
           # manually managed longhorn-system Setting for the same values.
           defaultBackupStore:
