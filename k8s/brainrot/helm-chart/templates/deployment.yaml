@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brainrot
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {app: brainrot}
+  template:
+    metadata:
+      labels: {app: brainrot}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: web
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if .Values.ingress.auth.enabled }}
+            - name: HLAB_AUTH_REQUIRED
+              value: "1"
+            - name: HLAB_AUTH_ORIGIN
+              value: {{ .Values.ingress.auth.publicOrigin | quote }}
+            - name: HLAB_REQUIRED_SCOPE
+              value: {{ .Values.ingress.auth.requiredScope | quote }}
+            {{- else }}
+            - name: APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: brainrot-auth
+                  key: APP_PASSWORD
+            {{- end }}
+            - name: DATA_DIR
+              value: /data
+            - name: COOKIE_SECURE
+              value: "1"
+            - name: DROPPER_PAT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.dropper.existingSecret | quote }}
+                  key: {{ .Values.dropper.secretKey | quote }}
+                  optional: true
+            - name: OMP_NUM_THREADS
+              value: "4"
+            - name: HF_HOME
+              value: /data/models
+            - name: XDG_CACHE_HOME
+              value: /data/models
+          ports:
+            - containerPort: 8000
+              name: http
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+            initialDelaySeconds: 3
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: brainrot-data}

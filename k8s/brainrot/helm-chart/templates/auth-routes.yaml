@@ -1,0 +1,35 @@
+{{- if .Values.ingress.auth.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: brainrot-auth-routes
+spec:
+  entryPoints: [web]
+  routes:
+    - kind: Rule
+      match: "Host(`{{ .Values.ingress.host }}`) && (Path(`/login`) || Path(`/logout`) || Path(`/api/session`) || (Path(`/api/logout`) && Method(`POST`)) || (Path(`/api/mine`) && Method(`GET`)) || (Path(`/api/articles`) && (Method(`GET`) || Method(`POST`))) || (PathRegexp(`^/api/articles/[^/]+$`) && Method(`GET`)) || (PathPrefix(`/api/voices/`) && Method(`GET`)) || (Path(`/api/videos`) && Method(`POST`)) || (PathRegexp(`^/api/videos/[^/]+/retry$`) && Method(`POST`)) || (PathRegexp(`^/api/videos/[^/]+$`) && Method(`DELETE`)) || ((Path(`/api/footage`) || Path(`/api/dropper/clips`)) && Method(`GET`)) || (Path(`/api/dropper/import`) && Method(`POST`)) || (Path(`/api/footage/upload`) && Method(`POST`)) || (Path(`/api/music/custom`) && (Method(`GET`) || Method(`POST`))))"
+      priority: 1000
+      middlewares:
+        - name: brainrot-auth
+      services:
+        - name: brainrot
+          port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: brainrot-auth-routes-websecure
+spec:
+  entryPoints: [websecure]
+  tls:
+    secretName: brainrot-cert-tls
+  routes:
+    - kind: Rule
+      match: "Host(`{{ .Values.ingress.host }}`) && (Path(`/login`) || Path(`/logout`) || Path(`/api/session`) || (Path(`/api/logout`) && Method(`POST`)) || (Path(`/api/mine`) && Method(`GET`)) || (Path(`/api/articles`) && (Method(`GET`) || Method(`POST`))) || (PathRegexp(`^/api/articles/[^/]+$`) && Method(`GET`)) || (PathPrefix(`/api/voices/`) && Method(`GET`)) || (Path(`/api/videos`) && Method(`POST`)) || (PathRegexp(`^/api/videos/[^/]+/retry$`) && Method(`POST`)) || (PathRegexp(`^/api/videos/[^/]+$`) && Method(`DELETE`)) || ((Path(`/api/footage`) || Path(`/api/dropper/clips`)) && Method(`GET`)) || (Path(`/api/dropper/import`) && Method(`POST`)) || (Path(`/api/footage/upload`) && Method(`POST`)) || (Path(`/api/music/custom`) && (Method(`GET`) || Method(`POST`))))"
+      priority: 1000
+      middlewares:
+        - name: brainrot-auth
+      services:
+        - name: brainrot
+          port: 80
+{{- end }}
