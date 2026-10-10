@@ -5,7 +5,9 @@ metadata:
   name: article-listener-auth-routes
 spec:
   entryPoints:
-    - web
+    - websecure
+  tls:
+    secretName: article-listener-cert-tls
   routes:
     {{- range .Values.ingress.hosts }}
     - kind: Rule
