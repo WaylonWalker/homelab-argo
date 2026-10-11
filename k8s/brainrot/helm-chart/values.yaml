@@ -29,6 +29,8 @@ dropper:
 rss:
   feeds:
     - https://waylonwalker.com/ping/rss.xml
+    - https://justin.searls.co/shorter-form.xml
+    - https://simonwillison.net/atom/notes/
   pollIntervalSeconds: 300
 ttsService:
   url: http://kokoro.kokoro.svc.cluster.local
