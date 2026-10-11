@@ -196,9 +196,12 @@ were not present in this check. Do not repeat recovery actions against the
 current primary. The current six database PVCs are healthy and streaming, but
 the old released `models-db-2` volume remains unknown and must be preserved
 until its recovery role is understood. The cluster also has degraded and
-unknown Longhorn volumes, recent probe timeout warnings, and a failing
-`posse-party-migrate` Job. These findings do not identify a safe volume repair
-by themselves.
+unknown Longhorn volumes and recent probe timeout warnings. The `posse-party`
+Argo app is Degraded; its database cluster is Hibernated with no pod or service
+endpoints, and its migration Job fails with connection refused. This appears
+consistent with the hibernated database, but confirm that hibernation is
+intentional before changing either workload. These findings do not identify a
+safe volume repair by themselves.
 
 Pod counts alone do not justify moving stateful workloads. Keep Falcon3
 hostPath and ZFS consumers there unless the data path changes deliberately.
