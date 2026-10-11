@@ -86,7 +86,7 @@ spec:
           args:
             - >-
               alembic upgrade head &&
-              python -m dropper.otel_entrypoint uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 2
+              python -m dropper.otel_entrypoint uvicorn dropper.api.main:app --host 0.0.0.0 --port 8000 --workers 1
           ports:
             - containerPort: 8000
               protocol: TCP
