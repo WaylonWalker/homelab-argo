@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "98e1853-20261011171737"
+  tag: "b95885f-20261011174007"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
@@ -26,6 +26,10 @@ persistence:
 dropper:
   existingSecret: brainrot-dropper
   secretKey: DROPPER_PAT
+rss:
+  feeds:
+    - https://waylonwalker.com/ping/rss.xml
+  pollIntervalSeconds: 300
 ttsService:
   url: http://kokoro.kokoro.svc.cluster.local
   secretName: brainrot-kokoro-auth

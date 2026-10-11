@@ -42,6 +42,10 @@ spec:
             {{- end }}
             - name: DATA_DIR
               value: /data
+            - name: RSS_FEEDS
+              value: {{ join "," .Values.rss.feeds | quote }}
+            - name: RSS_POLL_INTERVAL_SECONDS
+              value: {{ .Values.rss.pollIntervalSeconds | quote }}
             - name: COOKIE_SECURE
               value: "1"
             - name: DROPPER_PAT
