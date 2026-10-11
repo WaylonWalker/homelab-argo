@@ -42,6 +42,8 @@ spec:
             {{- end }}
             - name: DATA_DIR
               value: /data
+            - name: BRAINROT_PUBLIC_ORIGIN
+              value: {{ printf "https://%s" .Values.ingress.host | quote }}
             - name: RSS_FEEDS
               value: {{ join "," .Values.rss.feeds | quote }}
             - name: RSS_POLL_INTERVAL_SECONDS
