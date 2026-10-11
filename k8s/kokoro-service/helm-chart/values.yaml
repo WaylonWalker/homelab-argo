@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/kokoro-service
-  tag: "44637bd-20261011155415"
+  tag: "f107fc9-20261011160604"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
