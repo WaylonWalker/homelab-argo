@@ -30,6 +30,7 @@ ttsService:
   url: http://kokoro.kokoro.svc.cluster.local
   secretName: brainrot-kokoro-auth
   secretKey: KOKORO_API_TOKEN
+  tokenRevision: "20261011-2"
 resources:
   requests:
     cpu: 500m

@@ -7,6 +7,7 @@ imagePullSecrets:
 auth:
   secretName: kokoro-service-auth
   secretKey: KOKORO_API_TOKEN
+  tokenRevision: "20261011-2"
 idleSeconds: 600
 maxPending: 4
 persistence:

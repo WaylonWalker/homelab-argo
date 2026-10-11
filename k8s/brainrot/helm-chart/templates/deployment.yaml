@@ -11,6 +11,8 @@ spec:
   template:
     metadata:
       labels: {app: brainrot}
+      annotations:
+        kokoro.wayl.one/token-revision: {{ .Values.ttsService.tokenRevision | quote }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

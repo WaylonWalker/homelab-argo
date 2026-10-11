@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: kokoro
+      annotations:
+        kokoro.wayl.one/token-revision: {{ .Values.auth.tokenRevision | quote }}
     spec:
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
