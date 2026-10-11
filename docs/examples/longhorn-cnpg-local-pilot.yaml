@@ -1,0 +1,24 @@
+# STAGED EXAMPLE ONLY — not referenced by any Argo CD application or Kustomization.
+# Do not switch an existing CNPG Cluster to this class in-place.
+# Trial on a NEW disposable three-instance CNPG cluster after restoring backup health.
+# Longhorn strict-local is a single-copy volume: rely on CNPG for cross-node
+# database replication, on pod anti-affinity, and on verified off-node backups.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-cnpg-local
+  labels:
+    storage.wayl.one/tier: cnpg-local-pilot
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  dataEngine: v1
+  numberOfReplicas: "1"
+  dataLocality: strict-local
+  fsType: ext4
+  staleReplicaTimeout: "2880"
+  recurringJobSelector: "[]"
