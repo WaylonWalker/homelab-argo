@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "7ac21ae-20261011144532"
+  tag: "5b93e16-20261011160724"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
@@ -26,11 +26,14 @@ persistence:
 dropper:
   existingSecret: brainrot-dropper
   secretKey: DROPPER_PAT
-ttsModelIdleSeconds: 600
+ttsService:
+  url: http://kokoro.kokoro.svc.cluster.local
+  secretName: brainrot-kokoro-auth
+  secretKey: KOKORO_API_TOKEN
 resources:
   requests:
     cpu: 500m
-    memory: 3Gi
+    memory: 512Mi
   limits:
     cpu: "4"
-    memory: 8Gi
+    memory: 2Gi
