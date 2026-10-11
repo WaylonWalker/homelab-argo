@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/article-listener
-  tag: "431382a-20261010235332"
+  tag: "8293ed8-20261011172207"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
@@ -21,7 +21,11 @@ nodeName: ""
 resources:
   requests:
     cpu: 500m
-    memory: 2Gi
+    memory: 512Mi
   limits:
     cpu: "4"
-    memory: 8Gi
+    memory: 2Gi
+ttsService:
+  url: http://kokoro.kokoro.svc.cluster.local
+  secretName: article-listener-kokoro-auth
+  secretKey: KOKORO_API_TOKEN

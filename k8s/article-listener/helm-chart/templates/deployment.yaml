@@ -46,12 +46,13 @@ spec:
               value: /data
             - name: COOKIE_SECURE
               value: "1"
-            - name: HF_HOME
-              value: /data/models
-            - name: XDG_CACHE_HOME
-              value: /data/models
-            - name: OMP_NUM_THREADS
-              value: "4"
+            - name: TTS_SERVICE_URL
+              value: {{ .Values.ttsService.url | quote }}
+            - name: TTS_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.ttsService.secretName | quote }}
+                  key: {{ .Values.ttsService.secretKey | quote }}
           ports:
             - containerPort: 8000
               name: http
