@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kokoro-consumers-only
+spec:
+  podSelector:
+    matchLabels:
+      app: kokoro
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: brainrot
+          podSelector:
+            matchLabels:
+              app: brainrot
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: article-listener
+          podSelector:
+            matchLabels:
+              app: article-listener
+      ports:
+        - protocol: TCP
+          port: 8000

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kokoro-service
+description: Private shared CPU Kokoro speech synthesis API
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
