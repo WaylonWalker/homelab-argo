@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "10c3790-20261011140659"
+  tag: "7ac21ae-20261011144532"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
@@ -26,6 +26,7 @@ persistence:
 dropper:
   existingSecret: brainrot-dropper
   secretKey: DROPPER_PAT
+ttsModelIdleSeconds: 600
 resources:
   requests:
     cpu: 500m

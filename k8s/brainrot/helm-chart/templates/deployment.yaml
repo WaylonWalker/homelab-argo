@@ -50,6 +50,8 @@ spec:
                   optional: true
             - name: OMP_NUM_THREADS
               value: "4"
+            - name: TTS_MODEL_IDLE_SECONDS
+              value: {{ .Values.ttsModelIdleSeconds | default 600 | quote }}
             - name: HF_HOME
               value: /data/models
             - name: XDG_CACHE_HOME
