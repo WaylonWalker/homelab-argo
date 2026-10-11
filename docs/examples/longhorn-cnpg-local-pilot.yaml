@@ -1,8 +1,10 @@
 # STAGED EXAMPLE ONLY — not referenced by any Argo CD application or Kustomization.
 # Do not switch an existing CNPG Cluster to this class in-place.
 # Trial on a NEW disposable three-instance CNPG cluster after restoring backup health.
-# Longhorn strict-local is a single-copy volume: rely on CNPG for cross-node
-# database replication, on pod anti-affinity, and on verified off-node backups.
+# One Longhorn replica is a single-copy volume: rely on CNPG for cross-node
+# database replication and verified backups. Best-effort locality prefers the
+# pod's node but allows the volume to attach elsewhere after a move.
+# Do not use strict-local until its recovery behavior is verified for our release.
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -18,7 +20,7 @@ volumeBindingMode: WaitForFirstConsumer
 parameters:
   dataEngine: v1
   numberOfReplicas: "1"
-  dataLocality: strict-local
+  dataLocality: best-effort
   fsType: ext4
   staleReplicaTimeout: "2880"
   recurringJobSelector: "[]"
