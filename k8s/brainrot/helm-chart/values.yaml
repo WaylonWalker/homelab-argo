@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "9861de3-routing"
+  tag: "a3d5db4-feed"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
