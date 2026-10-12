@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "7143e86-20261012023029"
+  tag: "9861de3-routing"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
