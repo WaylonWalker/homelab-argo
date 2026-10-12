@@ -69,6 +69,14 @@ spec:
               value: /data/models
             - name: XDG_CACHE_HOME
               value: /data/models
+            - name: OTEL_SERVICE_NAME
+              value: brainrot
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.telemetry.endpoint | quote }}
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: {{ .Values.telemetry.sampleRatio | quote }}
           ports:
             - containerPort: 8000
               name: http

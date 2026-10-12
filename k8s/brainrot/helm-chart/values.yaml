@@ -1,9 +1,12 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "fe1c612-20261012011809"
+  tag: "5205df4-20261012021454"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
+telemetry:
+  endpoint: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
+  sampleRatio: "1.0"
 ingress:
   host: brainrot.waylonwalker.com
   className: traefik
