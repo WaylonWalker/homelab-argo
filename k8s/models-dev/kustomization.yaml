@@ -11,4 +11,4 @@ resources:
 images:
   - name: registry.wayl.one/models
     newName: registry.wayl.one/models
-    newTag: "grain-20261012-pass3b"
+    newTag: "201ffff"
