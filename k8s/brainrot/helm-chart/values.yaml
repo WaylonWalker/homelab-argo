@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "c77931a-unused-css-20261013122447"
+  tag: "49423c7-feed-font-202610131234"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
