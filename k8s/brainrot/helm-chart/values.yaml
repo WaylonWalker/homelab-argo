@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "33b2dd7-initial-feed-20261013124123"
+  tag: "b7f66d2-late-video-preload-20261013125658"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
