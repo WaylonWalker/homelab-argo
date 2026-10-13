@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "7ec49ff-lighthouse-20261013042130"
+  tag: "c77931a-unused-css-20261013122447"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
