@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "49423c7-feed-font-202610131234"
+  tag: "8e9fa65-lazy-posters-20261013123839"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
