@@ -6,4 +6,4 @@ spec:
   template:
     metadata:
       annotations:
-        static-site-security-config: "2026-10-14-1"
+        static-site-security-config: "2026-10-14-2"
