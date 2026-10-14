@@ -11,4 +11,4 @@ resources:
 images:
   - name: registry.wayl.one/models
     newName: registry.wayl.one/models
-    newTag: "201ffff"
+    newTag: "dev-20261013-78ccbcb627a1"
