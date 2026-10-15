@@ -11,4 +11,4 @@ resources:
 images:
   - name: registry.wayl.one/models
     newName: registry.wayl.one/models
-    newTag: "grain-idle-20261015"
+    newTag: "grain-idle-after-load-20261015"
