@@ -692,17 +692,26 @@ cloudflared-token:
     kubeseal -f private/cloudflared-secret.yaml -w cloudflared/cloudflared-sealed-secret.yaml --namespace cloudflared --name cloudflared-token
 
 
-update-markata-image-pin image_tag="":
+update-markata-image-pin image_tag="" scope="all":
     #!/usr/bin/env bash
     set -euo pipefail
     image_tag="{{image_tag}}"
+    scope="{{scope}}"
     image="ghcr.io/waylonwalker/markata-go-builder"
-    files=(
+    all_files=(
       argo-apps/apps/go-waylonwalker-com.yaml
       argo-apps/apps/waylonwalker-com-prod.yaml
       argo-apps/apps/wyattbubbylee-com-prod.yaml
       argo-apps/apps/rhiannonwalker-com-prod.yaml
     )
+    case "$scope" in
+      all) files=("${all_files[@]}") ;;
+      prod-builder) files=(argo-apps/apps/waylonwalker-com-prod.yaml) ;;
+      *)
+        echo "Usage: just update-markata-image-pin [sha-<published-commit>] [all|prod-builder]" >&2
+        exit 1
+        ;;
+    esac
 
     registry_token="$(curl --fail --silent --show-error \
       "https://ghcr.io/token?service=ghcr.io&scope=repository:waylonwalker/markata-go-builder:pull" | jq -r '.token')"
@@ -767,7 +776,11 @@ update-markata-image-pin image_tag="":
     fi
 
     for file in "${files[@]}"; do
-      sed -i -E "s/(tag: )sha-[0-9a-f]+/\\1${image_tag}/g" "$file"
+      if [[ "$scope" == "prod-builder" ]]; then
+        sed -i -E '/^[[:space:]]*build:[[:space:]]*$/,/^[[:space:]]*builderAdmin:[[:space:]]*$/ s/(tag: )sha-[0-9a-f]+/\\1'"${image_tag}"'/g' "$file"
+      else
+        sed -i -E "s/(tag: )sha-[0-9a-f]+/\\1${image_tag}/g" "$file"
+      fi
       echo "Updated $file to $image_tag"
     done
 
@@ -776,8 +789,10 @@ update-markata-image-pin image_tag="":
       exit 0
     fi
 
-    git add -- "${files[@]}"
-    git commit -m "chore(markata): update image pin to $image_tag"
+    git add -- justfile "${files[@]}"
+    git commit -m "chore(markata): update image pin to $image_tag ($scope)"
+    git push origin HEAD:main
+    kubectl annotate application 1-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
 
 # Backward-compatible alias for the original single-site recipe name.
 update-go-image-pin image_tag="":
