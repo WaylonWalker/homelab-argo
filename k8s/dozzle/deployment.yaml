@@ -55,7 +55,7 @@ spec:
       serviceAccountName: dozzle
       containers:
         - name: dozzle
-          image: amir20/dozzle:v10.5.1
+          image: amir20/dozzle:v10.10.0
           imagePullPolicy: IfNotPresent
           env:
             - name: DOZZLE_MODE
