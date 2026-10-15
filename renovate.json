@@ -1,0 +1,62 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "America/Chicago",
+  "dependencyDashboard": true,
+  "automerge": false,
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "ignorePaths": [
+    "disabled/**",
+    "backup.yaml",
+    "upgrade-plans/**",
+    "k8s/cert-manager/cert-manager.yaml"
+  ],
+  "argocd": {
+    "managerFilePatterns": [
+      "/^argo-apps\\/.*\\.ya?ml$/",
+      "/^argocd\\/.*\\.ya?ml$/"
+    ]
+  },
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/\\.ya?ml$/"
+    ]
+  },
+  "packageRules": [
+    {
+      "description": "Keep in-house image build-and-deploy tags under the existing release pipeline",
+      "matchPackageNames": [
+        "/^registry\\.wayl\\.one\\//"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Require dashboard approval before proposing breaking major-version updates",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Require dashboard approval for cluster-critical infrastructure and stateful services",
+      "matchFileNames": [
+        "argo-apps/core-apps/**",
+        "argocd/**",
+        "system-upgrade/**",
+        "k3s-p1/**",
+        "k8s/cnpg/**",
+        "k8s/cert-manager/**",
+        "k8s/external-dns/**",
+        "k8s/minio-longhorn-backup/**",
+        "k8s/traefik-config/**",
+        "k8s/forgejo/**",
+        "k8s/immich/**",
+        "k8s/nextcloud/**"
+      ],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}
