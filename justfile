@@ -777,7 +777,7 @@ update-markata-image-pin image_tag="" scope="all":
 
     for file in "${files[@]}"; do
       if [[ "$scope" == "prod-builder" ]]; then
-        sed -i -E '/^[[:space:]]*build:[[:space:]]*$/,/^[[:space:]]*builderAdmin:[[:space:]]*$/ s/(tag: )sha-[0-9a-f]+/\\1'"${image_tag}"'/g' "$file"
+        sed -i -E "/^[[:space:]]*build:[[:space:]]*$/,/^[[:space:]]*builderAdmin:[[:space:]]*$/ s/tag: sha-[0-9a-f]+/tag: ${image_tag}/g" "$file"
       else
         sed -i -E "s/(tag: )sha-[0-9a-f]+/\\1${image_tag}/g" "$file"
       fi

@@ -79,9 +79,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              \1sha-13bae76
+              tag: sha-13bae76
             builderImage:
-              \1sha-13bae76
+              tag: sha-13bae76
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
