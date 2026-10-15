@@ -792,7 +792,32 @@ update-markata-image-pin image_tag="" scope="all":
     git add -- justfile "${files[@]}"
     git commit -m "chore(markata): update image pin to $image_tag ($scope)"
     git push origin HEAD:main
+    revision="$(git rev-parse HEAD)"
+    kubectl patch application 1-apps -n argocd --type merge \
+      -p "{\"operation\":{\"sync\":{\"revision\":\"${revision}\",\"prune\":true}}}"
+    kubectl wait \
+      --for="jsonpath={.status.operationState.operation.sync.revision}=${revision}" \
+      application/1-apps -n argocd --timeout=600s
+    kubectl wait \
+      --for=jsonpath='{.status.operationState.phase}'=Succeeded \
+      application/1-apps -n argocd --timeout=600s
+
     kubectl annotate application 1-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
+    apps=(go-waylonwalker-com waylonwalker-com-prod wyattbubbylee-com-prod rhiannonwalker)
+    for app in "${apps[@]}"; do
+      kubectl annotate application "$app" -n argocd argocd.argoproj.io/refresh=hard --overwrite
+      kubectl wait \
+        --for="jsonpath={.status.sync.revisions[0]}=${revision}" \
+        "application/${app}" -n argocd --timeout=600s
+      kubectl wait \
+        --for=jsonpath='{.status.sync.status}'=Synced \
+        "application/${app}" -n argocd --timeout=600s
+    done
+
+    kubectl annotate application 1-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
+    kubectl wait \
+      --for=jsonpath='{.status.sync.status}'=Synced \
+      application/1-apps -n argocd --timeout=600s
 
 # Backward-compatible alias for the original single-site recipe name.
 update-go-image-pin image_tag="":
