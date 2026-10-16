@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/article-listener
-  tag: "274d12c-20261016170234"
+  tag: "d937b03-20261016175409"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
