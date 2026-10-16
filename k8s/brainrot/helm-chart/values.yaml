@@ -1,6 +1,6 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "1d59d1f-20261016181913"
+  tag: "c32bba9-20261016150200"
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
