@@ -67,9 +67,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-6defe94
+              tag: sha-eada09f
             builderImage:
-              tag: sha-6defe94
+              tag: sha-eada09f
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -184,7 +184,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-6defe94
+              tag: sha-eada09f
             mode: watch-content
             localCache:
               enabled: true
