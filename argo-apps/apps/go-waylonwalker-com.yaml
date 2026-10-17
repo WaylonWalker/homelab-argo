@@ -67,9 +67,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-eada09f
+              tag: sha-496b42a
             builderImage:
-              tag: sha-eada09f
+              tag: sha-496b42a
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
