@@ -121,6 +121,11 @@ spec:
 
           builderAdmin:
             enabled: true
+            strategy:
+              type: RollingUpdate
+              rollingUpdate:
+                maxUnavailable: 1
+                maxSurge: 0
             fast: false
             auth:
               trustedProxyCIDRs:
