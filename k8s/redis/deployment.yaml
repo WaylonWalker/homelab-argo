@@ -97,7 +97,7 @@ spec:
                   key: REDIS_PASSWORD_WS_PLAYGROUND
       containers:
         - name: redis
-          image: redis:7.4.2
+          image: redis:7.4.11
           command:
             - /bin/sh
             - -c
