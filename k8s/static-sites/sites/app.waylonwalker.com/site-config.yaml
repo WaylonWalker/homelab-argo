@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: "app"
+  namespace: "app"
+  host: "app.waylonwalker.com"
+  webrootPath: "/mnt/main/walkershare/waylon/sites/app.waylonwalker.com"
+  TELEMETRY_ENABLED: "enabled"
+  TELEMETRY_APP_NAME: "apps"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"
