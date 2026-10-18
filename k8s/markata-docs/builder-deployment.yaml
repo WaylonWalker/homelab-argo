@@ -51,8 +51,8 @@ spec:
               mountPath: /data/site
       containers:
         - name: builder
-          # Updated to the first successful main image before enabling this app.
-          image: ghcr.io/waylonwalker/markata-docs-builder:0.0.22
+          # Pinned to the verified successful upstream main docs workflow run 24.
+          image: ghcr.io/waylonwalker/markata-docs-builder:0.0.24
           imagePullPolicy: IfNotPresent
           env:
             - name: DOCS_REPOSITORY
