@@ -5,7 +5,7 @@ The documentation uses the same **separated builder / public Nginx site** patter
 - **Public:** https://markata.waylonwalker.com
 - **Authenticated builder:** https://build.markata.waylonwalker.com
 - **Source:** https://github.com/WaylonWalker/markata `main` branch, watched every 45 seconds
-- **Image:** `ghcr.io/waylonwalker/markata-docs-builder:0.0.22` (pin the published version)
+- **Image:** `ghcr.io/waylonwalker/markata-docs-builder:0.0.24` (pin the published version)
 - **Persistent releases:** `markata-docs-site` Longhorn RWO 3 GiB (builder and both public replicas pinned to `falcon3`)
 - **Temp source:** builder `emptyDir` for the shallow Git checkout
 - **Retention:** seven versioned releases plus persisted status/history
