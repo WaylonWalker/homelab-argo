@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: k8s/waylonwalker-com/waylonwalker-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata-go.git'
-      targetRevision: 5964f1145b384a1e9f0c44fea5abcb6076d5588e
+      targetRevision: e412ca6fe395da430188479167d2740d936ee8d1
       path: helm-chart
       helm:
         values: |
@@ -79,9 +79,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-5964f11
+              tag: sha-e412ca6
             builderImage:
-              tag: sha-5964f11
+              tag: sha-e412ca6
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -194,7 +194,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-5964f11
+              tag: sha-e412ca6
             mode: watch-content
             # Source cache symlinks target /data/cache; keep search's cache pod-local.
             localCache:
