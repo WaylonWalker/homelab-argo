@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: forgejo-mcp
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/waylonwalker/homelab-argo.git
+    targetRevision: HEAD
+    path: k8s/forgejo-mcp
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: forgejo-mcp
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

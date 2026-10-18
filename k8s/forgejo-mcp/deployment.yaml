@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: forgejo-mcp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo-mcp
+  namespace: forgejo-mcp
+  labels:
+    app: forgejo-mcp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: forgejo-mcp
+  template:
+    metadata:
+      labels:
+        app: forgejo-mcp
+      annotations:
+        diun.enable: "true"
+    spec:
+      # Upstream release OCI image is linux/amd64 only.
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: forgejo-mcp
+          image: git.b4mad.industries/agentic-forges/forgejo-mcp:v3.3.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --transport
+            - http
+            - --url
+            - http://forgejo.forgejo.svc.cluster.local:3000
+            - --host
+            - 0.0.0.0
+            - --http-port
+            - "8080"
+            - --allowed-hosts
+            - mcp.wayl.one
+          # HTTP clients MUST supply their own scoped Forgejo access token.
+          # Do not set FORGEJO_ACCESS_TOKEN or allow operator token fallback.
+          env:
+            - name: FORGEJO_MCP_AUTH_MODE
+              value: passthrough
+            - name: FORGEJO_USER_AGENT
+              value: forgejo-mcp/3.3.0
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo-mcp
+  namespace: forgejo-mcp
+spec:
+  type: ClusterIP
+  selector:
+    app: forgejo-mcp
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: forgejo-mcp
+  namespace: forgejo-mcp
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - mcp.wayl.one
+      secretName: forgejo-mcp-cert-tls
+  rules:
+    - host: mcp.wayl.one
+      http:
+        paths:
+          - path: /mcp
+            pathType: Prefix
+            backend:
+              service:
+                name: forgejo-mcp
+                port:
+                  name: http
