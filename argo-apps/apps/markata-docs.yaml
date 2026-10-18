@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: markata-docs
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: markata
+    app.kubernetes.io/environment: production
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/WaylonWalker/homelab-argo.git
+    targetRevision: main
+    path: k8s/markata-docs
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: markata-docs
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
