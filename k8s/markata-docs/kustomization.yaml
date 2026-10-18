@@ -5,3 +5,10 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - site-pvc.yaml
+  - nginx-config.yaml
+  - builder-deployment.yaml
+  - builder-service.yaml
+  - builder-ingress.yaml
+  - builder-auth.yaml
+  - builder-networkpolicy.yaml
