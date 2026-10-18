@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: markata-docs-site
+  labels:
+    app.kubernetes.io/name: markata-docs
+spec:
+  storageClassName: longhorn-build-fast
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi

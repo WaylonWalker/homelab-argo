@@ -1,30 +1,39 @@
-# Markata documentation, served by the homelab
+# Markata docs: homelab builder and public site
 
-The public documentation is served at <https://markata.waylonwalker.com>.
+The documentation uses the same **separated builder / public Nginx site** pattern as waylonwalker.com, but its generator is `scripts/build_docs_site.py`, not the Markata CLI. Its builder is therefore purpose-built, not the Markata Helm builder-admin command.
 
-- **Source**: `WaylonWalker/markata` repository, `docs/` and `docs-site/`.
-- **Build**: [Documentation website](https://github.com/WaylonWalker/markata/actions/workflows/docs-site.yml) GitHub Actions publishes `ghcr.io/waylonwalker/markata-docs:0.0.<run-number>` to GHCR after validation.
-- **Delivery**: Argo CD Application `markata-docs` in `argo-apps/apps/markata-docs.yaml` deploys immutable versioned Nginx images from this folder.
-- **Networking**: Traefik Ingress, cert-manager `letsencrypt-dns`, ExternalDNS, and the homelab Cloudflare tunnel.
-- **Storage**: none; generated HTML is embedded in the image. No Longhorn volume or builder required.
+- **Public:** https://markata.waylonwalker.com
+- **Authenticated builder:** https://build.markata.waylonwalker.com
+- **Source:** https://github.com/WaylonWalker/markata `main` branch, watched every 45 seconds
+- **Image:** `ghcr.io/waylonwalker/markata-docs-builder:0.0.22` (pin the published version)
+- **Persistent releases:** `markata-docs-site` Longhorn RWO 3 GiB (builder and both public replicas pinned to `falcon3`)
+- **Temp source:** builder `emptyDir` for the shallow Git checkout
+- **Retention:** seven versioned releases plus persisted status/history
+- **Publishing:** Python Markdown renderer in the build pod, atomic release directory + `current` symlink; Nginx reads `current` without a redeploy
+- **Admin:** HLab ForwardAuth with stripped identity headers and ingress NetworkPolicy restricted to Traefik. App also verifies trusted CIDR and identity header, and validates Origin for POST.
 
-## Validate
+## First rollout
+
+1. Verify upstream [docs website workflow](https://github.com/WaylonWalker/markata/actions/workflows/docs-site.yml) successfully pushed the pinned builder image and the seed site image can be pulled from GHCR.
+2. Merge Argo PR. Argo CD deploys PVC, builder pod, Nginx config, and ingress. The builder seeds the existing site image if the volume is empty, then shallow clones main and builds from source.
+3. Confirm Longhorn claim is bound, `builder` has run, `current` is a valid symlink, Nginx replicas are ready.
+4. Verify ExternalDNS and TLS for both hosts. Check that unauthenticated requests to the builder do not expose the admin UI.
+5. Visit the protected builder UI and use Build now; edit docs on main to observe a rebuild within about one minute.
+
+## Commands
 
 ```bash
 kubectl kustomize k8s/markata-docs/
 kubectl -n argocd get application markata-docs
+kubectl -n markata-docs get pvc,pods,svc,ingress
+kubectl -n markata-docs logs deployment/markata-docs-builder -c builder --tail=100
 kubectl -n markata-docs rollout status deployment/markata-docs
 curl -fsSI https://markata.waylonwalker.com/
 curl -fsSI https://markata.waylonwalker.com/docs/quickstart/
 ```
 
-After a new docs image is published, update the version in `deployment.yaml`. Renovate's Kubernetes manager can propose new versioned GHCR tags; `automerge` is currently disabled in the repository, so review and merge the update PR to roll out newer documentation. A published GHCR image alone **does not update Argo or restart pods**.
+Rollback is available from the authenticated builder UI and switches the `current` symlink atomically. A further source update resumes publishing normally.
 
-GitHub Pages is not used. Don't deploy the historical `markata/kubernetes/markata-go-docs.yaml` — it is a separate obsolete setup.
+**Do not run the historical `markata/kubernetes/markata-go-docs.yaml` CronJob.** It builds the wrong site and competes with this release store. GHCR docs images remain available for the first seed and fallback, but the running site is served from the Longhorn PVC rather than the baked Nginx image.
 
-### First deployment requirements
-
-1. Confirm the GitHub Actions [docs image publish](https://github.com/WaylonWalker/markata/actions/workflows/docs-site.yml) succeeded for the tag in the Deployment.
-2. Ensure the GHCR `markata-docs` package allows public pulls; otherwise add a pull secret to this namespace and Deployment.
-3. Argo CD syncs the application when this repository PR merges.
-4. Check ExternalDNS record creation, the Cloudflare tunnel route, and cert-manager certificate readiness. These depend on cluster runtime access; GitHub checks cannot prove public reachability.
+Watch release storage growth; the configured 3Gi is intentionally small for text-heavy docs.
