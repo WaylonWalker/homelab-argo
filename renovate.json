@@ -54,7 +54,21 @@
         "k8s/traefik-config/**",
         "k8s/forgejo/**",
         "k8s/immich/**",
-        "k8s/nextcloud/**"
+        "k8s/nextcloud/**",
+        "k8s/cloudflared/**",
+        "k8s/redis/**",
+        "k8s/postiz/**",
+        "k8s/ntfy/**",
+        "k8s/frigate/**",
+        "k8s/minio/**",
+        "k8s/registry/**",
+        "k8s/omada/**",
+        "k8s/homelab-auth/**",
+        "k8s/lantern-table/**",
+        "k8s/shots/**",
+        "k8s/shots-dev/**",
+        "k8s/status/**",
+        "k8s/kraft/**"
       ],
       "dependencyDashboardApproval": true
     }
