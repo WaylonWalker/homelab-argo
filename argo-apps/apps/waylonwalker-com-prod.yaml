@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: k8s/waylonwalker-com/waylonwalker-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata.git'
-      targetRevision: a8b0e1750be1b33fe6e0f8a38b7127872593ea88
+      targetRevision: 0d1d8258497ff943d823240f6ab0f454b3da2ea3
       path: helm-chart
       helm:
         values: |
@@ -79,9 +79,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-a8b0e17
+              tag: sha-0d1d825
             builderImage:
-              tag: sha-a8b0e17
+              tag: sha-0d1d825
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -194,7 +194,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-a8b0e17
+              tag: sha-0d1d825
             resources:
               requests:
                 # Fit the rolling search replacement before the builder starts.
