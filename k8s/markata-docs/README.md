@@ -2,7 +2,8 @@
 
 The documentation uses the same **separated builder / public Nginx site** pattern as waylonwalker.com, but its generator is `scripts/build_docs_site.py`, not the Markata CLI. Its builder is therefore purpose-built, not the Markata Helm builder-admin command.
 
-- **Public:** https://markata.waylonwalker.com
+- **Public (primary):** https://markata.dev
+- **Public (existing alias):** https://markata.waylonwalker.com
 - **Authenticated builder:** https://build.markata.waylonwalker.com
 - **Source:** https://github.com/WaylonWalker/markata `main` branch, watched every 45 seconds
 - **Image:** `ghcr.io/waylonwalker/markata-docs-builder:0.0.24` (pin the published version)
@@ -37,3 +38,42 @@ Rollback is available from the authenticated builder UI and switches the `curren
 **Do not run the historical `markata/kubernetes/markata-go-docs.yaml` CronJob.** It builds the wrong site and competes with this release store. GHCR docs images remain available for the first seed and fallback, but the running site is served from the Longhorn PVC rather than the baked Nginx image.
 
 Watch release storage growth; the configured 3Gi is intentionally small for text-heavy docs.
+
+## Apex hostname: markata.dev
+
+The separate `apex-ingress.yaml` routes **markata.dev** to the same
+`markata-docs` Service and shared published release as
+`markata.waylonwalker.com`. It issues its **own** cert-manager
+`letsencrypt-dns` certificate (`markata-dev-tls`), so the existing
+WaylonWalker-domain certificate is unchanged. No second builder, PVC, or Nginx
+Deployment is created.
+
+The zone `markata.dev` is already listed in
+`k8s/external-dns/zone-ids.yaml`, and the falcon Cloudflare tunnel has an
+unmatched-host catch-all route to Traefik. ExternalDNS runs in **create-only**
+mode and manages proxied Cloudflare CNAMEs to
+`1bdd7ce3-6476-43bc-a9e0-6e30167617e5.cfargotunnel.com`.
+
+**The apex is special.** Before claiming the new hostname is live, inspect
+the existing Cloudflare DNS records for the exact name `markata.dev`
+(including A, AAAA, CNAME) and confirm the zone is active. Cloudflare can
+flatten a CNAME at the root, but ExternalDNS may not create it if any record
+already exists; create-only deliberately **does not overwrite** it. If an
+existing apex DNS record points somewhere else, do not replace it
+automatically: inspect its current traffic and explicitly migrate it to the
+falcon tunnel. This repository change only adds the Ingress and requests DNS.
+
+```bash
+kubectl -n markata-docs get ingress markata-docs markata-docs-apex
+kubectl -n markata-docs get certificate,certificaterequest
+kubectl -n markata-docs get secret markata-dev-tls
+kubectl -n external-dns logs deployment/external-dns --since=15m
+dig +short markata.dev
+curl -fsSI https://markata.dev/
+curl -fsSI https://markata.dev/docs/quickstart/
+```
+
+Verify Cloudflare's apex CNAME target or flattened IP response resolves through
+the **falcon** tunnel and its catch-all route. A valid certificate and a
+successful homepage request prove the final cutover; GitHub manifest checks
+alone do not.
