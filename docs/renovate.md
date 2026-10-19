@@ -21,6 +21,10 @@ The app installation must be approved by a repository owner; adding `renovate.js
 - Disabled resources, historical backup manifests, upgrade plans, and the vendored cert-manager release manifest are excluded.
 - Native Argo CD, Kubernetes, Helm, Docker, and other supported managers discover version references. Some custom manifests may require additional extractors.
 
+Dependency PRs are checked by `.github/workflows/validate-gitops-yaml.yml` for parseable changed plain YAML. This is a syntax check only: it does not validate Helm charts, test deployments, check backups, or verify database migrations. Approvals and manual merges are still required for protected dependencies.
+
+**Note:** Adding an approval rule does not retroactively gate PRs that Renovate has already opened; review existing PRs individually.
+
 ## Deployment safety
 
 An approved or merged PR is **not** a guarantee of compatibility. Argo CD can auto-sync merged changes immediately.
