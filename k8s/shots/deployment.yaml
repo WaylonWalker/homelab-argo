@@ -103,7 +103,7 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.50
+        - image: registry.wayl.one/shot-scraper-api:0.0.51
           command:
             - "/bin/bash"
             - "-c"
@@ -150,7 +150,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.50"
+              value: "deployment.environment=production,service.version=0.0.51"
             - name: REDIS_URL
               value: redis://shots-redis.shot.svc.cluster.local:6379/0
             - name: AWS_ENDPOINT_URL
@@ -194,7 +194,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.50
+        - image: registry.wayl.one/shot-scraper-api:0.0.51
           command:
             - "/bin/bash"
             - "-c"
@@ -207,6 +207,7 @@ spec:
                 - python
                 - -m
                 - shot_scraper_api.worker_health
+                - --local-file
             initialDelaySeconds: 45
             periodSeconds: 10
             failureThreshold: 6
@@ -217,6 +218,7 @@ spec:
                 - python
                 - -m
                 - shot_scraper_api.worker_health
+                - --local-file
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
@@ -268,7 +270,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.50"
+              value: "deployment.environment=production,service.version=0.0.51"
             - name: WORKER_HEARTBEAT_INTERVAL_SECONDS
               value: "10"
             - name: WORKER_HEARTBEAT_TIMEOUT_SECONDS
