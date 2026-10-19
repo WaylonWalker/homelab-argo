@@ -1,0 +1,34 @@
+name: Verify Markata builder pin
+
+on:
+  pull_request:
+    paths:
+      - "argo-apps/apps/waylonwalker-com-prod.yaml"
+      - ".github/workflows/verify-markata-builder-pin.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm pinned source and published builder manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=argo-apps/apps/waylonwalker-com-prod.yaml
+          source_sha="$(sed -nE 's/^[[:space:]]+targetRevision: ([a-f0-9]{40})$/\1/p' "$manifest" | head -1)"
+          tag="sha-${source_sha:0:7}"
+          test "${#source_sha}" -eq 40
+          test "$(grep -Fc "tag: $tag" "$manifest")" -eq 3
+          image=waylonwalker/markata-go-builder
+          token="$(curl --fail --silent --show-error "https://ghcr.io/token?service=ghcr.io&scope=repository:${image}:pull" | jq -er '.token')"
+          echo "Verifying ghcr.io/${image}:${tag}"
+          curl --fail --silent --show-error --head \
+            -H "Authorization: Bearer $token" \
+            -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json' \
+            "https://ghcr.io/v2/${image}/manifests/${tag}" >/dev/null
+          echo "Published builder image confirmed."
