@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - apex-ingress.yaml
   - site-pvc.yaml
   - nginx-config.yaml
   - builder-deployment.yaml

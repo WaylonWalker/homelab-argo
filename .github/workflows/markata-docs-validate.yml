@@ -37,6 +37,7 @@ jobs:
               ('Service', 'markata-docs'),
               ('Service', 'markata-docs-builder'),
               ('Ingress', 'markata-docs'),
+              ('Ingress', 'markata-docs-apex'),
               ('Ingress', 'markata-docs-builder'),
               ('Middleware', 'markata-docs-builder-auth'),
               ('Middleware', 'markata-docs-builder-strip-identity'),
@@ -62,6 +63,18 @@ jobs:
           ingress = indexed[('Ingress','markata-docs-builder')]
           assert ingress['metadata']['annotations']['traefik.ingress.kubernetes.io/router.middlewares'].endswith('-auth@kubernetescrd')
           assert ingress['spec']['tls'][0]['hosts'] == ['build.markata.waylonwalker.com']
+          existing = indexed[('Ingress', 'markata-docs')]
+          apex = indexed[('Ingress', 'markata-docs-apex')]
+          assert existing['spec']['rules'][0]['host'] == 'markata.waylonwalker.com'
+          assert existing['spec']['tls'][0]['hosts'] == ['markata.waylonwalker.com']
+          assert apex['spec']['ingressClassName'] == 'traefik'
+          assert apex['spec']['rules'][0]['host'] == 'markata.dev'
+          assert apex['spec']['tls'][0]['hosts'] == ['markata.dev']
+          assert apex['spec']['tls'][0]['secretName'] == 'markata-dev-tls'
+          assert apex['metadata']['annotations']['cert-manager.io/cluster-issuer'] == 'letsencrypt-dns'
+          assert apex['metadata']['annotations']['external-dns.alpha.kubernetes.io/hostname'] == 'markata.dev'
+          backend = apex['spec']['rules'][0]['http']['paths'][0]['backend']['service']
+          assert backend['name'] == 'markata-docs' and backend['port']['name'] == 'http'
           policy = indexed[('NetworkPolicy','markata-docs-builder-ingress')]
           assert policy['spec']['policyTypes'] == ['Ingress']
           print(f'Validated {len(resources)} Kubernetes objects')
