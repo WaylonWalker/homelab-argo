@@ -27,7 +27,7 @@ spec:
       initContainers:
         - name: seed-first-release
           # Preserve the last verified GitHub-produced pages until first local build.
-          image: ghcr.io/waylonwalker/markata-docs:0.0.20
+          image: ghcr.io/waylonwalker/markata-docs:0.0.31
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh

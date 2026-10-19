@@ -31,7 +31,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: nginx
-          image: ghcr.io/waylonwalker/markata-docs:0.0.20
+          image: ghcr.io/waylonwalker/markata-docs:0.0.31
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
