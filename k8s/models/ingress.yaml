@@ -8,6 +8,12 @@ spec:
     - web
   routes:
     - kind: Rule
+      match: Host(`models.waylonwalker.com`) && (Path(`/`) || Path(`/og.png`))
+      priority: 100
+      services:
+        - name: models
+          port: 8080
+    - kind: Rule
       match: Host(`models.waylonwalker.com`)
       middlewares:
         - name: models-auth
