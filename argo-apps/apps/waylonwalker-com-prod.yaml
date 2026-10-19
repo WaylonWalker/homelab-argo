@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: k8s/waylonwalker-com/waylonwalker-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata.git'
-      targetRevision: 90a1ba5052dee4d6152287f474e09614f1822c98
+      targetRevision: 55a1374ec8a819e3cf5ddb4a761859fad93723ad
       path: helm-chart
       helm:
         values: |
@@ -40,6 +40,7 @@ spec:
 
           site:
             use404Page: true
+            cacheHtmlAtEdge: true
 
           markataEncryption:
             secretName: markata-go-encryption
