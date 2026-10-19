@@ -195,6 +195,11 @@ spec:
             enabled: true
             image:
               tag: sha-a8b0e17
+            resources:
+              requests:
+                # Fit the rolling search replacement before the builder starts.
+                # Search remains unthrottled; only its scheduling reservation changes.
+                cpu: 25m
             mode: watch-content
             # Source cache symlinks target /data/cache; keep search's cache pod-local.
             localCache:
