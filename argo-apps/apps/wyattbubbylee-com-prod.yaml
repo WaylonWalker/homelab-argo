@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: k8s/wyattbubbylee-com/wyattbubbylee-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata.git'
-      targetRevision: main
+      targetRevision: v0.14.0
       path: helm-chart
       helm:
         values: |
@@ -76,9 +76,9 @@ spec:
             # The archive-based CronJob is disabled because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-46d6215
+              tag: "0.14.0"
             builderImage:
-              tag: sha-46d6215
+              tag: "0.14.0"
             fast: false
             cacheDir: /data/cache/xdg
             notify:
@@ -175,7 +175,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-46d6215
+              tag: "0.14.0"
             mode: watch-content
             localCache:
               enabled: true
