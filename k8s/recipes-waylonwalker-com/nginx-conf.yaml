@@ -36,6 +36,10 @@ data:
         root /usr/share/nginx/html;
         index index.html;
 
+        location ~ /\. {
+            deny all;
+        }
+
         # Gzip compression - include markdown and text
         gzip on;
         gzip_vary on;

@@ -9,3 +9,4 @@ resources:
   - site-config.yaml
   - pvc.yaml
   - pv.yaml
+  - network-policy.yaml
