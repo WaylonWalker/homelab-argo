@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: builder
-          image: ghcr.io/waylonwalker/markata-go-builder:latest
+          image: ghcr.io/waylonwalker/markata-go-builder:0.14.0
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
