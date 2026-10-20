@@ -11,6 +11,6 @@ data:
   host: recipes.waylonwalker.com
   webrootPath: /mnt/main/walkershare/waylon/sites/recipes.waylonwalker.com
   vaultPath: /mnt/main/walkershare/waylon/vaults/recipes.waylonwalker.com
-  builderImage: ghcr.io/waylonwalker/markata-go-builder:latest
+  builderImage: ghcr.io/waylonwalker/markata-go-builder:0.14.0
   pollSeconds: "5"
   keepReleases: "5"
