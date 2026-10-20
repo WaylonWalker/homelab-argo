@@ -67,9 +67,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-496b42a
+              tag: sha-ac925fb
             builderImage:
-              tag: sha-496b42a
+              tag: sha-ac925fb
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
