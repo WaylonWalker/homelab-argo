@@ -10,7 +10,7 @@ spec:
       targetRevision: HEAD
       path: k8s/rhiannonwalker
     - repoURL: 'https://github.com/WaylonWalker/markata.git'
-      targetRevision: main
+      targetRevision: v0.14.0
       path: helm-chart
       helm:
         values: |
@@ -69,9 +69,9 @@ spec:
           build:
             enabled: false
             fetchImage:
-              tag: sha-46d6215
+              tag: "0.14.0"
             builderImage:
-              tag: sha-46d6215
+              tag: "0.14.0"
             fast: false
             cacheDir: /data/cache/xdg
             releases:
@@ -163,7 +163,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-46d6215
+              tag: "0.14.0"
             mode: watch-content
             localCache:
               enabled: true
