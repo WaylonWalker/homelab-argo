@@ -75,7 +75,7 @@ spec:
         fsGroupChangePolicy: "OnRootMismatch"
       containers:
         - name: forgejo
-          image: codeberg.org/forgejo/forgejo:13
+          image: codeberg.org/forgejo/forgejo@sha256:06d38310de496a10186d952bdad5ca764c153c8023ede8dfa0944c79a1dc5412
           env:
             - name: USER_UID
               value: "1000"
