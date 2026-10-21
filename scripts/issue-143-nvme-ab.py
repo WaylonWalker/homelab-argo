@@ -119,10 +119,13 @@ def secret_bytes(arm: str) -> bytes:
 
 
 def trigger(arm: str, delivery: str) -> None:
+    source_commit = builder_exec(
+        arm, "git", "-C", "/data/source", "rev-parse", "HEAD"
+    )
     body = json.dumps(
         {
             "ref": "refs/heads/main",
-            "after": delivery,
+            "after": source_commit,
             "repository": {"full_name": "WaylonWalker/waylonwalker.com"},
         },
         separators=(",", ":"),
