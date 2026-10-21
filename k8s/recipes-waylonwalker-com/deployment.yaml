@@ -114,8 +114,11 @@ spec:
             - -ceu
           args:
             - |
+              install -m 0700 -d /root/.ssh
+              install -m 0600 /ssh/id_ed25519 /root/.ssh/id_ed25519
+              ssh-keyscan -p 22 forgejo.forgejo.svc.cluster.local >> /root/.ssh/known_hosts
               git clone --branch main --single-branch \
-                https://git.waylonwalker.com/waylon/recipes.waylonwalker.com \
+                ssh://git@forgejo.forgejo.svc.cluster.local:22/waylon/recipes.waylonwalker.com \
                 /data/source
               chown -R 65532:65532 /data/source
           securityContext:
@@ -123,11 +126,18 @@ spec:
           volumeMounts:
             - name: source
               mountPath: /data
+            - name: source-ssh
+              mountPath: /ssh
+              readOnly: true
       volumes:
         - name: source
           emptyDir: {}
         - name: work
           emptyDir: {}
+        - name: source-ssh
+          secret:
+            secretName: builder-source-ssh
+            defaultMode: 0400
         - name: webroot
           persistentVolumeClaim:
             claimName: webroot
