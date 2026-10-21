@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: smb3.waylonwalker.com
+  namespace: smb3-waylonwalker-com
+  host: smb3.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/smb3.waylonwalker.com
+  TELEMETRY_ENABLED: "enabled"
+  TELEMETRY_APP_NAME: "smb3.waylonwalker.com"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"
