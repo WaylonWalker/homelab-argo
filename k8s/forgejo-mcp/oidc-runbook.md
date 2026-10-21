@@ -36,6 +36,14 @@ The live HLab Auth database is at migration `0008_route_auth_origin`. Revision
 upgrade and downgrade on disposable PostgreSQL before applying either revision
 to the live database.
 
+On 2026-10-21, a disposable Longhorn restore of the latest HLab Auth volume
+backup recovered PostgreSQL 17.2 at `0008_route_auth_origin`. The clone had 22
+application tables, and `pg_amcheck` completed successfully. The restored
+volume, PVC, PV, and test namespace were then removed. The backup target is
+MinIO on Falcon3's `main` ZFS mirror. The separate 4 TB IronWolf `tank` mirror
+does not currently hold this backup. This restore verifies the Longhorn copy;
+production rollout remains gated on adding and testing an off-cluster copy.
+
 ## Rollout gates
 
 Complete these gates before routing production MCP traffic through OAuth:
@@ -49,13 +57,15 @@ Complete these gates before routing production MCP traffic through OAuth:
    IronWolf mirror copy.
 4. Apply migrations `0009` and `0010` through the approved HLab Auth rollout.
    Keep OIDC disabled while the migration runs.
-5. Mount the RSA signing key from a Sealed Secret. Set
-   `HLAB_AUTH_OIDC_RESOURCE=https://mcp-oidc-stage.wayl.one/mcp`, then enable
-   OIDC and verify the provider discovery and JWKS endpoints over HTTPS.
-6. Start a separate resource-server deployment at
+5. Deploy the isolated `hlab-auth-oidc-stage` app at
+   `auth-oidc-stage.wayl.one`. Mount its RSA signing key from a Sealed Secret.
+   Set `HLAB_AUTH_OIDC_RESOURCE=https://mcp-oidc-stage.wayl.one/mcp` and verify
+   provider discovery and JWKS over HTTPS. Its database is separate from the
+   production database.
+6. Deploy the separate `forgejo-mcp-oidc-stage` app at
    `mcp-oidc-stage.wayl.one`. Keep the production `/mcp` route on passthrough.
-   Route the final `/issuer` URLs at `mcp.wayl.one` to the staging service so
-   Forgejo can validate the issuer that production will keep using.
+   Route only the final `/issuer` metadata and JWKS paths at `mcp.wayl.one` to
+   the staging service so Forgejo can validate the issuer production will use.
 7. Create a Forgejo Authorized Integration with the final issuer
    `https://mcp.wayl.one/issuer`, an exact `sub` claim rule, and read-only
    repository, issue, and user permissions. Do not grant write permissions.
@@ -81,7 +91,7 @@ ConfigMap or Git.
 ```text
 FORGEJO_MCP_AUTH_MODE=resource-server
 FORGEJO_MCP_ALLOWED_HOSTS=mcp-oidc-stage.wayl.one,mcp.wayl.one
-FORGEJO_MCP_AUTHORIZATION_SERVER=https://auth.wayl.one
+FORGEJO_MCP_AUTHORIZATION_SERVER=https://auth-oidc-stage.wayl.one
 FORGEJO_MCP_RESOURCE=https://mcp-oidc-stage.wayl.one/mcp
 FORGEJO_MCP_SCOPES_SUPPORTED=openid profile email offline_access forgejo
 FORGEJO_MCP_FORGEJO_JWT_ISSUER=https://mcp.wayl.one/issuer
@@ -132,8 +142,8 @@ for url in \
   https://mcp-oidc-stage.wayl.one/.well-known/oauth-protected-resource \
   https://mcp.wayl.one/issuer/.well-known/openid-configuration \
   https://mcp.wayl.one/issuer/jwks.json \
-  https://auth.wayl.one/.well-known/openid-configuration \
-  https://auth.wayl.one/oidc/jwks
+  https://auth-oidc-stage.wayl.one/.well-known/openid-configuration \
+  https://auth-oidc-stage.wayl.one/oidc/jwks
 do
   curl --silent --show-error --output /dev/null \
     --write-out '%{http_code} %{redirect_url}\n' "$url"
@@ -142,7 +152,7 @@ done
 
 Each request must return `200` and an empty redirect URL.
 
-Confirm that the staging MCP metadata names `https://auth.wayl.one`, the exact
+Confirm that the staging MCP metadata names `https://auth-oidc-stage.wayl.one`, the exact
 resource URL is `https://mcp-oidc-stage.wayl.one/mcp`, and the HLab Auth
 discovery metadata advertises `S256` and public-client authentication. Confirm
 that `https://mcp.wayl.one/issuer` serves the final issuer document and JWKS.

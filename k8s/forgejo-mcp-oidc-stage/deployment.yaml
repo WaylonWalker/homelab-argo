@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo-mcp-stage
+  namespace: forgejo-mcp-oidc-stage
+  labels:
+    app: forgejo-mcp-stage
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: forgejo-mcp-stage
+  template:
+    metadata:
+      labels:
+        app: forgejo-mcp-stage
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: forgejo-mcp
+          image: git.b4mad.industries/agentic-forges/forgejo-mcp@sha256:9ffdde38b9825666227676d1abbe410646014272fe9c317cb3435c0a6f3e5ad2
+          imagePullPolicy: IfNotPresent
+          args:
+            - --transport
+            - http
+            - --url
+            - http://forgejo.forgejo.svc.cluster.local:3000
+            - --host
+            - 0.0.0.0
+            - --http-port
+            - "8080"
+            - --allowed-hosts
+            - mcp-oidc-stage.wayl.one,mcp.wayl.one
+          env:
+            - name: FORGEJO_MCP_AUTH_MODE
+              value: resource-server
+            - name: FORGEJO_MCP_AUTHORIZATION_SERVER
+              value: https://auth-oidc-stage.wayl.one
+            - name: FORGEJO_MCP_RESOURCE
+              value: https://mcp-oidc-stage.wayl.one/mcp
+            - name: FORGEJO_MCP_SCOPES_SUPPORTED
+              value: openid profile email offline_access forgejo
+            - name: FORGEJO_MCP_FORGEJO_JWT_ISSUER
+              value: https://mcp.wayl.one/issuer
+            - name: FORGEJO_MCP_FORGEJO_JWT_SIGNING_KEY_FILE
+              value: /run/secrets/forgejo-mcp/signing.pem
+            - name: FORGEJO_USER_AGENT
+              value: forgejo-mcp/3.3.0
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          volumeMounts:
+            - name: signing-key
+              mountPath: /run/secrets/forgejo-mcp
+              readOnly: true
+      volumes:
+        - name: signing-key
+          secret:
+            secretName: forgejo-mcp-stage-signing
+            items:
+              - key: signing.pem
+                path: signing.pem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo-mcp-stage
+  namespace: forgejo-mcp-oidc-stage
+spec:
+  type: ClusterIP
+  selector:
+    app: forgejo-mcp-stage
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: forgejo-mcp-oidc-stage
+  namespace: forgejo-mcp-oidc-stage
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - mcp-oidc-stage.wayl.one
+      secretName: forgejo-mcp-oidc-stage-tls
+  rules:
+    - host: mcp-oidc-stage.wayl.one
+      http:
+        paths:
+          - path: /mcp
+            pathType: Prefix
+            backend:
+              service:
+                name: forgejo-mcp-stage
+                port:
+                  name: http
+          - path: /.well-known/oauth-protected-resource
+            pathType: Prefix
+            backend:
+              service:
+                name: forgejo-mcp-stage
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: forgejo-mcp-stage-final-issuer
+  namespace: forgejo-mcp-oidc-stage
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - mcp.wayl.one
+      secretName: forgejo-mcp-stage-issuer-tls
+  rules:
+    - host: mcp.wayl.one
+      http:
+        paths:
+          - path: /issuer/.well-known/openid-configuration
+            pathType: Exact
+            backend:
+              service:
+                name: forgejo-mcp-stage
+                port:
+                  name: http
+          - path: /issuer/jwks.json
+            pathType: Exact
+            backend:
+              service:
+                name: forgejo-mcp-stage
+                port:
+                  name: http

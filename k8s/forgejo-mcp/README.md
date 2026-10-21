@@ -17,6 +17,24 @@ Argo CD Application: `forgejo-mcp`, deployed from `k8s/forgejo-mcp`.
 See [the OAuth runbook](oidc-runbook.md) for the planned ChatGPT connection,
 deployment checks, rollback, and known gates.
 
+## Isolated OAuth staging
+
+The staged deployments use separate Argo Applications and namespaces:
+
+- HLab Auth: `hlab-auth-oidc-stage` at
+  `https://auth-oidc-stage.wayl.one`, with a new PostgreSQL database.
+- Forgejo MCP: `forgejo-mcp-oidc-stage` at
+  `https://mcp-oidc-stage.wayl.one/mcp`.
+- The staging MCP server publishes its issuer metadata and JWKS at
+  `https://mcp.wayl.one/issuer`. Its `mcp.wayl.one` Ingress serves only
+  `/issuer`; the existing production `/mcp` Ingress stays on passthrough.
+
+Staging uses sealed, separately generated keys. Its initial user, OAuth client,
+Forgejo Authorized Integration, and per-user `forgejo_aud` must be configured
+before an end-to-end read test. Do not grant that integration write access.
+These staged resources do not change the production HLab Auth Deployment or
+production database.
+
 ## Connecting a client
 
 1. In Forgejo (`https://git.wayl.one`), create a fine-grained, revocable
