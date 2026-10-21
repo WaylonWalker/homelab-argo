@@ -1,6 +1,6 @@
 # WaylonWalker NVMe A/B trial, 2026-10-20
 
-**Status: BLOCKED.** No candidate build or storage change ran. Production stayed on its current PVCs.
+**Status: BLOCKED pending production replica recovery and restore checksum comparison.** No A/B result exists. No candidate build or production mount change ran. Production remained on its existing PVCs.
 
 ## Decision
 
@@ -28,7 +28,7 @@ Captured on 2026-10-20 from Kubernetes context `default`.
 | Site PVC replicas | Requested 2; attached volume is `degraded`; only one replica runs on `falcon3` |
 | Replica scheduling | Longhorn reports `precheck new replica failed: tags not fulfilled` |
 | Backup system | Read-only `scripts/storage-backup-check.sh` passed; latest completed backup was `2026-10-20T22:22:24Z` |
-| Restore evidence | No disposable restore with a matching sentinel was found or run |
+| Restore evidence at first inventory | No disposable restore with a matching sentinel was found or run |
 | Node load sample | `falcon3`: 1558m CPU of 4 cores, 13922 MiB memory; builder pod: 312m CPU, 1378 MiB |
 
 The host-path cache filesystem has about 17.8% free space. A move of the measured site and source data would use about 6.6 GiB more. That leaves about 76.4 GiB free, before peak-build and recovery space. The result fails the 20% free-space gate even before those reserves.
@@ -93,8 +93,43 @@ The backup diagnostic checks backup infrastructure and age. It does not create a
 
 Accept the candidate only when the median `prepare + build + promote` time improves by at least 20% and 15 seconds. Require public p95 TTFB to worsen by no more than 10%. Require no increase in 5xx or permission incidents. Require no unacceptable cold-build regression. Require the disk headroom gate to pass.
 
-Do not deploy if any gate fails or if measurement noise hides the result. The present evidence fails the disk headroom and restore gates. The production site volume is also degraded. No A/B threshold was measured.
+Do not deploy if any gate fails or if measurement noise hides the result. The initial inventory failed the disk headroom gate. The post-prune inventory now shows 271 GiB free (58% of the 466 GiB XFS filesystem), so the earlier capacity blocker is cleared pending a peak-build and recovery headroom calculation. The production site volume remains degraded. No A/B threshold was measured.
 
 ## Evidence limits
 
-No production setting, source content, PVC, PV, backup, or release changed during this inventory. No candidate deployment or build ran. No backup restore ran. The worktree inventory came from `origin/main` at `208794ff3a53c559ca7490d2bc358c62ab96ca80`; the operator's original checkout was left unchanged.
+No production setting, source content, PVC, PV, or release changed during the first inventory. No candidate deployment or build ran during that inventory. The worktree inventory came from `origin/main` at `208794ff3a53c559ca7490d2bc358c62ab96ca80`; the operator's original checkout was left unchanged.
+
+## Follow-up inventory, 2026-10-21
+
+The owner ran a supported CRI image prune on Falcon3. A post-prune SSH scan measured 271 GiB free on `/var`, up from 83 GiB. The XFS mount is 466 GiB total and 195 GiB used.
+
+| Path or measurement | Post-prune result |
+|---|---:|
+| `/var/lib/rancher/k3s` | 33 GiB |
+| `/var/lib/rancher/k3s/agent/containerd` | 29 GiB |
+| Containerd overlayfs snapshots | 21 GiB |
+| Containerd content blobs | 7.3 GiB |
+| CRI image filesystem | 22,501,687,296 bytes, about 21 GiB |
+| Registered CRI images | 70 entries, down from 580 |
+| CRI containers | 117 running; 51 exited |
+| `/var/lib/longhorn/fast-nvme` | 105 GiB |
+| `/var/lib/markata-go` | 4.2 GiB: cache 973 MiB; workspace directory 3.3 GiB |
+| `/var/lib/containers` | 1.3 GiB |
+| `/var/lib/kubelet` | 530 MiB |
+| `/var/log` | 26 GiB: PCP 21 GiB; journal 4 GiB; pods 1 GiB |
+| `/var/home` | 7 GiB |
+| ZFS `main` | 7.69 TiB available by `df`; 7.69 TiB available by `zfs list` |
+
+The live Builder Admin pod mounts only the source PVC, site PVC, and cache host path. It does not mount the 3.3 GiB host workspace directory. Do not treat that directory as disposable without an owner review.
+
+The one running replica for the production site volume occupies about 105 GiB under `/var/lib/longhorn/fast-nvme/replicas`. Do not move or delete it. Falcon3's `fast-nvme` disk allows scheduling. Falcon2's other `fast` disk, `/mnt/vault/longhorn`, does not allow scheduling. The `longhorn-build-fast` StorageClass selects `fast` and requests two replicas. This explains the current scheduling failure. No Longhorn scheduling setting changed.
+
+`du -xhd1 /var` reports about 178 GiB, while `df` reports 195 GiB used. The difference is about 17 GiB. A deleted-open file scan found 148 descriptors with 2.20 TB of logical size. Only one descriptor was on the NVMe, with zero allocated blocks. Deleted-open files do not explain the current difference.
+
+The new site backup completed at `2026-10-21T02:29:42Z`. It covers volume `pvc-cbc9a896-5733-4892-ab42-be4fd2946a89`, size `32212254720` bytes. Longhorn uploaded `923364465` new bytes. The source backup completed at `2026-10-21T02:24:52Z`. It covers volume `pvc-dccccdba-0c59-4ba9-a759-3b268e59c8d4`, size `10737418240` bytes. Longhorn uploaded `7778764` new bytes.
+
+Disposable restore volumes `issue-143-site-restore-20261021` and `issue-143-source-restore-20261021` were created from these backups. The source restore completed. A read-only pod mounted it and confirmed the sentinel hash `816705def28caf37623b50c987c41115a58b5f8549ebf7e54c18e782e9291aee` for `/restore/markata-go.toml`; the Git checkout is present. The site restore remains attached and healthy, but Longhorn still reports `RestoreInProgress`, `restoreRequired=true`, and `actualSize=0` more than ten minutes after creation. The replica is active and not marked failed. No restored site files have been read or compared.
+
+The cleared capacity blocker does not clear the separate production Longhorn health gate: the production site PVC still has one running replica on Falcon3, while Falcon2's other `fast` disk is not schedulable. The site restore has also not completed, so its sentinel check cannot pass. No canary has been deployed and no A/B build has run. Keep the disposable restore resources for diagnosis; do not change production scheduling, mounts, or replicas to force progress.
+
+The original checkout remains unchanged. No canary or production serving configuration has been deployed. A/B measurements have not started.
