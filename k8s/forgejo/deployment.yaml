@@ -47,6 +47,9 @@ spec:
     - name: web
       port: 3000
       targetPort: 3000
+    - name: ssh
+      port: 22
+      targetPort: 22
   type: ClusterIP
 ---
 apiVersion: apps/v1
