@@ -67,9 +67,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-8682b60
+              tag: sha-99637e3
             builderImage:
-              tag: sha-8682b60
+              tag: sha-99637e3
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -184,7 +184,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-8682b60
+              tag: sha-99637e3
             mode: watch-content
             localCache:
               enabled: true
