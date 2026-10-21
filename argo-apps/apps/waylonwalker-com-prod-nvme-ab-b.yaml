@@ -23,9 +23,6 @@ spec:
     server: https://kubernetes.default.svc
     namespace: waylonwalker-com-prod-nvme-ab-b-notes
   syncPolicy:
-    automated:
-      selfHeal: true
-      prune: false
     syncOptions:
       - CreateNamespace=true
       - RespectIgnoreDifferences=true

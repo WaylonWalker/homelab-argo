@@ -63,7 +63,7 @@ One HTTPS request per path ran on 2026-10-20. These are single samples, not p50 
 
 No 5xx response occurred in this small sample. This sample does not cover the required smoke paths, preview authentication, redirects, content negotiation, cache headers, ingress TLS details, restart, failed build, or rollback.
 
-## Required operator actions
+## Initial operator checklist (superseded by trial status below)
 
 Complete these actions before any candidate build:
 
@@ -132,7 +132,7 @@ Disposable restore volumes `issue-143-site-restore-20261021` and `issue-143-sour
 
 At `2026-10-21T03:18Z`, Falcon3 `/var` had 274 GiB free of 466 GiB (59%) and about 242.9 million free inodes. This clears the 20% free-space floor before trial work, but peak-build and recovery headroom still need measurement. The production site PVC still has one running replica on Falcon3, while Falcon2's other `fast` disk is not schedulable. Keep production settings and serving paths unchanged. The issue permits an isolated canary; the degraded production volume remains a recovery risk and blocks any production cutover until its resilience is restored.
 
-The source and site restore sentinel checks passed. Their temporary PV/PVC bindings were moved from the restore-check namespace into the A canary namespace. Both restore Longhorn volumes remain detached when not mounted. The source sentinel is `markata-go.toml`; the site sentinel is `current/index.html`. A seed-copy pod is copying the restored site and source trees to the B host paths and copying the idle production cache into separate A and B host paths. It is also generating checksummed tree manifests that compare file contents, links, modes, and owners. The production cache copy began after the production Builder Admin returned to idle. At the last inventory, the seed-copy pod was still hashing; no candidate deployment or build had run.
+The source and site restore sentinel checks passed. Their temporary PV/PVC bindings were moved from the restore-check namespace into the A canary namespace. Both restore Longhorn volumes remain detached when not mounted. The source sentinel is `markata-go.toml`; the site sentinel is `current/index.html`. The seed copy and full tree comparisons completed; results and later candidate activity are recorded in the final status section below.
 
 ### Public serving baseline, 2026-10-21
 
@@ -152,8 +152,52 @@ Before the canary copy started, the public endpoints below each received 20 sequ
 
 The final `www` redirect resolves to `https://waylonwalker.com/` with status 200. TLS verification passed. The home page returned `text/html` when the request sent `Accept: application/json`. The home page cache header was `public, max-age=0, s-maxage=60`; `/8bitcc.png` returned `max-age=31536000` and `public, immutable`; `/rss.xml` returned `text/xml`. These are baseline checks only. Repeat them after and during the candidate workload. [Raw HTTPS samples](BUILDER_NVME_AB_TTFB_BEFORE_2026-10-21.jsonl).
 
-The live production Argo application is Synced and Healthy at homelab revision `51431dd50a48787595af0c9456b1684e855e07c8`, with Markata chart revision `aac5b49752518ab84b7541385d0d42706e79a41d`. The live builder image is `sha-8682b60` with digest `sha256:5cf3ef968b47deb861320b4b6ab37e195715e07efb898ef029ccd28079817b2e`; its source commit is `ce0db0c5259f72b1d879f15ce21835aae2b5168b`. The production site Longhorn volume remains degraded: the replica scheduler reports `ReplicaSchedulingFailure` because the required disk tags are not fulfilled.
+At the initial canary checkpoint, production used image `sha-8682b60`; its later transition to `sha-99637e3` is recorded below. The production site Longhorn volume remains degraded: the replica scheduler reports `ReplicaSchedulingFailure` because the required disk tags are not fulfilled.
 
 Two recent production builds used source commit `ce0db0c5259f72b1d879f15ce21835aae2b5168b` and builder image `sha-d37c9dd` (digest `sha256:77dd3fc12892e5952e9c7f997aa23431661cad1662459a1a78f52660b189bbbc`). Their `prepare + build + promote` times were 225.330 s (webhook) and 250.206 s (manual UI), median 237.768 s, n=2. A subsequent startup-revision build on the current `sha-8682b60` image took 271.232 s for `prepare + build + promote`; it is a cold image-revision transition, n=1. These are context only, not matched A/B results, and do not meet the 10-build gate.
 
-The issue A/B application manifests and shared values are in `argo-apps/apps/waylonwalker-com-prod-nvme-ab-{a,b}.yaml` and `values/issue-143/`. Both apps use the pinned Markata chart, separate namespaces, an ingress class with no controller, and automated pruning disabled. The A PV manifest is in `k8s/waylonwalker-com/issue-143/restore-volumes.yaml`. The benchmark harness is `scripts/issue-143-nvme-ab.py`; it alternates matched warm builds, runs two cold-cache builds per arm, records builder and node counters, captures public home-page TTFB during builds, and discards warm pairs that overlap production builds or use a different source commit.
+
+## Trial status, 2026-10-21 — BLOCKED
+
+**BLOCKED: Falcon3 pod and CPU scheduling headroom for isolated canaries after the production builder rollout.** The disk-space floor is clear: `/var` measured 291,991,027,712 bytes free (about 272 GiB, 58.5%) with about 99.5% of inodes free. Scheduling headroom is not clear. `falcon3` has a four-CPU allocatable capacity, 110-pod limit, 107 running pods, and 3,870m CPU requests (96%). During the canary run, production Builder Admin and Search replacements became Pending with `Too many pods` and `Insufficient cpu`. The A and B Builder Admins and B site server were scaled to zero to restore production scheduling. Do not restart the canaries until a capacity change or an operator-approved scheduling plan leaves production rollouts schedulable.
+
+Production recovered to Argo `Synced Healthy`. Builder Admin, Search, and Site are Ready, with Builder Admin and Search on `ghcr.io/waylonwalker/markata-go-builder:sha-99637e3`. Startup-revision build `build-1792556114965423430` succeeded at `2026-10-21T04:18:44Z` (prepare 19 ms, build 196,408 ms, promote 12,783 ms, prune 15,589 ms, total 209,490 ms). This was an image-transition build, not a matched trial. After it completed, each public path below received 20 sequential HTTPS requests. No 5xx response occurred, all expected status codes were returned, and every p95 was below its pre-canary baseline:
+
+| Path | Status counts | Before p95 | After p50 | After p95 | n |
+|---|---:|---:|---:|---:|---:|
+| `/` | 200: 20 | 0.334 s | 0.267 s | 0.293 s | 20 |
+| `/just-fucking-use-kubernetes/` | 200: 20 | 0.324 s | 0.262 s | 0.285 s | 20 |
+| `/archive/` | 200: 20 | 0.325 s | 0.260 s | 0.281 s | 20 |
+| `/8bitcc.png` | 200: 20 | 0.311 s | 0.256 s | 0.279 s | 20 |
+| `/reader/` | 200: 20 | 0.342 s | 0.260 s | 0.291 s | 20 |
+| `/rss.xml` | 200: 20 | 0.325 s | 0.272 s | 0.309 s | 20 |
+| `/api/search?q=markata` | 200: 20 | 0.343 s | 0.273 s | 0.289 s | 20 |
+| `/this-should-404/` | 404: 20 | 0.348 s | 0.279 s | 0.292 s | 20 |
+| `https://www.waylonwalker.com/` | 301: 20 | 0.296 s | 0.250 s | 0.265 s | 20 |
+
+These are post-build production samples, not measurements during canary work. Raw requests are in [post-build HTTPS samples](BUILDER_NVME_AB_TTFB_AFTER_2026-10-21.jsonl).
+
+### Data collected before pausing
+
+Seed-copy comparisons passed. The restored site tree matched across 341,479 entries (SHA-256 `20aca7f9abb45bc8fef3b021651becc7f4f28f867c8b3613e2b842e34df64be2`); the source tree matched across 59,581 entries (SHA-256 `64dd2d2d6e05b0be2f3512d39a5b76cccbb98a2b807787805191e07d6275f9c7a`); A and B cache trees matched across 17,804 entries (SHA-256 `704cf0b146244d85e48d6c52cfa5a021667cee545fa15ab648734931a247bbdc`). Backup restore sentinels also passed as recorded above.
+
+The candidates initially used identical builder image `sha-8682b60`, source commit `ce0db0c5259f72b1d879f15ce21835aae2b5168b`, and separate storage. Three clean matched warm pairs completed before production changed to `sha-99637e3`. No cold builds ran. The analyzer reports:
+
+| Warm `prepare + build + promote` | Median | p95 | n |
+|---|---:|---:|---:|
+| A: restored Longhorn volumes | 96.189 s | 96.750 s | 3 |
+| B: Falcon3 NVMe hostPaths | 85.052 s | 94.035 s | 3 |
+
+The paired median improvement is 11.049 s (11.6%), with a bootstrap 95% percentile interval of 2.156–12.565 s. This misses both required thresholds (20% and 15 seconds) and is too small a sample for a decision. The candidate samples had no 5xx responses. During the three pairs, public home-page p95 TTFB was 0.303 s on A (n=57) and 0.306 s on B (n=52), with zero 5xx; these small samples do not complete the required all-path before/after p95 comparison. The JSONL retains phase records, build IDs, source commit, publication counters, CPU and I/O counters, node samples, and TTFB samples: [partial trial records](BUILDER_NVME_AB_RUNS_2026-10-21.jsonl).
+
+Pair four was interrupted after B completed and was not recorded as a matched pair. Do not count it. The production image then changed while canaries were running, so the partial results cannot be combined with a future trial on `sha-99637e3`.
+
+### Safe resume steps
+
+1. Add Falcon3 allocatable CPU/pod capacity or an approved placement plan that preserves room for production rollout replacements while the two isolated builders run. Current evidence is 96% requested CPU and 107/110 pods; filesystem free space alone does not clear this blocker.
+2. Restore the production site Longhorn volume to its required two healthy replicas before any production storage cutover. Do not change Longhorn disk tags, force replicas, or move the production mount as part of this experiment.
+3. Confirm production is idle and healthy, select the same current builder image and source revision for both arms, then manually sync the candidate Apps. The candidate manifests now have automated sync disabled. Keep `prune:false` and retain all candidate PVs, PVCs, hostPath copies, backups, and restore volumes.
+4. Re-run at least 10 clean matched warm pairs and 2 cold builds per arm, with the new image/source tuple. Record CPU, I/O wait, load, free bytes/inodes and public all-path TTFB. Stop the trial if production rollout pods become Pending or any production 5xx/availability incident occurs.
+5. Compare against the acceptance gates above. Keep this PR in draft and do not cut production over until every gate passes and restore/rollback steps are rehearsed.
+
+At pause, both candidate deployments were scaled to zero. Their PVCs remained Bound, including A's restored Longhorn site/source PVs and B's NVMe hostPath data; backups and restore volumes were retained. Production serving remained on its original production PVCs. No production mount migration or Longhorn scheduling change was made.

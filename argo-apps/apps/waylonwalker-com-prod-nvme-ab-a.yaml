@@ -30,9 +30,6 @@ spec:
       jsonPointers:
         - /spec/volumeName
   syncPolicy:
-    automated:
-      selfHeal: true
-      prune: false
     syncOptions:
       - CreateNamespace=true
       - RespectIgnoreDifferences=true
