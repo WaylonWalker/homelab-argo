@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 import statistics
 import subprocess
 import sys
@@ -234,8 +235,17 @@ def wait_for_prod_idle(timeout: int = 1800) -> None:
 def node_delta(before: dict, after: dict) -> dict:
     result: dict = {}
     try:
-        start = [int(value) for value in before["stat"].split()[1:]]
-        stop = [int(value) for value in after["stat"].split()[1:]]
+        def cpu_fields(snapshot: dict) -> list[int]:
+            raw = snapshot.get("cpu") or snapshot.get("stat")
+            if not raw:
+                raise KeyError("cpu")
+            fields = raw.split()
+            if fields[0] == "cpu":
+                fields = fields[1:]
+            return [int(value) for value in fields[:8]]
+
+        start = cpu_fields(before)
+        stop = cpu_fields(after)
         delta = [max(0, end - begin) for begin, end in zip(start, stop)]
         total = sum(delta)
         result["cpu_busy_percent"] = round(
@@ -617,12 +627,33 @@ def analyze(args: argparse.Namespace) -> int:
         clean_attempts: dict[int, list[dict]] = {}
         for record in warm:
             clean_attempts.setdefault(int(record["order"]), []).append(record)
-        summary["warm_matched_pairs"] = sum(
-            1
+        matched_pairs = [
+            {record["arm"]: record for record in pair}
             for pair in clean_attempts.values()
             if {record["arm"] for record in pair} == {"A", "B"}
             and len(pair) == 2
-        )
+        ]
+        summary["warm_matched_pairs"] = len(matched_pairs)
+        paired_improvements = [
+            float(pair["A"].get("complete_ms") or 0)
+            - float(pair["B"].get("complete_ms") or 0)
+            for pair in matched_pairs
+        ]
+        if paired_improvements:
+            rng = random.Random(143)
+            bootstrap_medians = [
+                statistics.median(
+                    rng.choices(paired_improvements, k=len(paired_improvements))
+                )
+                for _ in range(10000)
+            ]
+            summary["paired_improvement_ms"] = {
+                **summarize(paired_improvements),
+                "bootstrap_95_percentile_ci": [
+                    percentile(bootstrap_medians, 0.025),
+                    percentile(bootstrap_medians, 0.975),
+                ],
+            }
         for arm in ("A", "B"):
             arm_warm = [record for record in warm if record["arm"] == arm]
             arm_cold = [record for record in cold if record["arm"] == arm]
