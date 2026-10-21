@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: k8s/waylonwalker-com/go-waylonwalker-com
     - repoURL: 'https://github.com/WaylonWalker/markata.git'
-      targetRevision: main
+      targetRevision: v0.14.0
       path: helm-chart
       helm:
         values: |
@@ -67,9 +67,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-ac925fb
+              tag: "0.14.0"
             builderImage:
-              tag: sha-ac925fb
+              tag: "0.14.0"
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -184,7 +184,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-eada09f
+              tag: "0.14.0"
             mode: watch-content
             localCache:
               enabled: true
