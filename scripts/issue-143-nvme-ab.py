@@ -4,9 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import base64
-import hashlib
-import hmac
 import json
 import math
 import statistics
@@ -25,12 +22,10 @@ ARMS = {
     "a": {
         "namespace": "waylonwalker-com-prod-nvme-ab-a-notes",
         "project": "waylonwalker-com-prod-nvme-ab-a",
-        "secret": "issue-143-webhook-a",
     },
     "b": {
         "namespace": "waylonwalker-com-prod-nvme-ab-b-notes",
         "project": "waylonwalker-com-prod-nvme-ab-b",
-        "secret": "issue-143-webhook-b",
     },
 }
 PROD_NAMESPACE = "waylonwalker-com-prod-notes"
@@ -103,65 +98,67 @@ def prod_state() -> dict:
     return json.loads(raw)
 
 
-def secret_bytes(arm: str) -> bytes:
-    config = ARMS[arm]
-    encoded = kubectl(
-        config["namespace"],
-        "get",
-        "secret",
-        config["secret"],
-        "-o",
-        "jsonpath={.data.webhook-secret}",
-    )
-    if not encoded:
-        raise RuntimeError(f"arm {arm.upper()} webhook secret is empty")
-    return base64.b64decode(encoded)
-
-
-def trigger(arm: str, delivery: str) -> None:
-    source_commit = builder_exec(
-        arm, "git", "-C", "/data/source", "rev-parse", "HEAD"
-    )
-    body = json.dumps(
-        {
-            "ref": "refs/heads/main",
-            "after": source_commit,
-            "repository": {"full_name": "WaylonWalker/waylonwalker.com"},
-        },
-        separators=(",", ":"),
-    ).encode()
-    signature = hmac.new(secret_bytes(arm), body, hashlib.sha256).hexdigest()
+def trigger(arm: str, delivery: str) -> set[str]:
+    prior_builds = {build.get("id") for build in read_state(arm).get("builds", [])}
     pod = builder_pod(arm)
+    enqueue_code = r'''import os, sys, urllib.error, urllib.parse, urllib.request
+identity = sys.argv[1]
+base = "http://" + os.environ["POD_IP"] + ":8080/"
+identity_headers = {"X-Hlab-User-Id": identity}
+page = urllib.request.urlopen(urllib.request.Request(base, headers=identity_headers), timeout=15)
+cookie = page.headers.get("Set-Cookie", "").split(";", 1)[0]
+if not cookie or "=" not in cookie:
+    raise SystemExit("Builder Admin did not issue a CSRF cookie")
+token = cookie.split("=", 1)[1]
+data = urllib.parse.urlencode({"csrf_token": token}).encode()
+headers = {
+    **identity_headers,
+    "Origin": "https://issue-143.invalid",
+    "Sec-Fetch-Site": "same-origin",
+    "Cookie": cookie,
+    "Content-Type": "application/x-www-form-urlencoded",
+}
+request = urllib.request.Request(base + "api/builds", data=data, headers=headers, method="POST")
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, response, code, message, headers, new_url):
+        return None
+try:
+    response = urllib.request.build_opener(NoRedirect).open(request, timeout=15)
+    status = response.status
+except urllib.error.HTTPError as error:
+    status = error.code
+if status != 303:
+    raise SystemExit("Builder Admin returned HTTP " + str(status))
+print("enqueued")
+'''
     response = kubectl(
         ARMS[arm]["namespace"],
         "exec",
         pod,
         "--",
-        "wget",
-        "-q",
-        "-O-",
-        "--header=X-GitHub-Event: push",
-        f"--header=X-GitHub-Delivery: {delivery}",
-        f"--header=X-Hub-Signature-256: sha256={signature}",
-        "--header=Content-Type: application/json",
-        f"--post-data={body.decode()}",
-        "http://127.0.0.1:8080/webhook",
-        timeout=20,
+        "python3",
+        "-c",
+        enqueue_code,
+        delivery,
+        timeout=30,
     )
-    if response:
-        raise RuntimeError(f"arm {arm.upper()} webhook returned: {response}")
+    if response != "enqueued":
+        raise RuntimeError(f"arm {arm.upper()} manual build was not enqueued")
+    return prior_builds
 
 
-def wait_for_build(arm: str, delivery: str, timeout: int) -> dict:
+def wait_for_build(arm: str, delivery: str, prior_builds: set[str], timeout: int) -> dict:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         state = read_state(arm)
         for build in state.get("builds", []):
-            detail = build.get("trigger_detail", "")
-            if delivery in detail:
+            if build.get("actor_id") == delivery or (
+                build.get("id") not in prior_builds
+                and build.get("trigger_type") == "manual-ui"
+            ):
                 return build
         running = state.get("running") or {}
-        if delivery in running.get("detail", ""):
+        if running.get("actor_id") == delivery or running.get("id") not in prior_builds:
             build_id = running.get("id")
             if build_id:
                 for build in state.get("builds", []):
@@ -355,7 +352,7 @@ def build_once(arm: str, kind: str, order: int, timeout: int) -> dict:
     before = read_node_stats()
     container_before = read_container_stats(arm)
     started = datetime.now(timezone.utc)
-    trigger(arm, delivery)
+    prior_builds = trigger(arm, delivery)
     ttfb_stop = threading.Event()
     ttfb_samples: list[dict] = []
     sampler = threading.Thread(
@@ -363,7 +360,7 @@ def build_once(arm: str, kind: str, order: int, timeout: int) -> dict:
     )
     sampler.start()
     try:
-        build = wait_for_build(arm, delivery, timeout)
+        build = wait_for_build(arm, delivery, prior_builds, timeout)
     finally:
         ttfb_stop.set()
         sampler.join(timeout=20)
