@@ -1,5 +1,8 @@
 project_identifier: waylonwalker-com-prod-nvme-ab-a
 
+site:
+  replicaCount: 0
+
 builderAdmin:
   webhook:
     existingSecretName: issue-143-webhook-a
