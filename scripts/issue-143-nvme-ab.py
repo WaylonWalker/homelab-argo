@@ -616,7 +616,14 @@ def analyze(args: argparse.Namespace) -> int:
             and not record.get("production_overlap")
             and record.get("source_commit") == fixed_commit
         ]
-        phases = ("prepare_ms", "build_ms", "promote_ms", "complete_ms", "total_ms")
+        phases = (
+            "prepare_ms",
+            "build_ms",
+            "promote_ms",
+            "prune_ms",
+            "complete_ms",
+            "total_ms",
+        )
         summary = {
             "source_commit": fixed_commit,
             "arms": {},
