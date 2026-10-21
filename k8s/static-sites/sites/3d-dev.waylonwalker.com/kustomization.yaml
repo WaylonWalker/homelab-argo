@@ -9,6 +9,7 @@ replicas:
 
 components:
   - ../../components/telemetry
+  - ../../components/paused
 
 resources:
   - ../../base
