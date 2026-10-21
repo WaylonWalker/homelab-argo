@@ -58,7 +58,7 @@ metadata:
   name: dropper-wayl-one
   namespace: dropper-dev
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
