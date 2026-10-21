@@ -3,6 +3,7 @@ kind: Kustomization
 
 components:
   - ../../components/telemetry
+  - ../../components/paused
 
 resources:
   - ../../base
