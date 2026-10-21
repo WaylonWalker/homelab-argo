@@ -1,0 +1,32 @@
+project_identifier: waylonwalker-com-prod-nvme-ab-a
+
+builderAdmin:
+  webhook:
+    existingSecretName: issue-143-webhook-a
+  networkPolicy:
+    traefikNamespace: waylonwalker-com-prod-nvme-ab-a-notes
+    traefikNamespaceSelector:
+      kubernetes.io/metadata.name: waylonwalker-com-prod-nvme-ab-a-notes
+
+storage:
+  source:
+    mode: pvc
+    storageClassName: longhorn
+    size: 10Gi
+    accessModes:
+      - ReadWriteOnce
+  site:
+    mode: pvc
+    storageClassName: longhorn
+    size: 30Gi
+    volumeName: issue-143-ab-a-site-pv
+    accessModes:
+      - ReadWriteOnce
+  cache:
+    enabled: true
+    mode: hostPath
+    hostPath:
+      path: /var/lib/markata-go/issue-143/ab-a/cache
+      type: Directory
+    accessModes:
+      - ReadWriteOnce
