@@ -11,6 +11,11 @@ Argo CD Application: `forgejo-mcp`, deployed from `k8s/forgejo-mcp`.
   Anonymous requests are rejected by the upstream server. No global
   service-side Forgejo token is stored or configured. Do **not** turn on
   `--allow-operator-token-fallback`.
+- Forgejo currently runs v17.0.0. The deployment still uses passthrough mode;
+  OAuth resource-server mode is not enabled.
+
+See [the OAuth runbook](oidc-runbook.md) for the planned ChatGPT connection,
+deployment checks, rollback, and known gates.
 
 ## Connecting a client
 
@@ -43,8 +48,10 @@ A GET alone with a token is not a complete MCP protocol health test.
   Traefik and any HTTP logs must not record Authorization headers.
 - The MCP server forwards a client's PAT to Forgejo. Use separate
   least-privilege tokens for each agent and revoke compromised tokens.
-- The MCP server's OAuth resource-server mode requires Forgejo 16+;
-  this homelab currently deploys Forgejo 13, so this uses token passthrough.
+- The MCP server's OAuth resource-server mode requires Forgejo 16+; the
+  homelab's current Forgejo v17 meets that requirement. The current MCP
+  deployment still uses token passthrough until HLab Auth OIDC and the
+  resource-server configuration pass the runbook's gates.
 - Not all ChatGPT plans or clients support registering a remote MCP with
   custom Authorization headers. Deploying this service alone does not
   connect ChatGPT to it.
