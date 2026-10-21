@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgejo-ssh-known-hosts
+  namespace: recipes-waylonwalker-com
+data:
+  known_hosts: forgejo.forgejo.svc.cluster.local ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGzs6CjggmNo2GxcmiLg/ewvilkz+/ILRBMTJCSu08GK

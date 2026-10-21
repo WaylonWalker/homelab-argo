@@ -63,6 +63,8 @@ spec:
               value: "2"
             - name: MARKATA_GO_BUILDER_ADMIN_STARTUP_REBUILD
               value: "true"
+            - name: GIT_SSH_COMMAND
+              value: ssh -i /ssh-key/id_ed25519 -o UserKnownHostsFile=/ssh-known-hosts/known_hosts -o StrictHostKeyChecking=yes
           resources:
             requests:
               cpu: 25m
@@ -77,6 +79,12 @@ spec:
             - name: source
               mountPath: /data/source
               subPath: source
+            - name: source-ssh-key
+              mountPath: /ssh-key
+              readOnly: true
+            - name: source-ssh-known-hosts
+              mountPath: /ssh-known-hosts
+              readOnly: true
           ports:
             - name: builder-admin
               containerPort: 8080
@@ -117,7 +125,7 @@ spec:
             - |
               install -m 0700 -d /root/.ssh
               install -m 0600 /ssh/id_ed25519 /root/.ssh/id_ed25519
-              ssh-keyscan -p 22 forgejo.forgejo.svc.cluster.local >> /root/.ssh/known_hosts
+              install -m 0644 /ssh-known-hosts/known_hosts /root/.ssh/known_hosts
               git clone --branch main --single-branch \
                 ssh://git@forgejo.forgejo.svc.cluster.local:22/waylon/recipes.waylonwalker.com \
                 /data/source
@@ -127,18 +135,25 @@ spec:
           volumeMounts:
             - name: source
               mountPath: /data
-            - name: source-ssh
+            - name: source-ssh-key
               mountPath: /ssh
+              readOnly: true
+            - name: source-ssh-known-hosts
+              mountPath: /ssh-known-hosts
               readOnly: true
       volumes:
         - name: source
           emptyDir: {}
         - name: work
           emptyDir: {}
-        - name: source-ssh
+        - name: source-ssh-key
           secret:
             secretName: builder-source-ssh
             defaultMode: 0400
+        - name: source-ssh-known-hosts
+          configMap:
+            name: forgejo-ssh-known-hosts
+            defaultMode: 0444
         - name: webroot
           persistentVolumeClaim:
             claimName: webroot

@@ -10,3 +10,4 @@ resources:
   - pvc.yaml
   - pv.yaml
   - network-policy.yaml
+  - forgejo-ssh-known-hosts.yaml
