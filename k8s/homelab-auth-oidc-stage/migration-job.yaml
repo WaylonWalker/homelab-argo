@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: migrate
-          image: registry.wayl.one/hlab-auth@sha256:13103bf8ad2ca25f74daf2516f1ed8afa244534d3a33a9de134619b4baf5b8b6
+          image: registry.wayl.one/hlab-auth@sha256:9b21c4a6da20ed344c32586bd3151a1788057aa550c5f70d52714060a1b3e73c
           command: ["alembic", "upgrade", "head"]
           envFrom:
             - secretRef:
