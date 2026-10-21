@@ -41,9 +41,9 @@ storage:
 build:
   enabled: false
   fetchImage:
-    tag: sha-d37c9dd
+    tag: sha-8682b60
   builderImage:
-    tag: sha-d37c9dd
+    tag: sha-8682b60
   fast: false
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

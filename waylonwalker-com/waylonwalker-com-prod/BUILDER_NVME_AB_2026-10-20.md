@@ -130,8 +130,30 @@ The new site backup completed at `2026-10-21T02:29:42Z`. It covers volume `pvc-c
 
 Disposable restore volumes `issue-143-site-restore-20261021` and `issue-143-source-restore-20261021` were created from these backups. The source restore completed. A read-only pod mounted it and confirmed the sentinel hash `816705def28caf37623b50c987c41115a58b5f8549ebf7e54c18e782e9291aee` for `/restore/markata-go.toml`; the Git checkout is present. The site restore advanced to 100%, detached, and cleared `restoreRequired`. A read-only pod confirmed that `/restore/current/index.html` has the recorded pre-backup SHA-256 `431b7f5671582a98626829013deab3de2b8af59f4dcbd1e54f875456ed2679c6`.
 
-At `2026-10-21T02:54Z`, Falcon3 `/var` had 284 GiB free of 466 GiB (61%) and 242,919,714 free inodes. This clears the 20% free-space floor before trial work, but peak-build and recovery headroom still need measurement. The production site PVC still has one running replica on Falcon3, while Falcon2's other `fast` disk is not schedulable. Keep production settings and serving paths unchanged. The issue permits an isolated canary; the degraded production volume remains a recovery risk and blocks any production cutover until its resilience is restored. The production builder was running a manual UI build at `2026-10-21T02:54Z`; cache cloning must wait until it is idle.
+At `2026-10-21T03:18Z`, Falcon3 `/var` had 274 GiB free of 466 GiB (59%) and about 242.9 million free inodes. This clears the 20% free-space floor before trial work, but peak-build and recovery headroom still need measurement. The production site PVC still has one running replica on Falcon3, while Falcon2's other `fast` disk is not schedulable. Keep production settings and serving paths unchanged. The issue permits an isolated canary; the degraded production volume remains a recovery risk and blocks any production cutover until its resilience is restored.
 
-The source restore test pod and its temporary PV/PVC are retained in `waylonwalker-com-prod-notes`. The site restore test pod and temporary PV/PVC are also retained there. The site and source restore volumes are detached and healthy. Their restored sentinels passed. No canary build has run yet.
+The source and site restore sentinel checks passed. Their temporary PV/PVC bindings were moved from the restore-check namespace into the A canary namespace. Both restore Longhorn volumes remain detached when not mounted. The source sentinel is `markata-go.toml`; the site sentinel is `current/index.html`. A seed-copy pod is copying the restored site and source trees to the B host paths and copying the idle production cache into separate A and B host paths. It is also generating checksummed tree manifests that compare file contents, links, modes, and owners. The production cache copy began after the production Builder Admin returned to idle. At the last inventory, the seed-copy pod was still hashing; no candidate deployment or build had run.
 
-The original checkout remains unchanged. No canary or production serving configuration has been deployed. A/B measurements have not started.
+### Public serving baseline, 2026-10-21
+
+Before the canary copy started, the public endpoints below each received 20 sequential HTTPS requests. TTFB includes the external network path. A response with status 301 or 404 is expected for the redirect and missing-path rows. No 5xx response occurred.
+
+| Path | Status counts | p50 TTFB | p95 TTFB | n |
+|---|---|---:|---:|---:|
+| `/` | 200: 20 | 0.289 s | 0.334 s | 20 |
+| `/just-fucking-use-kubernetes/` | 200: 20 | 0.285 s | 0.324 s | 20 |
+| `/archive/` | 200: 20 | 0.293 s | 0.325 s | 20 |
+| `/8bitcc.png` | 200: 20 | 0.291 s | 0.311 s | 20 |
+| `/reader/` | 200: 20 | 0.294 s | 0.342 s | 20 |
+| `/rss.xml` | 200: 20 | 0.292 s | 0.325 s | 20 |
+| `/api/search?q=markata` | 200: 20 | 0.311 s | 0.343 s | 20 |
+| `/this-should-404/` | 404: 20 | 0.315 s | 0.348 s | 20 |
+| `https://www.waylonwalker.com/` | 301: 20 | 0.278 s | 0.296 s | 20 |
+
+The final `www` redirect resolves to `https://waylonwalker.com/` with status 200. TLS verification passed. The home page returned `text/html` when the request sent `Accept: application/json`. The home page cache header was `public, max-age=0, s-maxage=60`; `/8bitcc.png` returned `max-age=31536000` and `public, immutable`; `/rss.xml` returned `text/xml`. These are baseline checks only. Repeat them after and during the candidate workload. [Raw HTTPS samples](BUILDER_NVME_AB_TTFB_BEFORE_2026-10-21.jsonl).
+
+The live production Argo application is Synced and Healthy at homelab revision `51431dd50a48787595af0c9456b1684e855e07c8`, with Markata chart revision `aac5b49752518ab84b7541385d0d42706e79a41d`. The live builder image is `sha-8682b60` with digest `sha256:5cf3ef968b47deb861320b4b6ab37e195715e07efb898ef029ccd28079817b2e`; its source commit is `ce0db0c5259f72b1d879f15ce21835aae2b5168b`. The production site Longhorn volume remains degraded: the replica scheduler reports `ReplicaSchedulingFailure` because the required disk tags are not fulfilled.
+
+Two recent production builds used source commit `ce0db0c5259f72b1d879f15ce21835aae2b5168b` and builder image `sha-d37c9dd` (digest `sha256:77dd3fc12892e5952e9c7f997aa23431661cad1662459a1a78f52660b189bbbc`). Their `prepare + build + promote` times were 225.330 s (webhook) and 250.206 s (manual UI), median 237.768 s, n=2. A subsequent startup-revision build on the current `sha-8682b60` image took 271.232 s for `prepare + build + promote`; it is a cold image-revision transition, n=1. These are context only, not matched A/B results, and do not meet the 10-build gate.
+
+The issue A/B application manifests and shared values are in `argo-apps/apps/waylonwalker-com-prod-nvme-ab-{a,b}.yaml` and `values/issue-143/`. Both apps use the pinned Markata chart, separate namespaces, an ingress class with no controller, and automated pruning disabled. The A PV manifest is in `k8s/waylonwalker-com/issue-143/restore-volumes.yaml`. The benchmark harness is `scripts/issue-143-nvme-ab.py`; it alternates matched warm builds, runs two cold-cache builds per arm, records builder and node counters, captures public home-page TTFB during builds, and discards warm pairs that overlap production builds or use a different source commit.
