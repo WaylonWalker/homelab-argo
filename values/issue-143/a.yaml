@@ -16,6 +16,7 @@ storage:
     mode: pvc
     storageClassName: longhorn
     size: 10Gi
+    volumeName: issue-143-ab-a-source-pv
     accessModes:
       - ReadWriteOnce
   site:
