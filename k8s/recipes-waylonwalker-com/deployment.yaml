@@ -41,7 +41,6 @@ spec:
             - /webroot/.builder-admin
             - --releases-keep
             - "5"
-            - --auto-build-on-upgrade
             - --watch=false
             - --webhook-enabled
             - --webhook-branch
@@ -62,6 +61,8 @@ spec:
               value: https://recipes.waylonwalker.com
             - name: MARKATA_GO_CONCURRENCY
               value: "2"
+            - name: MARKATA_GO_BUILDER_ADMIN_STARTUP_REBUILD
+              value: "true"
           resources:
             requests:
               cpu: 100m
