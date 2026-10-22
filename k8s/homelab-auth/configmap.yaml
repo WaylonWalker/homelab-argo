@@ -23,3 +23,7 @@ data:
   HLAB_AUTH_SESSION_ABSOLUTE_TIMEOUT_DAYS: "90"
   HLAB_AUTH_PUBLIC_AUTH_ORIGIN: https://auth.wayl.one
   HLAB_AUTH_TRUSTED_PROXY_CIDRS: '["10.42.0.0/16"]'
+  HLAB_AUTH_OIDC_ENABLED: "true"
+  HLAB_AUTH_OIDC_RESOURCE: https://mcp-oidc-stage.wayl.one/mcp
+  HLAB_AUTH_OIDC_SIGNING_KEY_ID: hlab-auth-oidc-2026-10-22
+  HLAB_AUTH_OIDC_SIGNING_PRIVATE_KEY_FILE: /run/secrets/oidc/private.pem

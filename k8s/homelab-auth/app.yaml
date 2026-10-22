@@ -50,9 +50,19 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: oidc-signing
+              mountPath: /run/secrets/oidc
+              readOnly: true
       volumes:
         - name: tmp
           emptyDir: {}
+        - name: oidc-signing
+          secret:
+            secretName: hlab-auth-oidc-signing
+            defaultMode: 0444
+            items:
+              - key: private.pem
+                path: private.pem
 ---
 apiVersion: v1
 kind: Service
