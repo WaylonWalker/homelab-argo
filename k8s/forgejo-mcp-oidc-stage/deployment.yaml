@@ -44,7 +44,7 @@ spec:
             - name: FORGEJO_MCP_AUTH_MODE
               value: resource-server
             - name: FORGEJO_MCP_AUTHORIZATION_SERVER
-              value: https://auth-oidc-stage.wayl.one
+              value: https://auth.wayl.one
             - name: FORGEJO_MCP_RESOURCE
               value: https://mcp-oidc-stage.wayl.one/mcp
             - name: FORGEJO_MCP_SCOPES_SUPPORTED
