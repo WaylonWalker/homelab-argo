@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - configmap.yaml
+  - oidc-signing-sealed-secret.yaml
   - hlab-auth-pg-app-sealed-secret.yaml
   - hlab-auth-sealed-secret.yaml
   - cnpg-cluster.yaml
