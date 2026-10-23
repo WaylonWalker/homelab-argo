@@ -13,6 +13,19 @@ use_gitignore = true
 [markata-go.layout]
 name = "docs"
 
+[markata-go.theme]
+custom_css = "raccoon-brand.css"
+fontpack = "marker-note"
+
+[markata-go.theme.motif]
+kind = "block-w"
+color = "ink"
+color_mix = 0.012
+
+[[markata-go.head.link]]
+rel = "icon"
+href = "/raccoon-favicon.svg"
+
 [markata-go.auto_feeds.tags]
 enabled = false
 

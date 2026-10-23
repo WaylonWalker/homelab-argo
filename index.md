@@ -1,21 +1,29 @@
 ---
-title: "Homelab documentation"
-description: "Operational notes, architecture records, and runbooks for the WaylonWalker homelab."
-slug: "/"
+title: 'Homelab docs'
+description: 'Runbooks and maps for the homelab, from routine operations to recovery.'
+slug: '/'
 published: true
 template: page
 ---
 
-# Homelab docs
+<section class="docs-home-hero" aria-labelledby="docs-home-title">
+  <div class="docs-home-copy">
+    <p class="docs-home-eyebrow">WAYLON WALKER'S HOMELAB</p>
+    <h1 id="docs-home-title">A small homelab,<br><span>built by <del>hand</del> <em>agents.</em></span></h1>
+    <p class="docs-home-deck">A working map of the services, storage, and recovery paths that keep this homelab running.</p>
+    <p class="docs-home-note">Runbooks, diagrams, and notes from a raccoon cloud in the basement.</p>
+  </div>
+  <figure class="docs-home-art">
+    <img src="/raccoon.svg" alt="A friendly raccoon wearing a glowing Kubernetes visor above homelab server hardware." width="1200" height="875" fetchpriority="high">
+    <figcaption>rescued hardware, surprisingly still running.</figcaption>
+  </figure>
+</section>
 
-This site collects the operational notes and runbooks maintained in the
-[`homelab-argo` repository](https://github.com/WaylonWalker/homelab-argo).
+## Things that live here.
 
-Choose a task to get a focused feed of runbooks and reference pages.
+Pick a task to browse the notes and runbooks.
 
-## Start with a task
-
-::: md-grid {data-columns="2"}
+::: md-grid {data-columns="2" data-gap="lg"}
 
 :::: md-card
 ### [Operate](/operate/)
@@ -34,7 +42,7 @@ Restore workloads, validate backups, and handle recovery work.
 :::: md-card
 ### [Understand](/understand/)
 
-Explore architecture, inventories, and the network map.
+Explore architecture, inventories, and the [network map](/security/issue-174-network-map/).
 
 ::::
 
@@ -46,15 +54,3 @@ Plan and roll out infrastructure changes.
 ::::
 
 :::
-
-## Network map
-
-[Explore the issue #174 dependency map](/security/issue-174-network-map/) for a
-first-pass view of configured service connections. The map labels configured
-edges; it does not claim to show all live traffic.
-
-## Related references
-
-- [Security inventory: issue 174](/security/issue-174-inventory/)
-- [Storage architecture](/storage-architecture/)
-- [Cluster maintenance plan](/cluster-maintenance-2026-10-10/)
