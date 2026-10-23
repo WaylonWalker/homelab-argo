@@ -118,3 +118,40 @@ spec:
           port: 8787
   tls:
     secretName: stillframe-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: stillframe-tunnel-routes
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 3000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 3000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`)
+      priority: 2000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`)
+      priority: 2000
+      services:
+        - name: stillframe
+          port: 8787
