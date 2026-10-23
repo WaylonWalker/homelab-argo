@@ -74,6 +74,8 @@ spec:
               value: /data
             - name: STILLFRAME_FOLDER
               value: /photos
+            - name: STILLFRAME_EXCLUDED_PATHS
+              value: stillframe
             - name: STILLFRAME_MAP_STYLE_URL
               value: https://tiles.openfreemap.org/styles/dark
             - name: STILLFRAME_MAP_CONNECT_ORIGINS
@@ -136,7 +138,7 @@ spec:
             type: Directory
         - name: photos
           hostPath:
-            path: /mnt/main/walkershare/waylon/photos
+            path: /mnt/main/walkershare
             type: Directory
         - name: tmp
           emptyDir:
