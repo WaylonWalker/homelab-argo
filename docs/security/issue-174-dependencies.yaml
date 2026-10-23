@@ -1,0 +1,75 @@
+# Public-safe first-pass dependency graph. Configured edges are not proof of live traffic.
+# Add a rule only after checking selectors, runtime traffic, and background jobs.
+version: 1
+issue: 174
+edges:
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: whoami, service: whoami, port: 5678, protocol: TCP}
+    reason: Public echo routes, including the DNS canary.
+    evidence: [k8s/whoami/deployment.yaml, k8s/whoami/external-dns-canary.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only the live Traefik pod selector to whoami TCP 80.
+  - source: {namespace: whoami, workload: whoami}
+    destination: {namespace: kube-system, service: kube-dns, port: 53, protocol: UDP/TCP}
+    reason: DNS access reserved for the first isolated workload.
+    evidence: [k8s/whoami/networkpolicy.yaml]
+    confidence: medium
+    observation: policy-allow-only
+    proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
+  - source: {namespace: forgejo, workload: forgejo}
+    destination: {namespace: forgejo, service: forgejo-db-rw, port: 5432, protocol: TCP}
+    reason: Application database.
+    evidence: [k8s/forgejo/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Forgejo.
+  - source: {namespace: forgejo-mcp, workload: forgejo-mcp}
+    destination: {namespace: forgejo, service: forgejo, port: 3000, protocol: TCP}
+    reason: User-scoped Forgejo API requests.
+    evidence: [k8s/forgejo-mcp/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Forgejo MCP.
+  - source: {namespace: recipes-waylonwalker-com, workload: web}
+    destination: {namespace: forgejo, service: forgejo, port: 22, protocol: TCP}
+    reason: Source checkout over SSH.
+    evidence: [k8s/recipes-waylonwalker-com/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve for builder jobs, including infrequent runs.
+  - source: {namespace: shot, workload: shot-wayl-one-and-worker}
+    destination: {namespace: shot, service: shots-redis, port: 6379, protocol: TCP}
+    reason: Queue state.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve for API and worker pods.
+  - source: {namespace: shot, workload: shot-wayl-one-and-worker}
+    destination: {namespace: minio, service: minio, port: 9000, protocol: TCP}
+    reason: Object storage.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating shot workloads.
+  - source: {namespace: shot, workload: shot-wayl-one-and-worker}
+    destination: {namespace: observability, service: otel-collector-opentelemetry-collector, port: 4317, protocol: TCP}
+    reason: OTLP traces.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve telemetry egress.
+  - source: {namespace: brainrot, workload: brainrot}
+    destination: {namespace: kokoro, service: kokoro, port: 80, protocol: TCP}
+    reason: Text-to-speech requests.
+    evidence: [k8s/brainrot/helm-chart/values.yaml]
+    confidence: medium
+    observation: configured
+    proposed_rule: Verify service port and live usage before a policy.
+  - source: {namespace: brainrot, workload: brainrot}
+    destination: {namespace: observability, service: otel-collector-opentelemetry-collector, port: 4317, protocol: TCP}
+    reason: OTLP traces.
+    evidence: [k8s/brainrot/helm-chart/values.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve telemetry egress.
