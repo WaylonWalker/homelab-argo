@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/waylonwalker/k8s-basic.git'
+    repoURL: 'https://git.wayl.one/waylon/k8s-basic.git'
     targetRevision: HEAD
     path: helm-chart
     helm:
