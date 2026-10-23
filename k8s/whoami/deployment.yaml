@@ -22,6 +22,7 @@ spec:
       annotations:
         diun.enable: "true"
     spec:
+      automountServiceAccountToken: false
       tolerations:
         - key: "performance"
           operator: "Equal"
