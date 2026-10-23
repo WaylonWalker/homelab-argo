@@ -1,0 +1,14 @@
+[markata-go]
+title = "Homelab Docs"
+description = "Operational notes and runbooks for the WaylonWalker homelab."
+url = "https://homelab.waylonwalker.com"
+output_dir = "output"
+templates_dir = "templates"
+assets_dir = "site-assets"
+
+[markata-go.glob]
+patterns = ["index.md", "docs/**/*.md"]
+use_gitignore = true
+
+[markata-go.layout]
+name = "docs"
