@@ -53,3 +53,10 @@ routes returned HTTP 200 before the policy. Other backend egress is denied.
 This rule depends on the deployed image continuing to use local results
 storage and no configured external IP information service. Recheck those
 settings before enabling optional LibreSpeed features or changing the image.
+
+The `themes.waylonwalker.com` static site is a separate policy target. Its
+nginx pod serves a mounted webroot and has no configured upstream proxy or
+application egress. The Faro telemetry script is inserted into HTML for the
+visitor's browser; it is not a connection from the nginx pod. The policy in
+that site's overlay allows Traefik ingress and CoreDNS egress only. Recheck
+the nginx template before adding server-side proxy features.

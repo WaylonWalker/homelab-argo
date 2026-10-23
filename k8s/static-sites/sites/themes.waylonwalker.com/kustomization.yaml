@@ -8,6 +8,7 @@ resources:
   - ../../base
   - ../../components/hostpath-webroot
   - site-config.yaml
+  - networkpolicy.yaml
 
 # This site uses the editor's remote motif image picker, so keep its checked
 # security and validator policy local to this deployment.
