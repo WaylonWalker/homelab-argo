@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - forgejo-mcp-stage-signing-sealed-secret.yaml
   - deployment.yaml
+  - no-cache-middleware.yaml

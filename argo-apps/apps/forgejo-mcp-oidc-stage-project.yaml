@@ -36,3 +36,5 @@ spec:
       kind: Ingress
     - group: bitnami.com
       kind: SealedSecret
+    - group: traefik.io
+      kind: Middleware
