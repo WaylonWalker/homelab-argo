@@ -171,3 +171,17 @@ edges:
     confidence: high
     observation: ingress-configured-and-http-200; chart-render-diff-is-networkpolicy-only
     proposed_rule: Allow only the live Traefik pod selector on TCP 8000; use the active k8s-basic Forgejo chart.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: models, service: models, port: 8080, protocol: TCP}
+    reason: Authenticated public model catalog routes.
+    evidence: [k8s/models/ingress.yaml, k8s/models/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-auth-redirect
+    proposed_rule: Allow only the live Traefik pod selector on TCP 8080.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: models-dev, service: models-dev, port: 8080, protocol: TCP}
+    reason: Authenticated development model catalog routes.
+    evidence: [k8s/models-dev/ingress.yaml, k8s/models-dev/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-auth-redirect
+    proposed_rule: Allow only the live Traefik pod selector on TCP 8080.
