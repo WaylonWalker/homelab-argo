@@ -33,7 +33,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: stillframe
-          image: registry.wayl.one/stillframe@sha256:402864a33c8dad6ec65b31c7a7903fb167126fa943b1c975bc5815f55a865e7b
+          image: registry.wayl.one/stillframe@sha256:a0e6c4da07818ede4c3dca934097c54aaf9e09b2b8cd324161b555b726255f6e
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
