@@ -1,0 +1,108 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stillframe-strip-hlab-identity
+spec:
+  headers:
+    customRequestHeaders:
+      X-Hlab-User-Id: ""
+      X-Hlab-Username: ""
+      X-Hlab-Display-Name: ""
+      X-Hlab-Email: ""
+      X-Hlab-Groups: ""
+      X-Hlab-Roles: ""
+      X-Hlab-Scopes: ""
+      X-Hlab-Auth-Method: ""
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stillframe-forward-auth
+spec:
+  forwardAuth:
+    address: http://hlab-auth.hlab-auth.svc.cluster.local:8000/api/v1/forward-auth
+    trustForwardHeader: false
+    addAuthCookiesToResponse:
+      - __Host-hlab-app-session
+    authResponseHeaders:
+      - X-Hlab-User-Id
+      - X-Hlab-Username
+      - X-Hlab-Display-Name
+      - X-Hlab-Email
+      - X-Hlab-Groups
+      - X-Hlab-Roles
+      - X-Hlab-Scopes
+      - X-Hlab-Auth-Method
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stillframe-auth
+spec:
+  chain:
+    middlewares:
+      - name: stillframe-strip-hlab-identity
+      - name: stillframe-forward-auth
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stillframe-public
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - stillframe.waylonwalker.com
+        - stillframe.wayl.one
+      secretName: stillframe-tls
+  rules:
+    - host: stillframe.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: stillframe
+                port:
+                  name: http
+    - host: stillframe.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: stillframe
+                port:
+                  name: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: stillframe-protected-routes
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 1000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 1000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+  tls:
+    secretName: stillframe-tls

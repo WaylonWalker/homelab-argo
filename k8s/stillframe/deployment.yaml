@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stillframe
+  labels:
+    app.kubernetes.io/name: stillframe
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stillframe
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stillframe
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: cluster-regcred
+      nodeSelector:
+        kubernetes.io/hostname: falcon3
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        # The Walkershare SMB mount is uid/gid 1000 and mode 0775.
+        # Keep the app unprivileged while granting read access through this group.
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: stillframe
+          image: registry.wayl.one/stillframe@sha256:402864a33c8dad6ec65b31c7a7903fb167126fa943b1c975bc5815f55a865e7b
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8787
+          env:
+            - name: STILLFRAME_MODE
+              value: hosted
+            - name: STILLFRAME_DATA
+              value: /data
+            - name: STILLFRAME_FOLDER
+              value: /photos
+            - name: STILLFRAME_PUBLIC_URL
+              value: https://stillframe.waylonwalker.com
+            - name: STILLFRAME_TRUSTED_PROXY_CIDRS
+              value: 10.42.0.0/24
+            - name: STILLFRAME_OTEL_ENABLED
+              value: "true"
+            - name: STILLFRAME_ENVIRONMENT
+              value: production
+            - name: OTEL_SERVICE_NAME
+              value: stillframe
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: photos
+              mountPath: /photos
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: stillframe-data
+        - name: photos
+          hostPath:
+            path: /mnt/main/walkershare/waylon/photos
+            type: Directory
+        - name: tmp
+          emptyDir:
+            sizeLimit: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stillframe
+spec:
+  selector:
+    app.kubernetes.io/name: stillframe
+  ports:
+    - name: http
+      port: 8787
+      targetPort: http
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: stillframe-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: longhorn
