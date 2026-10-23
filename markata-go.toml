@@ -26,6 +26,9 @@ color_mix = 0.012
 rel = "icon"
 href = "/raccoon-favicon.svg"
 
+[[markata-go.head.script]]
+src = "/raccoon-theme.js"
+
 [markata-go.auto_feeds.tags]
 enabled = false
 
