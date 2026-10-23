@@ -21,7 +21,7 @@ spec:
         - name: cluster-regcred
       initContainers:
         - name: cache-search-models
-          image: registry.wayl.one/stillframe@sha256:469835b7c95129ddb30a32ef8846a527ed736c40c27d24d18915514f3795f011
+          image: registry.wayl.one/stillframe@sha256:2a0e2ea8968330aa55a3a1de2d8a0bae3429231d7b90c42a5dadb5ffa5496aee
           imagePullPolicy: IfNotPresent
           command:
             - /app/.venv/bin/python
@@ -62,7 +62,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: stillframe
-          image: registry.wayl.one/stillframe@sha256:469835b7c95129ddb30a32ef8846a527ed736c40c27d24d18915514f3795f011
+          image: registry.wayl.one/stillframe@sha256:2a0e2ea8968330aa55a3a1de2d8a0bae3429231d7b90c42a5dadb5ffa5496aee
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
