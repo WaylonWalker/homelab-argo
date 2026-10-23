@@ -115,3 +115,17 @@ edges:
     confidence: medium
     observation: configured-dynamic-egress
     proposed_rule: Defer policy until feed hosts, redirects, and DNS behavior are measured.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: librespeed, service: librespeed, port: 80, protocol: TCP}
+    reason: Public speed test routes and backend requests.
+    evidence: [k8s/librespeed/librespeed.yaml, k8s/librespeed/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only the live Traefik pod selector to LibreSpeed TCP 80.
+  - source: {namespace: librespeed, workload: librespeed}
+    destination: {namespace: kube-system, service: kube-dns, port: 53, protocol: UDP/TCP}
+    reason: DNS access reserved for the isolated backend.
+    evidence: [k8s/librespeed/networkpolicy.yaml]
+    confidence: medium
+    observation: policy-allow-only
+    proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
