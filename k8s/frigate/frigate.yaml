@@ -109,10 +109,10 @@ spec:
           #     gpu.intel.com/i915: 1
           resources:
             requests:
-              memory: 2Gi
+              memory: 6Gi
               cpu: "1"
             limits:
-              memory: 6Gi
+              memory: 12Gi
               cpu: "2"
           volumeMounts:
             - mountPath: /config
