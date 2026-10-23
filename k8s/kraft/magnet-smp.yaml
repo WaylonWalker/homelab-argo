@@ -6,7 +6,9 @@ metadata:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  # not a backup, but uses a longhorn storage class with backup applied
+  # Retain the saved world if this resource is pruned.
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
   name: magnet-smp-season2-data
   namespace: magnet-smp
 spec:
@@ -42,7 +44,7 @@ metadata:
   name: magnet-smp-pdb
   namespace: magnet-smp
 spec:
-  minAvailable: 1
+  minAvailable: 0
   selector:
     matchLabels:
       app: magnet-smp
