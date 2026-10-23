@@ -27,6 +27,17 @@ body:has(.docs-home-hero) .post-header {
   background: center / contain no-repeat url("/raccoon-nav.svg");
 }
 
+.site-header .site-title:has(.site-title-mark)::before {
+  display: none;
+}
+
+.site-header .site-title-mark {
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
+}
+
 .docs-home-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(250px, 0.65fr);
