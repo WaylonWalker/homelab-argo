@@ -105,7 +105,13 @@ spec:
         - name: stillframe
           port: 8787
     - kind: Rule
-      match: Host(`stillframe.waylonwalker.com`) || Host(`stillframe.wayl.one`)
+      match: Host(`stillframe.waylonwalker.com`)
+      priority: 2000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`)
       priority: 2000
       services:
         - name: stillframe
