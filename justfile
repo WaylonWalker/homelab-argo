@@ -703,12 +703,14 @@ update-markata-image-pin image_tag="" scope="all":
       argo-apps/apps/waylonwalker-com-prod.yaml
       argo-apps/apps/wyattbubbylee-com-prod.yaml
       argo-apps/apps/rhiannonwalker-com-prod.yaml
+      k8s/homelab-docs/helm-values.yaml
     )
     case "$scope" in
       all) files=("${all_files[@]}") ;;
       prod-builder) files=(argo-apps/apps/waylonwalker-com-prod.yaml) ;;
+      homelab-docs) files=(k8s/homelab-docs/helm-values.yaml) ;;
       *)
-        echo "Usage: just update-markata-image-pin [sha-<published-commit>] [all|prod-builder]" >&2
+        echo "Usage: just update-markata-image-pin [sha-<published-commit>] [all|prod-builder|homelab-docs]" >&2
         exit 1
         ;;
     esac
@@ -764,8 +766,12 @@ update-markata-image-pin image_tag="" scope="all":
 
     for file in "${files[@]}"; do
       tag_count="$(grep -Ec '^[[:space:]]+tag: sha-[0-9a-f]+$' "$file")"
-      if [[ "$tag_count" != 3 ]]; then
-        echo "Expected three Markata image tags in $file; found $tag_count." >&2
+      expected_tag_count=3
+      if [[ "$file" == "k8s/homelab-docs/helm-values.yaml" ]]; then
+        expected_tag_count=2
+      fi
+      if [[ "$tag_count" != "$expected_tag_count" ]]; then
+        echo "Expected $expected_tag_count Markata image tags in $file; found $tag_count." >&2
         exit 1
       fi
     done
@@ -803,7 +809,7 @@ update-markata-image-pin image_tag="" scope="all":
       application/1-apps -n argocd --timeout=600s
 
     kubectl annotate application 1-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
-    apps=(go-waylonwalker-com waylonwalker-com-prod wyattbubbylee-com-prod rhiannonwalker)
+    apps=(go-waylonwalker-com waylonwalker-com-prod wyattbubbylee-com-prod rhiannonwalker homelab-docs)
     for app in "${apps[@]}"; do
       kubectl annotate application "$app" -n argocd argocd.argoproj.io/refresh=hard --overwrite
       kubectl wait \
