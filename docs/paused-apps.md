@@ -14,7 +14,7 @@ This page records workloads that currently have zero replicas. A zero replica co
 | `kube-system/headlamp` | Argo CD `headlamp` application | At zero. The application remains managed by Argo CD. |
 | `posse-party/posse-party` and `posse-party/posse-party-db` | Argo CD `posse-party` application | App Deployment is zero; CNPG database is hibernated. PVC is retained. Remove the hibernation annotation and set `enablePDB: true` (or omit it) before resuming the database. |
 | `postiz/postiz`, `postiz/postiz-redis`, and `postiz/postiz-db` | Argo CD `postiz` application | Both Deployments are zero; CNPG database is hibernated. Four PVCs remain Bound. Remove the hibernation annotation and set `enablePDB: true` (or omit it) before resuming the database. |
-| `magnet-smp/magnet-smp` | Argo CD `kraft` application after this change | Deployment remains at zero. Season 2 PVC is retained and protected from Argo pruning; the separate season 3 PVC remains outside this manifest. Set replicas to one to resume the server. |
+| `magnet-smp/magnet-smp` | Argo CD `kraft` application after this change | Deployment remains at zero. Season 2 PVC is retained and protected from Argo pruning; the separate season 3 PVC remains outside this manifest. Restore the `magnet-smp-pdb` resource with `minAvailable: 1` and set replicas to one when resuming the server. |
 
 ## Live zero replicas without confirmed GitOps ownership
 
@@ -40,4 +40,4 @@ Do not delete PVCs as part of a pause or resume. Paused databases do not need a 
 
 ## Review scope
 
-The cluster inventory found five PDBs with zero expected pods and `InsufficientPods`: Magnet SMP, two PerformPeoria databases, Posse Party, and Postiz. This change addresses the Argo-managed Magnet SMP, Posse Party, and Postiz resources. PerformPeoria's CNPG resources are managed outside this repository and remain unmodified. PDBs for active workloads were left unchanged.
+The cluster inventory found five PDBs with zero expected pods and `InsufficientPods`: Magnet SMP, two PerformPeoria databases, Posse Party, and Postiz. This change addresses the Argo-managed Magnet SMP, Posse Party, and Postiz resources. The paused Magnet SMP PDB is removed because Kubernetes still reports `DisruptionAllowed=False` when `minAvailable` is zero and no pods exist. PerformPeoria's CNPG resources are managed outside this repository. I set `enablePDB: false` on both live, hibernated CNPG clusters to remove their warnings. This live change is not persisted in the uninitialized PerformPeoria source checkout; its manifests need to be updated before a future apply. PDBs for active workloads were left unchanged.

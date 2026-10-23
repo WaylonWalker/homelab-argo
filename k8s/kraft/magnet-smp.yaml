@@ -38,17 +38,6 @@ spec:
       protocol: TCP
   type: ClusterIP
 ---
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: magnet-smp-pdb
-  namespace: magnet-smp
-spec:
-  minAvailable: 0
-  selector:
-    matchLabels:
-      app: magnet-smp
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
