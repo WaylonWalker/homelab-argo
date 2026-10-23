@@ -1,9 +1,10 @@
 # Stillframe
 
-The app runs on `falcon3` and reads all of `/mnt/main/walkershare` at `/photos`,
-mounted read-only. Hidden directories are skipped by the scanner, and
-`STILLFRAME_EXCLUDED_PATHS=stillframe` keeps the app's own previews, models,
-and database out of the photo catalog. The app data lives in the separate
+The app runs on `falcon3` and reads `/mnt/main/walkershare` at `/photos`,
+mounted read-only. Hidden directories are skipped by the scanner. Explicit
+`STILLFRAME_EXCLUDED_PATHS` entries keep the app's own data and website/game
+repository outputs out of the photo catalog; `STILLFRAME_EXCLUDED_DIR_NAMES`
+also skips `websites` and `output` directories at any depth. The app data lives in the separate
 `main/walkershare/stillframe` ZFS child dataset, mounted at
 `/mnt/main/walkershare/stillframe`; it inherits Walkershare's LZ4 compression
 and 128 KiB record size. The original Longhorn `stillframe-data` claim is
