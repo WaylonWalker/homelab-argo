@@ -75,6 +75,8 @@ builderAdmin:
     enabled: true
     host: build-homelab.waylonwalker.com
     ingressClassName: traefik
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: build-homelab.waylonwalker.com
     tls:
       enabled: true
       secretName: build-homelab-docs-tls
