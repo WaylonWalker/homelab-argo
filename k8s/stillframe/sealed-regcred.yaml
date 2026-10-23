@@ -1,0 +1,14 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: cluster-regcred
+  namespace: stillframe
+spec:
+  encryptedData:
+    .dockerconfigjson: AgBC6WFDFmrFFyFYa6CkS5cITGss0bcf5AzqI1vXS4gngcAze8gDXzx1Hhnls0fVTayWER4bV4/wJUYdDqzgHA5CWpFLnkCM/J1eA3GEQJZd97Y1+Hsw0VB/qb/1XACl974dgHJdhOlXNaXo9/MwXvbEOyjErtnBd7VwEdzFH5jjUkiJA2twjvH1wp/S/xh9Ws+x1wrvd9fAUurbgdHrqKCLcPCq7wycc7/8Dm1xG6evNFv5/gcVEdLR+S4jQkhQ6KODQRZL6YEBytpZrF8sZKdyALj5ub9SYhoFMx/9jUDYOusGNHTf0tQNnMqKgc96jAXyYlgL14OKqKaZa+Y0sTv5ehT5TX5/9z6OoNWDZU14VfTxn0eykIdsNUFasY1kLpk/epZjMB+GYmnpf+ATdqp9u1p6JW5CBaaGU1dB/OsR4BqgOFc/QEhXZbhpl+YijwXkSYWEqbYxComMi50XaY4ifbOqbN4WLjP3lh7yhMaR9LUDh3QuuITtRKuAWQEqgdMGz+MNnzfw1LZxjuKMPxcz8KgLONIzEWbExMQ3NplSzDA0b7FC0bcsP0EjRTwHO/MOgS4i/G/1Z/GjZR7mcFWyl42uhkh4iFfb3U9pY4lJryqsiNRTe1zzGjQ7htcyN41a86+3IhNecDNtcEHzlHy/pioEps3hiyhh/dwaoQBOQdh1Pxfe9iVcDaCeQWIatQa2kMnAT6TjOW01bf+t3UZGW8OvoBUyCf4l86y36T2AfKsUgMCJlNdxBidbTXMMwUGzO4snCJP5VjrgU/KCRxwevEd6n7D4fxr68Y9sshiXeXgqy0S4OzzW5vV9kA/KM4+wRAqEfo1LAQ==
+  template:
+    metadata:
+      name: cluster-regcred
+      namespace: stillframe
+    type: kubernetes.io/dockerconfigjson
