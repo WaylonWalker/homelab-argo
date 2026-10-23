@@ -4,6 +4,9 @@ image:
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
+privateRegistry:
+  enabled: false
+  encryptedDockerConfig: ""
 ingress:
   hosts:
     - listen.waylonwalker.com

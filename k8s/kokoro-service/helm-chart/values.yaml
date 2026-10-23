@@ -4,6 +4,9 @@ image:
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: regcred
+privateRegistry:
+  enabled: false
+  encryptedDockerConfig: ""
 auth:
   secretName: kokoro-service-auth
   secretKey: KOKORO_API_TOKEN

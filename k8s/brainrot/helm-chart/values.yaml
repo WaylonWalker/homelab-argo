@@ -4,6 +4,9 @@ image:
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: cluster-regcred
+privateRegistry:
+  enabled: false
+  encryptedDockerConfig: ""
 telemetry:
   endpoint: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
   sampleRatio: "1.0"

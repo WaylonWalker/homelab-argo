@@ -16,9 +16,14 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: {{ .Values.nodeName | quote }}
       {{- end }}
+      {{- if .Values.privateRegistry.enabled }}
+      imagePullSecrets:
+        - name: registry-pull
+      {{- else }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
       {{- toYaml . | nindent 6 }}
+      {{- end }}
       {{- end }}
       securityContext:
         fsGroup: 10001

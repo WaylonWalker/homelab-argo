@@ -14,9 +14,14 @@ spec:
       annotations:
         kokoro.wayl.one/token-revision: {{ .Values.ttsService.tokenRevision | quote }}
     spec:
+      {{- if .Values.privateRegistry.enabled }}
+      imagePullSecrets:
+        - name: registry-pull
+      {{- else }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- end }}
       securityContext:
         fsGroup: 10001
