@@ -35,3 +35,14 @@ service-account token mounts and RBAC by workload; inspect privileged and
 hostPath workloads individually. Avoid publishing internal addresses or secret
 values. Check Cloudflare Access and application authentication separately from
 cluster routing.
+
+The second scan of `~/git` found more paths in app source repos. It confirmed
+that Brainrot has scheduled RSS and Dropper HTTP clients, Shot has Redis and S3
+clients, and Lantern Table uses Valkey for public-mode signaling. The public
+graph now includes only connections already visible in this GitOps repository.
+The detailed map for private app repositories is kept locally and is not
+published here. In particular, a forward-auth URL in an Ingress chart means
+Traefik calls the auth service; the protected application is not the caller.
+LibreSpeed is the next isolated policy candidate: its deployed manifest has
+only a timezone variable, no mounted app configuration, and no configured
+database or IP information service. Verify its backend routes during rollout.

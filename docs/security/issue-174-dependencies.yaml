@@ -73,3 +73,45 @@ edges:
     confidence: high
     observation: configured
     proposed_rule: Preserve telemetry egress.
+  - source: {namespace: lantern-table, workload: lantern-table}
+    destination: {namespace: lantern-table, service: lantern-valkey, port: 6379, protocol: TCP}
+    reason: Shared state for public mode and multi-replica signaling.
+    evidence: [k8s/lantern-table/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Lantern Table.
+  - source: {namespace: article-listener, workload: article-listener}
+    destination: {namespace: kokoro, service: kokoro, port: 80, protocol: TCP}
+    reason: Text-to-speech requests.
+    evidence: [k8s/article-listener/helm-chart/values.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Article Listener.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: hlab-auth, service: hlab-auth, port: 8000, protocol: TCP}
+    reason: Forward authentication for protected app routes.
+    evidence: [k8s/brainrot/helm-chart/values.yaml, k8s/article-listener/helm-chart/values.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve Traefik to auth before changing protected app ingress.
+  - source: {namespace: shot, workload: shot-wayl-one-cleanup}
+    destination: {namespace: shot, service: shot-wayl-one, port: 5000, protocol: TCP}
+    reason: Scheduled queue cleanup endpoint.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured-batch-job
+    proposed_rule: Preserve the CronJob path even if short traffic samples show none.
+  - source: {namespace: forgejo, workload: forgejo-runner}
+    destination: {namespace: forgejo, service: forgejo, port: 3000, protocol: TCP}
+    reason: Runner registration and job polling when resumed.
+    evidence: [k8s/forgejo/runner.yaml]
+    confidence: high
+    observation: configured-paused
+    proposed_rule: Keep in the recovery design; runner currently has zero replicas.
+  - source: {namespace: brainrot, workload: brainrot}
+    destination: {namespace: external, service: public-rss-feeds, port: 443, protocol: TCP}
+    reason: Scheduled feed polling and user-added public feeds.
+    evidence: [k8s/brainrot/helm-chart/values.yaml]
+    confidence: medium
+    observation: configured-dynamic-egress
+    proposed_rule: Defer policy until feed hosts, redirects, and DNS behavior are measured.
