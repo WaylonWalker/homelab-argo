@@ -31,11 +31,24 @@ spec:
           ports:
             - containerPort: 8000
               name: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
           readinessProbe:
+            timeoutSeconds: 3
             httpGet:
               path: /health/ready
               port: http
           livenessProbe:
+            timeoutSeconds: 3
             httpGet:
               path: /health/live
               port: http
