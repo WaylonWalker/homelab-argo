@@ -150,3 +150,10 @@ edges:
     confidence: high
     observation: ingress-configured-and-http-200
     proposed_rule: Allow the live Traefik pod selector to the app pods on TCP 8765.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: shot, service: shot-wayl-one, port: 5000, protocol: TCP}
+    reason: Public screenshot API routes.
+    evidence: [k8s/shots/deployment.yaml, k8s/shots/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only Traefik and the cleanup CronJob pod to the API.

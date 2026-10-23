@@ -345,6 +345,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            app: shot-wayl-one-cleanup
         spec:
           restartPolicy: Never
           containers:
