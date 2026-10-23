@@ -5,10 +5,11 @@ which is the existing Walkershare mount. Only the dedicated `photos`
 directory is mounted into the app, read-only. The library index, previews,
 models, and edits live in the `main/walkershare/stillframe` ZFS child dataset,
 mounted at `/mnt/main/walkershare/stillframe`. It inherits Walkershare's LZ4
-compression and 128 KiB record size. An init container copies the existing
-Longhorn data there before the app starts. The old `stillframe-data` claim is
-retained as a rollback copy and excluded from Argo pruning until migration is
-verified. Snapshot scheduling is managed separately from this deployment.
+compression and 128 KiB record size. The app remains pinned to `falcon3`, which
+hosts both the dataset and read-only photos. The original Longhorn
+`stillframe-data` claim is retained unmounted as a rollback copy and excluded
+from Argo pruning. Snapshot scheduling is managed separately from this
+deployment.
 
 The public home page is available on both hostnames:
 
