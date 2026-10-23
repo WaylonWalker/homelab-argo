@@ -25,9 +25,11 @@ If the service cannot limit permissions, record that limit. Use the credential o
 ## Scan changes
 
 - Run the repository pre-commit checks before you commit.
-- Keep secret scanning enabled for every pull request. Scan the current source tree.
+- Keep secret scanning enabled for every pull request. Scan both the current source tree and the pull request commit range.
 - Allow known false positives only with a narrow rule and a clear reason.
 - Do not disable a scan because old Git history contains a known exposure. Remove the value from current source and rotate it.
+
+For a credential rotation, do not replace the active service credential until a controlled check proves that the replacement keeps the existing identity working alongside the canary identity. Keep the old identity available through the canary and rollback window. Verify each namespace-local `SealedSecret` has produced its target `Secret` before changing a consumer. Record exposed historical credentials for separate remediation, even after removing them from the current tree.
 
 ## Report an exposure
 
