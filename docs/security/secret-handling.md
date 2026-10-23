@@ -13,14 +13,19 @@ Use this guide when you add, move, or rotate a credential in this repository.
 ## Rotate a credential
 
 1. Find every workload, job, build script, and operator that uses the credential.
-2. Check which actions the credential permits. Do not assume that a pull credential is read-only.
-3. Create a new credential. Keep the old credential active during the canary.
-4. Seal the new value for each target namespace. Validate each `SealedSecret` before you commit it.
-5. Update one canary workload. Make it pull a fresh image, then check that it starts successfully.
-6. Move the remaining consumers to the new credential. Check scheduled jobs and build tools as well.
-7. Revoke the old credential after every consumer uses the new one.
+2. Record the actions that the credential permits. Do not assume that a pull credential is read-only.
+3. Create separate identities for runtime pulls and build pushes.
+4. Add the new runtime identity to registry auth. Keep the old identity active.
+5. Seal each credential for its target namespace. Validate each `SealedSecret` before you commit it.
+6. Sync registry auth and the namespace-local `SealedSecret` first. Make sure that both runtime identities work.
+7. Make sure that the canary namespace has the generated Secret. Then update the canary workload in a separate GitOps change.
+8. Force a fresh image pull. Make sure that the pod starts and the application works.
+9. If the canary fails, revert the workload change. Keep the old identity active during recovery.
+10. Move the remaining consumers in small batches. Include scheduled jobs and build workflows.
+11. Revoke the old identity after every required consumer uses and passes a fresh pull or push.
 
-If the service cannot limit permissions, record that limit. Use the credential only where needed. Plan a separate change to add scoped access.
+With htpasswd, each identity can pull, push, and delete in every repository. It does not provide read-only or repository-scoped permissions.
+Record this limit. Plan a separate change for scoped registry authorization.
 
 ## Scan changes
 
@@ -29,7 +34,9 @@ If the service cannot limit permissions, record that limit. Use the credential o
 - Allow known false positives only with a narrow rule and a clear reason.
 - Do not disable a scan because old Git history contains a known exposure. Remove the value from current source and rotate it.
 
-For a credential rotation, do not replace the active service credential until a controlled check proves that the replacement keeps the existing identity working alongside the canary identity. Keep the old identity available through the canary and rollback window. Verify each namespace-local `SealedSecret` has produced its target `Secret` before changing a consumer. Record exposed historical credentials for separate remediation, even after removing them from the current tree.
+For a credential rotation, keep the old identity active until all required consumers use the new identities. Make sure that each namespace-local `SealedSecret` has produced its target `Secret` before changing a consumer. Record exposed historical credentials for separate remediation, even after removing them from the current tree.
+
+A sealed manifest does not deploy unless an active Argo Application manages its path. Do not count an unmanaged manifest as a migrated consumer. Add Argo ownership before you rely on that Secret.
 
 ## Report an exposure
 

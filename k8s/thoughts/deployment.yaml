@@ -91,7 +91,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
       imagePullSecrets:
-        - name: registry-pull
+        - name: cluster-regcred
       volumes:
         - name: data
           persistentVolumeClaim:
