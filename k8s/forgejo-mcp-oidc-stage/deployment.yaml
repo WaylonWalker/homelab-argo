@@ -115,6 +115,7 @@ metadata:
   namespace: forgejo-mcp-oidc-stage
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
+    traefik.ingress.kubernetes.io/router.middlewares: forgejo-mcp-oidc-stage-forgejo-mcp-no-cache@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -147,6 +148,7 @@ metadata:
   namespace: forgejo-mcp-oidc-stage
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
+    traefik.ingress.kubernetes.io/router.middlewares: forgejo-mcp-oidc-stage-forgejo-mcp-no-cache@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
