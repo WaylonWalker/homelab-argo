@@ -1,0 +1,59 @@
+# Temporary isolated image-pull canary. Remove after fresh-pull validation.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: thoughts-registry-pull-canary
+  namespace: thoughts
+  labels:
+    app: thoughts-registry-pull-canary
+    homelab.waylonwalker.com/purpose: registry-pull-canary
+spec:
+  restartPolicy: Always
+  imagePullSecrets:
+    - name: registry-pull
+  containers:
+    - name: thoughts
+      image: registry.wayl.one/thoughts:0.0.36
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 5400
+          name: http
+          protocol: TCP
+      env:
+        - name: TZ
+          value: America/Chicago
+        - name: DATABASE_URL
+          value: sqlite:////data/database.db
+        - name: DROPPER_URL
+          value: https://dropper.wayl.one
+        - name: ENV
+          value: prod
+      envFrom:
+        - secretRef:
+            name: thoughts-secret
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "256Mi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
+      volumeMounts:
+        - name: data
+          mountPath: /data
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 5400
+        initialDelaySeconds: 30
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 5400
+        initialDelaySeconds: 10
+        periodSeconds: 5
+  volumes:
+    - name: data
+      emptyDir: {}
