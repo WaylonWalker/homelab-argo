@@ -75,7 +75,7 @@ spec:
             - name: STILLFRAME_FOLDER
               value: /photos
             - name: STILLFRAME_EXCLUDED_PATHS
-              value: stillframe:public/games:waylon/git/covers.waylonwalker.com:waylon/git/wyattbubbylee.com:waylon/git/screenshots.waylonwalker.com:waylon/git/waylonwalker.com:waylon/git/pype.dev:waylon/git/minecraft-recording.waylonwalker.com:waylon/git/neovimconf2022.waylonwalker.com:waylon/git/aylawalker.com:waylon/git/raft.waylonwalker.com:waylon/git/rhiannonwalker.com:waylon/git/fluffed-up.com:waylon/git/stable-diffusion-waylonwalker-com:waylon/git/stable-diffusion-pype-dev:wyatt/saved stuff/wyattbubbylee.com
+              value: waylon/music:waylon/sites:stillframe:public/games:waylon/git/covers.waylonwalker.com:waylon/git/wyattbubbylee.com:waylon/git/screenshots.waylonwalker.com:waylon/git/waylonwalker.com:waylon/git/pype.dev:waylon/git/minecraft-recording.waylonwalker.com:waylon/git/neovimconf2022.waylonwalker.com:waylon/git/aylawalker.com:waylon/git/raft.waylonwalker.com:waylon/git/rhiannonwalker.com:waylon/git/fluffed-up.com:waylon/git/stable-diffusion-waylonwalker-com:waylon/git/stable-diffusion-pype-dev:wyatt/saved stuff/wyattbubbylee.com
             - name: STILLFRAME_EXCLUDED_DIR_NAMES
               value: websites:output
             - name: STILLFRAME_MAP_STYLE_URL
