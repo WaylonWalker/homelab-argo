@@ -43,6 +43,7 @@ spec:
       annotations:
         diun.enable: "true"
     spec:
+      automountServiceAccountToken: false
       containers:
         - env:
             - name: TZ
