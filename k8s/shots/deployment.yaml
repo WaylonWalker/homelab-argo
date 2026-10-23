@@ -357,7 +357,8 @@ spec:
                 - /bin/sh
                 - -lc
                 - >-
-                  curl --fail --show-error --silent
+                  curl --fail --show-error --silent --retry 5
+                  --retry-connrefused --retry-delay 2 --connect-timeout 5
                   -X POST
                   "http://shot-wayl-one.shot.svc.cluster.local:5000/queue/cleanup?completed_age_hours=24&stale_age_minutes=30"
 
