@@ -73,7 +73,7 @@ builderAdmin:
       - 10.42.2.0/24
   ingress:
     enabled: true
-    host: build.homelab.waylonwalker.com
+    host: build-homelab.waylonwalker.com
     ingressClassName: traefik
     tls:
       enabled: true
