@@ -34,7 +34,7 @@ metadata:
   name: installer
   namespace: installer
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       service: installer
