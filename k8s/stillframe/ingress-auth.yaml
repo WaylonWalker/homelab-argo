@@ -90,7 +90,7 @@ spec:
   routes:
     - kind: Rule
       match: Host(`stillframe.waylonwalker.com`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
-      priority: 1000
+      priority: 3000
       middlewares:
         - name: stillframe-auth
       services:
@@ -98,9 +98,15 @@ spec:
           port: 8787
     - kind: Rule
       match: Host(`stillframe.wayl.one`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
-      priority: 1000
+      priority: 3000
       middlewares:
         - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) || Host(`stillframe.wayl.one`)
+      priority: 2000
       services:
         - name: stillframe
           port: 8787
