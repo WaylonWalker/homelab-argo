@@ -1,0 +1,187 @@
+/* Small Raccoon Cloud touches for the docs home and shared site header. */
+body:has(.docs-home-hero) article.post {
+  max-width: min(1184px, calc(100vw - 48px));
+  padding-inline: 0;
+}
+
+body:has(.docs-home-hero) .post-header {
+  display: none;
+}
+
+.site-header .site-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.site-header .site-title::before {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
+  background: center / contain no-repeat url("/raccoon-nav.svg");
+}
+
+.docs-home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(250px, 0.65fr);
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 3.5rem);
+  min-height: 27rem;
+  padding: 3.5rem 0 3.75rem;
+  border-bottom: 1px solid var(--color-border, #353a43);
+}
+
+.docs-home-copy,
+.docs-home-art {
+  min-width: 0;
+}
+
+.docs-home-eyebrow,
+.docs-home-note,
+.docs-home-art figcaption {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.docs-home-eyebrow {
+  margin: 0 0 1.2rem;
+  color: var(--color-text-muted, #8b919d);
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.docs-home-hero h1 {
+  max-width: 13ch;
+  margin: 0 0 1.5rem;
+  font-size: clamp(2.7rem, 5.3vw, 4.75rem);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.065em;
+}
+
+.docs-home-hero h1 span {
+  white-space: nowrap;
+}
+
+.docs-home-hero h1 del {
+  color: var(--color-text-muted, #8b919d);
+  text-decoration-color: var(--color-primary, #eab458);
+  text-decoration-thickness: 0.08em;
+}
+
+.docs-home-hero h1 em {
+  color: var(--color-primary, #eab458);
+  font-style: normal;
+}
+
+.docs-home-deck {
+  max-width: 43rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  line-height: 1.65;
+}
+
+.docs-home-note {
+  color: var(--color-text-muted, #8b919d);
+  font-size: 0.85rem;
+}
+
+.docs-home-art {
+  width: min(100%, 22rem);
+  margin: 0 auto;
+}
+
+.docs-home-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.docs-home-art figcaption {
+  margin-top: 0.4rem;
+  color: var(--color-text-muted, #8b919d);
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.docs-home-hero + h2 {
+  margin-top: 3.75rem;
+}
+
+.post-content .md-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem 2.5rem;
+}
+
+.post-content .md-grid[data-columns="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.post-content .md-card {
+  min-width: 0;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--color-border-soft, var(--color-border, #353a43));
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-surface, #171b24) 78%, transparent);
+  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.post-content .md-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-primary, #eab458) 50%, transparent);
+  background: var(--color-surface, #171b24);
+}
+
+.post-content .md-card > :first-child {
+  margin-top: 0;
+}
+
+.post-content .md-card > :last-child {
+  margin-bottom: 0;
+}
+
+.post-content .md-card h3 {
+  margin-bottom: 0.55rem;
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+}
+
+.post-content .md-card h3 a {
+  color: var(--color-text, inherit);
+}
+
+.post-content .md-card h3 a:hover {
+  color: var(--color-primary, #eab458);
+}
+
+@media (max-width: 760px) {
+  body:has(.docs-home-hero) article.post {
+    max-width: calc(100vw - 2rem);
+  }
+
+  .docs-home-hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 1rem;
+    padding: 2.75rem 0 3rem;
+  }
+
+  .docs-home-hero h1 span {
+    white-space: normal;
+  }
+
+  .docs-home-art {
+    width: min(100%, 20rem);
+    margin-top: 0.5rem;
+  }
+
+  .post-content .md-grid[data-columns="2"] {
+    grid-template-columns: 1fr;
+  }
+}

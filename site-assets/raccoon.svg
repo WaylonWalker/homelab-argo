@@ -1,0 +1,587 @@
+<svg style="--raccoon-bg: transparent" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 875" data-nodes="3" role="group" aria-labelledby="mascot-title mascot-desc" class="raccoon-mascot">
+  <title id="mascot-title">Raccoon Cloud mascot</title>
+  <desc id="mascot-desc">Friendly raccoon with glowing Kubernetes visor, cloud silhouette, and one-, two-, or three-node homelab hardware. Click or focus the nose and press Enter or Space to change layouts. Brush past the hanging cables or scroll to set off springy vine-like ripples and gravity nudges.</desc>
+  <style><![CDATA[
+    /* Put variables on the INLINE svg itself or any ancestor.
+       --raccoon-bg: transparent removes the backdrop. */
+    .raccoon-mascot .bg                 { fill: var(--raccoon-bg, #21262d); }
+    .raccoon-mascot .cloud              { fill: none; stroke: var(--raccoon-cloud, #8a989f); stroke-width: 2.4; stroke-dasharray: 6 10; stroke-linecap: round; opacity: .67; }
+    .raccoon-mascot .fur                { fill: var(--raccoon-fur, #9ca4ae); }
+    .raccoon-mascot .fur-shadow         { fill: var(--raccoon-fur-shadow, #79848f); }
+    .raccoon-mascot .fur-light          { fill: var(--raccoon-fur-light, #d9e1e8); }
+    .raccoon-mascot .fur-white          { fill: var(--raccoon-fur-white, #edf3f8); }
+    .raccoon-mascot .ear-inside         { fill: var(--raccoon-ear, #26303b); }
+    .raccoon-mascot .mask               { fill: var(--raccoon-mask, #141c25); }
+    .raccoon-mascot .mask-shine         { fill: var(--raccoon-mask-shine, #244452); }
+    .raccoon-mascot .ink-fill           { fill: var(--raccoon-ink, #151a22); }
+    .raccoon-mascot .ink-line           { stroke: var(--raccoon-ink, #151a22); stroke-linecap: round; stroke-linejoin: round; fill:none; }
+    .raccoon-mascot .accent-fill        { fill: var(--raccoon-accent, #32eaf3); }
+    .raccoon-mascot .accent-stroke      { stroke: var(--raccoon-accent, #32eaf3); fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .raccoon-mascot .accent-cable       { stroke: var(--raccoon-accent, #32eaf3); fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+    .raccoon-mascot .k8s-wheel-use      { fill: var(--raccoon-accent, #32eaf3); color: var(--raccoon-accent, #32eaf3); }
+    .raccoon-mascot .glow-layer         { filter: url(#accent-blur); opacity: var(--raccoon-glow, .65); }
+    .raccoon-mascot .circuit            { stroke: var(--raccoon-accent, #32eaf3); stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .raccoon-mascot .hardware           { stroke: var(--raccoon-hardware, #d6e2eb); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .raccoon-mascot .hardware-fill      { fill: var(--raccoon-hardware, #d6e2eb); }
+    .raccoon-mascot .hardware-secondary { stroke: var(--raccoon-hardware-muted, #a8bdc9); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .raccoon-mascot .panel              { fill: var(--raccoon-panel, #232b35); }
+    .raccoon-mascot .cheek-line         { stroke: var(--raccoon-fur-white, #edf3f8); stroke-width: 4.5; fill: none; stroke-linecap: round; }
+    .raccoon-mascot .nose-shine         { fill: var(--raccoon-accent, #32eaf3); }
+    .raccoon-mascot .nose-button        { cursor: pointer; }
+    .raccoon-mascot .nose-button:focus-visible { filter: drop-shadow(0 0 4px var(--raccoon-accent, #32eaf3)); }
+    .raccoon-mascot .node-layout { display: none; }
+    .raccoon-mascot[data-nodes="1"] .node-layout[data-layout="1"],
+    .raccoon-mascot[data-nodes="2"] .node-layout[data-layout="2"],
+    .raccoon-mascot[data-nodes="3"] .node-layout[data-layout="3"] { display: inline; }
+    .raccoon-mascot .server-slot { fill: var(--raccoon-panel, #232b35); stroke: var(--raccoon-hardware, #d6e2eb); stroke-width:3.5; }
+    .raccoon-mascot .server-detail { fill: none; stroke: var(--raccoon-hardware-muted, #a8bdc9); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    .raccoon-mascot .server-accent { fill: var(--raccoon-accent, #32eaf3); }
+    .raccoon-mascot .server-trim { fill: none; stroke: var(--raccoon-accent, #32eaf3); stroke-linecap:round; stroke-width:2.2; }
+    .raccoon-mascot .nas-body { fill: var(--raccoon-panel, #232b35); stroke: var(--raccoon-hardware, #d6e2eb); stroke-width:4; }
+    .raccoon-mascot .nas-bay { cursor: pointer; transition: transform 280ms cubic-bezier(.2,1,.35,1); transform-box: fill-box; }
+    .raccoon-mascot .nas-bay[data-ejected="true"] { transform: translate(19px, -5px); }
+    .raccoon-mascot .nas-bay .bay-face { fill: var(--raccoon-mask, #141c25); stroke: var(--raccoon-hardware-muted, #a8bdc9); stroke-width:2.1; }
+    .raccoon-mascot .nas-bay .bay-handle { fill:none; stroke:var(--raccoon-hardware,#d6e2eb); stroke-width:3; stroke-linecap:round; }
+    .raccoon-mascot .nas-bay .bay-led { fill:var(--raccoon-accent,#32eaf3); transition:opacity 200ms ease; }
+    .raccoon-mascot .nas-bay[data-ejected="true"] .bay-led { opacity:.22; }
+    .raccoon-mascot .nas-bay:focus-visible { outline:3px solid var(--raccoon-accent,#32eaf3); outline-offset:3px; }
+    @media (prefers-reduced-motion: reduce) { .raccoon-mascot .nas-bay, .raccoon-mascot .nas-bay .bay-led {transition:none;} }
+  ]]></style>
+  <defs>
+    <filter id="accent-blur" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <!-- Kubernetes wheel silhouette from the official Kubernetes project logo (Apache-2.0 / CC BY 4.0).
+         Shape is embedded vector data, not a linked image. -->
+    <symbol id="kubernetes-wheel" viewBox="102 255 575 515">
+      <path d="m 389.5,272.1 c -8.5,0 -15.3,7.6 -15.3,17 0,0.1 0,0.3 0,0.4 -0,1.3 -0.1,2.8 -0,3.9 0.2,5.4 1.4,9.6 2.1,14.6 1.3,10.7 2.4,19.5 1.7,27.8 -0.6,3.1 -2.9,5.9 -5,7.9 l -0.4,6.5 c -9.2,0.8 -18.4,2.2 -27.7,4.3 -39.8,9 -74,29.5 -100.1,57.2 -1.7,-1.2 -4.7,-3.3 -5.5,-3.9 -2.7,0.4 -5.5,1.2 -9.1,-0.9 -6.9,-4.6 -13.1,-11 -20.6,-18.7 -3.5,-3.7 -6,-7.2 -10.1,-10.7 -0.9,-0.8 -2.4,-1.9 -3.4,-2.7 -3.2,-2.6 -7,-3.9 -10.7,-4 -4.7,-0.2 -9.2,1.7 -12.2,5.4 -5.3,6.6 -3.6,16.7 3.8,22.6 0.1,0.1 0.2,0.1 0.2,0.2 1,0.8 2.2,1.9 3.2,2.6 4.4,3.2 8.3,4.9 12.7,7.4 9.2,5.7 16.8,10.3 22.8,16 2.4,2.5 2.8,6.9 3.1,8.8 l 4.9,4.4 c -26.3,39.5 -38.4,88.4 -31.3,138.2 l -6.4,1.9 c -1.7,2.2 -4.1,5.6 -6.6,6.6 -7.9,2.5 -16.7,3.4 -27.5,4.5 -5,0.4 -9.4,0.2 -14.7,1.2 -1.2,0.2 -2.8,0.6 -4.1,0.9 -0,0 -0.1,0 -0.1,0 -0.1,0 -0.2,0.1 -0.2,0.1 -9,2.2 -14.8,10.5 -13,18.7 1.9,8.2 10.7,13.1 19.8,11.2 0.1,-0 0.2,-0 0.2,-0 0.1,-0 0.2,-0.1 0.3,-0.1 1.3,-0.3 2.9,-0.6 4,-0.9 5.2,-1.4 9,-3.5 13.7,-5.3 10.1,-3.6 18.5,-6.7 26.7,-7.9 3.4,-0.3 7,2.1 8.8,3.1 l 6.7,-1.1 c 15.4,47.6 47.6,86.1 88.3,110.3 l -2.8,6.7 c 1,2.6 2.1,6.1 1.4,8.7 -3,7.7 -8.1,15.8 -13.9,24.9 -2.8,4.2 -5.7,7.4 -8.2,12.2 -0.6,1.1 -1.4,2.9 -2,4.1 -3.9,8.4 -1,18.1 6.5,21.8 7.6,3.7 17.1,-0.2 21.1,-8.6 0,-0 0,-0 0,-0 0,-0 -0,-0 0,-0 0.6,-1.2 1.4,-2.8 1.9,-3.9 2.2,-5 2.9,-9.2 4.4,-14 4.1,-10.2 6.3,-20.9 11.9,-27.5 1.5,-1.8 4,-2.5 6.6,-3.2 l 3.5,-6.3 c 35.5,13.6 75.3,17.3 115.1,8.3 9.1,-2.1 17.8,-4.7 26.3,-7.9 1,1.7 2.8,5.1 3.3,5.9 2.6,0.9 5.5,1.3 7.8,4.7 4.2,7.1 7,15.6 10.5,25.8 1.5,4.8 2.3,9.1 4.5,14 0.5,1.1 1.3,2.7 1.9,3.9 4.1,8.5 13.6,12.3 21.2,8.7 7.6,-3.6 10.5,-13.3 6.5,-21.8 -0.6,-1.2 -1.4,-3 -2,-4.1 -2.5,-4.8 -5.4,-8 -8.2,-12.2 -5.8,-9.1 -10.6,-16.6 -13.6,-24.3 -1.2,-4 0.2,-6.4 1.2,-9 -0.6,-0.7 -1.8,-4.4 -2.6,-6.2 42.4,-25 73.6,-64.9 88.3,-111.1 2,0.3 5.4,0.9 6.5,1.1 2.3,-1.5 4.4,-3.5 8.6,-3.2 8.2,1.2 16.6,4.2 26.7,7.9 4.7,1.8 8.5,3.9 13.7,5.3 1.1,0.3 2.7,0.6 4,0.9 0.1,0 0.2,0.1 0.3,0.1 0.1,0 0.2,0 0.2,0 9.1,2 17.9,-3 19.8,-11.2 1.9,-8.2 -3.9,-16.5 -13,-18.7 -1.3,-0.3 -3.2,-0.8 -4.5,-1 -5.3,-1 -9.7,-0.8 -14.7,-1.2 -10.7,-1.1 -19.6,-2 -27.5,-4.5 -3.2,-1.2 -5.5,-5.1 -6.6,-6.6 l -6.2,-1.8 c 3.2,-23.2 2.3,-47.3 -3.2,-71.5 -5.6,-24.4 -15.5,-46.7 -28.7,-66.3 1.6,-1.4 4.6,-4.1 5.4,-4.9 0.2,-2.7 0,-5.6 2.9,-8.7 6,-5.7 13.6,-10.3 22.8,-16 4.3,-2.6 8.4,-4.2 12.7,-7.4 1,-0.7 2.3,-1.9 3.4,-2.7 7.3,-5.9 9,-16 3.8,-22.6 -5.3,-6.6 -15.5,-7.2 -22.8,-1.4 -1,0.8 -2.5,1.9 -3.4,2.7 -4.1,3.5 -6.7,7 -10.1,10.7 -7.6,7.7 -13.8,14.1 -20.6,18.7 -3,1.7 -7.3,1.1 -9.3,1 l -5.8,4.2 C 500.3,376.9 455,354.6 406.4,350.3 c -0.1,-2 -0.3,-5.7 -0.4,-6.8 -2,-1.9 -4.4,-3.5 -5,-7.7 -0.7,-8.2 0.4,-17.1 1.7,-27.8 0.7,-5 1.9,-9.1 2.1,-14.6 0,-1.2 -0,-3 -0,-4.4 -0,-9.4 -6.9,-17 -15.3,-17 z m -19.2,118.8 -4.5,80.3 -0.3,0.2 c -0.3,7.2 -6.2,12.9 -13.5,12.9 -3,0 -5.7,-1 -8,-2.6 l -0.1,0.1 -65.9,-46.7 c 20.2,-19.9 46.1,-34.6 76,-41.4 5.5,-1.2 10.9,-2.2 16.3,-2.8 z m 38.4,0 c 34.8,4.3 67.1,20.1 91.8,44.2 l -65.4,46.4 -0.2,-0.1 c -5.8,4.2 -14,3.2 -18.5,-2.5 -1.9,-2.3 -2.8,-5.1 -2.9,-7.8 l -0.1,-0 z m -154.6,74.2 60.1,53.8 -0.1,0.3 c 5.4,4.7 6.2,12.9 1.7,18.6 -1.9,2.3 -4.3,3.9 -7,4.6 l -0.1,0.3 -77.1,22.3 c -3.9,-35.9 4.5,-70.8 22.4,-99.8 z m 270.3,0 c 8.9,14.5 15.7,30.7 19.7,48.2 4,17.3 5,34.6 3.3,51.3 l -77.5,-22.3 -0.1,-0.3 c -6.9,-1.9 -11.2,-9 -9.6,-16 0.7,-2.9 2.2,-5.4 4.3,-7.2 l -0,-0.2 59.8,-53.5 z M 377.1,523 h 24.6 l 15.3,19.1 -5.5,23.9 -22.1,10.6 -22.2,-10.7 -5.5,-23.9 z m 79,65.5 c 1,-0.1 2.1,0 3.1,0.2 l 0.1,-0.2 79.8,13.5 c -11.7,32.8 -34,61.2 -63.8,80.2 l -31,-74.8 0.1,-0.1 c -2.8,-6.6 0,-14.4 6.5,-17.5 1.7,-0.8 3.4,-1.3 5.2,-1.3 z m -133.9,0.3 c 6.1,0.1 11.5,4.3 13,10.5 0.7,2.9 0.3,5.8 -0.8,8.3 l 0.2,0.3 -30.6,74 C 275.4,663.6 252.5,636.1 240.3,602.3 l 79.1,-13.4 0.1,0.2 c 0.9,-0.2 1.8,-0.2 2.7,-0.2 z m 66.8,32.4 c 2.1,-0.1 4.3,0.4 6.3,1.3 2.7,1.3 4.8,3.3 6.1,5.8 h 0.3 l 39,70.4 c -5.1,1.7 -10.3,3.1 -15.6,4.4 -29.8,6.8 -59.5,4.7 -86.4,-4.5 l 38.9,-70.3 h 0.1 c 2.3,-4.4 6.8,-7 11.4,-7.1 z" fill="inherit" stroke="none"/>
+    </symbol>
+    <g id="sparkle" class="hardware-secondary"><path d="M-5 -5 L-2 -2 M2 2 L5 5 M5 -5 L2 -2 M-2 2 L-5 5"/></g>
+  </defs>
+
+  <!-- Background and a hand-drawn dotted cloud: independent themed layers -->
+  <rect class="bg" width="1200" height="875"/>
+  <path class="cloud" d="M291 365 C253 387 206 363 195 319 C183 275 194 242 218 225 C189 165 232 132 266 135 C256 93 288 63 329 79 C344 29 402 42 457 89 C479 48 509 57 526 64 C560 4 623 11 653 33 C678 45 683 66 688 76 C724 57 761 65 783 94 C820 53 876 38 902 71 C928 98 927 123 917 145 C967 104 1018 147 1009 202 C1010 214 1003 225 994 237 C1036 249 1055 278 1034 310 C1082 350 1041 387 985 376"/>
+
+  <!-- Ethernet/power cables with a deeper droopy hang -->
+  <g class="hardware-secondary" stroke-width="3.5">
+    <path data-swing="l0" d="M338 405 C330 470 327 534 340 579 C349 611 373 624 406 617 H442"/>
+    <path data-swing="l1" d="M352 420 C344 500 345 579 360 634 C371 676 401 692 443 681 H462"/>
+    <path data-swing="l2" d="M368 433 C361 521 363 608 380 665 C392 707 424 723 468 710"/>
+    <path data-swing="r0" d="M862 405 C870 470 873 534 860 579 C851 611 827 624 794 617 H758"/>
+    <path data-swing="r1" d="M848 420 C856 500 855 579 840 634 C829 676 799 692 757 681 H738"/>
+    <path data-swing="r2" d="M832 433 C839 521 837 608 820 665 C808 707 776 723 732 710"/>
+  </g>
+  <g class="hardware" stroke-width="2.8">
+    <path data-swing="l3" d="M336 424 C322 506 323 575 339 612 C354 644 395 641 442 613"/>
+    <path data-swing="r3" d="M864 424 C878 506 877 575 861 612 C846 644 805 641 758 613"/>
+    <path data-swing="l4" d="M442 613 C456 603 468 582 472 559"/>
+    <path data-swing="r4" d="M758 613 C744 603 732 582 728 559"/>
+  </g>
+  <g class="glow-layer">
+    <path data-swing="l1" class="accent-cable" stroke-width="6" d="M352 420 C344 500 345 579 360 634 C371 676 401 692 443 681 H462"/>
+    <path data-swing="r1" class="accent-cable" stroke-width="6" d="M848 420 C856 500 855 579 840 634 C829 676 799 692 757 681 H738"/>
+  </g>
+  <g>
+    <path data-swing="l1" class="accent-cable" stroke-width="2.6" d="M352 420 C344 500 345 579 360 634 C371 676 401 692 443 681 H462"/>
+    <path data-swing="r1" class="accent-cable" stroke-width="2.6" d="M848 420 C856 500 855 579 840 634 C829 676 799 692 757 681 H738"/>
+  </g>
+
+  <!-- Raccoon ears -->
+  <g id="left-ear">
+    <path class="fur-light" d="M345 275 C319 238 317 157 327 115 C337 65 356 58 377 69 C427 89 481 131 508 168 L494 278 Z"/>
+    <path class="ear-inside" d="M365 232 C349 191 345 127 358 107 C370 85 395 112 422 129 C450 147 466 163 476 189 Z"/>
+    <path class="fur-shadow" opacity=".48" d="M346 80 C377 74 444 132 481 178 C449 155 398 115 371 104 Z"/>
+  </g>
+  <g id="right-ear" transform="translate(1200 0) scale(-1 1)">
+    <path class="fur-light" d="M345 275 C319 238 317 157 327 115 C337 65 356 58 377 69 C427 89 481 131 508 168 L494 278 Z"/>
+    <path class="ear-inside" d="M365 232 C349 191 345 127 358 107 C370 85 395 112 422 129 C450 147 466 163 476 189 Z"/>
+    <path class="fur-shadow" opacity=".48" d="M346 80 C377 74 444 132 481 178 C449 155 398 115 371 104 Z"/>
+  </g>
+
+  <!-- Head outline: top tuft, forehead, cheeks, and chin -->
+  <path class="fur" d="M301 327 Q312 272 355 235 C385 187 422 152 474 141 L458 136 492 128 473 119 Q515 129 551 114 L563 101 561 121 Q580 105 600 99 Q596 111 591 120 Q630 101 664 107 L650 118 Q707 123 729 133 L706 138 Q777 157 836 219 Q884 255 900 325 L911 351 888 367 913 376 897 390 910 398 878 415 889 426 850 447 Q805 480 734 491 Q664 513 600 515 Q530 512 466 493 Q388 481 342 449 L312 425 323 417 288 395 309 385 292 371 308 363 280 350Z"/>
+  <path class="fur-shadow" opacity=".72" d="M350 244 Q405 179 499 145 Q453 176 429 205 C399 225 366 267 349 304Z"/>
+  <path class="fur-shadow" opacity=".72" d="M850 244 Q795 179 701 145 Q747 176 771 205 C801 225 834 267 851 304Z"/>
+
+  <!-- White silver facial stripes distinguish a raccoon from a cat -->
+  <path class="fur-light" d="M281 320 C338 281 362 237 423 213 Q487 180 533 215 Q558 237 575 260 Q517 228 466 239 Q384 255 340 303Z"/>
+  <path class="fur-white" d="M281 319 C326 276 369 221 426 195 Q503 165 553 236 Q566 254 572 266 Q533 244 507 230 Q453 199 403 238 Q349 274 315 321Z" opacity=".82"/>
+  <path class="fur-light" d="M919 320 C862 281 838 237 777 213 Q713 180 667 215 Q642 237 625 260 Q683 228 734 239 Q816 255 860 303Z"/>
+  <path class="fur-white" d="M919 319 C874 276 831 221 774 195 Q697 165 647 236 Q634 254 628 266 Q667 244 693 230 Q747 199 797 238 Q851 274 885 321Z" opacity=".82"/>
+
+  <!-- Mask and dark visor with a shallow V over the bridge -->
+  <path class="mask" d="M284 322 Q336 266 390 239 Q458 199 514 236 Q564 260 600 251 Q637 260 685 236 Q749 198 813 241 Q866 267 918 322 L895 346 914 360 880 381 Q839 417 774 433 Q717 453 657 413 Q632 388 600 374 Q568 388 544 413 Q487 451 429 432 Q357 421 319 381 L283 359 306 348Z"/>
+  <path class="mask-shine" opacity=".82" d="M310 319 C402 226 475 204 541 251 Q579 272 601 260 Q626 273 672 249 C756 201 827 231 896 317 Q828 264 760 253 Q707 238 666 271 Q606 293 548 271 Q449 216 377 275Z"/>
+  <path class="mask" d="M323 321 C391 270 435 235 499 247 Q565 276 600 273 Q634 279 703 247 Q771 235 876 326 C788 278 755 267 715 274 Q643 307 600 292 Q536 307 477 274 Q412 257 323 321Z"/>
+  <!-- Cheek tufts separate the dark raccoon face from the gray lower face -->
+  <path class="fur-light" d="M292 367 L310 373 299 380 328 386 313 398 352 411 337 419 381 444 Q434 468 500 471 Q442 452 418 433 Q361 413 334 381 Z"/>
+  <path class="fur-light" d="M908 367 L890 373 901 380 872 386 887 398 848 411 863 419 819 444 Q766 468 700 471 Q758 452 782 433 Q839 413 866 381 Z"/>
+
+  <!-- Eye HUD: concentric rings, dashed scanning ticks, luminous Kubernetes helm -->
+  <g id="left-eye-hud" transform="translate(466 332)">
+    <g class="glow-layer">
+      <circle r="86" class="accent-stroke" stroke-width="7"/>
+      <circle r="74" class="accent-stroke" stroke-width="5"/>
+      <use href="#kubernetes-wheel" xlink:href="#kubernetes-wheel" class="k8s-wheel-use" x="-56" y="-56" width="112" height="112"/>
+    </g>
+    <circle r="88" class="accent-stroke" stroke-width="3" stroke-dasharray="264 21 85 19 59 105" transform="rotate(-77)"/>
+    <circle r="79" class="accent-stroke" stroke-width="2.6" stroke-dasharray="162 14 203 14" transform="rotate(6)"/>
+    <circle r="71" class="accent-stroke" stroke-width="1.3" opacity=".85"/>
+    <circle r="61" class="accent-stroke" stroke-width="2.6"/>
+    <path class="accent-stroke" d="M0 -98 V-83 M0 83 V96 M-98 0 H-86 M86 0 H98" stroke-width="2.2"/>
+    <use href="#kubernetes-wheel" xlink:href="#kubernetes-wheel" class="k8s-wheel-use" x="-53" y="-53" width="106" height="106"/>
+  </g>
+
+  <!-- Right eye HUD matches the Kubernetes-wheel left eye -->
+  <g id="right-eye-hud" transform="translate(734 332)">
+    <g class="glow-layer">
+      <circle r="86" class="accent-stroke" stroke-width="7"/>
+      <circle r="74" class="accent-stroke" stroke-width="5"/>
+      <use href="#kubernetes-wheel" xlink:href="#kubernetes-wheel" class="k8s-wheel-use" x="-56" y="-56" width="112" height="112"/>
+    </g>
+    <circle r="88" class="accent-stroke" stroke-width="3" stroke-dasharray="264 21 85 19 59 105" transform="rotate(77)"/>
+    <circle r="79" class="accent-stroke" stroke-width="2.6" stroke-dasharray="162 14 203 14" transform="rotate(-6)"/>
+    <circle r="71" class="accent-stroke" stroke-width="1.3" opacity=".85"/>
+    <circle r="61" class="accent-stroke" stroke-width="2.6"/>
+    <path class="accent-stroke" d="M0 -98 V-83 M0 83 V96 M-98 0 H-86 M86 0 H98" stroke-width="2.2"/>
+    <g class="circuit" opacity=".75" stroke-width="2">
+      <path d="M55 -38 H78"/><circle cx="84" cy="-38" r="2.8" class="accent-fill"/>
+      <path d="M55 0 H78"/><circle cx="84" cy="0" r="2.8" class="accent-fill"/>
+      <path d="M55 38 H78"/><circle cx="84" cy="38" r="2.8" class="accent-fill"/>
+      <path d="M-55 -38 H-78"/><circle cx="-84" cy="-38" r="2.8" class="accent-fill"/>
+      <path d="M-55 0 H-78"/><circle cx="-84" cy="0" r="2.8" class="accent-fill"/>
+      <path d="M-55 38 H-78"/><circle cx="-84" cy="38" r="2.8" class="accent-fill"/>
+      <path d="M-20 -57 V-77"/><circle cx="-20" cy="-83" r="2.8" class="accent-fill"/>
+      <path d="M20 57 V77"/><circle cx="20" cy="83" r="2.8" class="accent-fill"/>
+    </g>
+    <use href="#kubernetes-wheel" xlink:href="#kubernetes-wheel" class="k8s-wheel-use" x="-53" y="-53" width="106" height="106"/>
+  </g>
+
+
+  <!-- Lower cheek light gray fur; angular fur blades hint at bandit markings -->
+  <path class="fur-light" d="M312 408 L333 431 Q382 465 441 470 L480 470 Q425 485 372 456Z"/>
+  <path class="fur-light" d="M888 408 L867 431 Q818 465 759 470 L720 470 Q775 485 828 456Z"/>
+  <path class="fur-white" opacity=".55" d="M390 463 Q483 507 599 510 Q716 506 811 463 Q737 518 602 521 Q467 523 390 463Z"/>
+
+  <!-- Cream muzzle / nose / whiskers and gentle smile -->
+  <path class="fur-light" d="M476 465 Q528 443 550 402 Q567 377 585 378 Q600 359 615 378 Q634 375 653 402 Q671 434 723 460 Q695 491 637 505 Q603 514 563 505 Q504 498 476 465Z"/>
+  <path class="fur-white" d="M531 469 Q562 427 577 401 Q589 382 602 380 Q615 382 628 401 Q640 425 673 469 Q642 495 600 496 Q557 494 531 469Z" opacity=".88"/>
+  <path class="ink-fill nose-button" role="button" tabindex="0" focusable="true" aria-label="Change homelab node layout; currently three nodes" d="M574 409 Q581 395 600 396 Q621 393 627 406 Q630 421 612 434 L601 442 Q589 436 577 424 Q570 417 574 409Z"/>
+  <path class="nose-shine" d="M581 409 Q596 402 620 410 Q625 414 617 416 Q598 418 586 416 Q580 415 581 409Z"/>
+  <path class="ink-line" d="M600 440 V457 Q586 482 565 460 M600 457 Q615 482 638 459" stroke-width="6"/>
+  <g class="cheek-line">
+    <path d="M547 432 Q502 422 450 441"/>
+    <path d="M542 444 Q488 445 454 463"/>
+    <path d="M653 432 Q698 422 750 441"/>
+    <path d="M658 444 Q712 445 746 463"/>
+  </g>
+
+  <!-- Switchable homelab hardware: 1 compute / 2 compute / 2 compute + tall NAS. -->
+  <g id="server-rack">
+  <g class="node-layout" data-layout="1" role="group" aria-label="One compute node">
+    <path class="hardware" stroke-width="3.4" d="M427 487 Q417 502 424 514 V604 M773 487 Q783 502 776 514 V604" opacity=".83"/>
+    <path class="server-detail" stroke-width="2.8" d="M423 518 H439 M761 518 H777"/>
+    <g id="compute-1-layout-1" aria-label="Compute node 1">
+      <rect x="439" y="527" width="322" height="76" rx="12" class="server-slot"/>
+      <rect x="444" y="534" width="4" height="62" rx="2" class="server-accent" opacity=".65"/>
+          <g class="hardware-secondary" stroke-width="2.7" transform="translate(491 572) scale(.76)">
+      <path d="M0 24 L-29 -4 Q-36 -13 -27 -23 Q-15 -37 -2 -19 L0 -16 Q12 -34 25 -23 Q36 -13 28 -2Z"/>
+      <path d="M-26 -9 H-15 L-9 0 L2 -11 H14"/>
+      <circle cx="-16" cy="-9" r="3" class="panel"/>
+      <circle cx="2" cy="-11" r="3" class="panel"/>
+      <path d="M0 24 V1 L10 -6"/>
+    </g>
+      <path d="M540 561.0 H645 M540 572.0 H633" class="server-detail"/>
+      <circle cx="691" cy="565.0" r="5.2" class="hardware-fill"/>
+      <circle cx="713" cy="565.0" r="5.2" class="hardware-fill"/>
+      <circle cx="735" cy="565.0" r="5.2" class="hardware-fill"/>
+      <circle cx="748" cy="541" r="3.3" class="server-accent"/>
+    </g>
+    <path d="M456 609 H742" class="server-detail" opacity=".45"/>
+  </g>
+  <g class="node-layout" data-layout="2" role="group" aria-label="Two compute nodes">
+    <path class="hardware" stroke-width="3.4" d="M427 487 Q417 502 424 514 V680 M773 487 Q783 502 776 514 V680" opacity=".83"/>
+    <path class="server-detail" stroke-width="2.8" d="M423 518 H439 M761 518 H777"/>
+    <g id="compute-1-layout-2" aria-label="Compute node 1">
+      <rect x="439" y="527" width="322" height="64" rx="12" class="server-slot"/>
+      <rect x="444" y="534" width="4" height="50" rx="2" class="server-accent" opacity=".65"/>
+          <g class="hardware-secondary" stroke-width="2.7" transform="translate(491 566) scale(.76)">
+      <path d="M0 24 L-29 -4 Q-36 -13 -27 -23 Q-15 -37 -2 -19 L0 -16 Q12 -34 25 -23 Q36 -13 28 -2Z"/>
+      <path d="M-26 -9 H-15 L-9 0 L2 -11 H14"/>
+      <circle cx="-16" cy="-9" r="3" class="panel"/>
+      <circle cx="2" cy="-11" r="3" class="panel"/>
+      <path d="M0 24 V1 L10 -6"/>
+    </g>
+      <path d="M540 555.0 H645 M540 566.0 H633" class="server-detail"/>
+      <circle cx="691" cy="559.0" r="5.2" class="hardware-fill"/>
+      <circle cx="713" cy="559.0" r="5.2" class="hardware-fill"/>
+      <circle cx="735" cy="559.0" r="5.2" class="hardware-fill"/>
+      <circle cx="748" cy="541" r="3.3" class="server-accent"/>
+    </g>
+    <g id="compute-2-layout-2" aria-label="Compute node 2">
+      <rect x="439" y="602" width="322" height="64" rx="12" class="server-slot"/>
+      <rect x="444" y="609" width="4" height="50" rx="2" class="server-accent" opacity=".65"/>
+      <path d="M466 630.0 H637 M466 642.0 H594" class="server-detail"/>
+      <circle cx="691" cy="634.0" r="5.2" class="hardware-fill"/>
+      <circle cx="713" cy="634.0" r="5.2" class="hardware-fill"/>
+      <circle cx="735" cy="634.0" r="5.2" class="hardware-fill"/>
+      <circle cx="748" cy="616" r="3.3" class="server-accent"/>
+    </g>
+    <path d="M452 675 H748" class="server-detail" opacity=".55"/>
+  </g>
+  <g class="node-layout" data-layout="3" role="group" aria-label="Two compute nodes and a tall hot-swap NAS">
+    <path class="hardware" stroke-width="3.4" d="M427 487 Q417 502 424 514 V831 M773 487 Q783 502 776 514 V831" opacity=".83"/>
+    <path class="server-detail" stroke-width="2.8" d="M423 518 H439 M761 518 H777"/>
+    <g id="compute-1-layout-3" role="group" aria-label="Compute node 1">
+      <rect x="439" y="526" width="322" height="58" rx="12" class="server-slot"/>
+      <rect x="444" y="533" width="4" height="44" rx="2" class="server-accent" opacity=".65"/>
+          <g class="hardware-secondary" stroke-width="2.7" transform="translate(491 562) scale(.76)">
+      <path d="M0 24 L-29 -4 Q-36 -13 -27 -23 Q-15 -37 -2 -19 L0 -16 Q12 -34 25 -23 Q36 -13 28 -2Z"/>
+      <path d="M-26 -9 H-15 L-9 0 L2 -11 H14"/>
+      <circle cx="-16" cy="-9" r="3" class="panel"/>
+      <circle cx="2" cy="-11" r="3" class="panel"/>
+      <path d="M0 24 V1 L10 -6"/>
+    </g>
+      <path d="M540 551.0 H645 M540 562.0 H633" class="server-detail"/>
+      <circle cx="691" cy="555.0" r="5.2" class="hardware-fill"/>
+      <circle cx="713" cy="555.0" r="5.2" class="hardware-fill"/>
+      <circle cx="735" cy="555.0" r="5.2" class="hardware-fill"/>
+      <circle cx="748" cy="540" r="3.3" class="server-accent"/>
+    </g>
+    <g id="compute-2-layout-3" role="group" aria-label="Compute node 2">
+      <rect x="439" y="593" width="322" height="58" rx="12" class="server-slot"/>
+      <rect x="444" y="600" width="4" height="44" rx="2" class="server-accent" opacity=".65"/>
+      <path d="M466 618.0 H637 M466 630.0 H594" class="server-detail"/>
+      <circle cx="691" cy="622.0" r="5.2" class="hardware-fill"/>
+      <circle cx="713" cy="622.0" r="5.2" class="hardware-fill"/>
+      <circle cx="735" cy="622.0" r="5.2" class="hardware-fill"/>
+      <circle cx="748" cy="607" r="3.3" class="server-accent"/>
+    </g>
+    <!-- Third node: a much taller NAS chassis with six actual-looking hot-swap caddies. -->
+    <path class="server-detail" d="M471 655 V674 M729 655 V674" stroke-width="4"/>
+    <rect x="472" y="663" width="256" height="179" rx="15" class="nas-body"/>
+    <rect x="481" y="674" width="238" height="24" rx="7" fill="var(--raccoon-mask, #141c25)"/>
+    <rect x="481" y="674" width="3" height="24" rx="2" class="server-accent"/>
+    <text x="492" y="690" fill="var(--raccoon-hardware,#d6e2eb)" font-size="12.5" font-weight="700" letter-spacing="2.2" font-family="ui-monospace,SFMono-Regular,Consolas,monospace">NAS</text>
+    <path class="server-trim" d="M544 685 H650" opacity=".7"/>
+    <circle cx="700" cy="685.5" r="4" class="server-accent"/>
+      <g class="nas-bay" data-bay="1" data-ejected="false" role="button" tabindex="0" focusable="true" aria-label="Eject NAS drive bay 1" aria-pressed="false">
+        <rect x="485" y="704" width="108" height="38" rx="6" class="bay-face"/>
+        <path d="M498 713 V733 M498 713 H508 M498 733 H508" class="bay-handle"/>
+        <path d="M524 717 H563 M524 727 H553" class="server-detail" stroke-width="1.7" opacity=".64"/>
+        <circle cx="578" cy="723" r="3.2" class="bay-led"/>
+      </g>
+      <g class="nas-bay" data-bay="2" data-ejected="false" role="button" tabindex="0" focusable="true" aria-label="Eject NAS drive bay 2" aria-pressed="false">
+        <rect x="606" y="704" width="108" height="38" rx="6" class="bay-face"/>
+        <path d="M619 713 V733 M619 713 H629 M619 733 H629" class="bay-handle"/>
+        <path d="M645 717 H684 M645 727 H674" class="server-detail" stroke-width="1.7" opacity=".64"/>
+        <circle cx="699" cy="723" r="3.2" class="bay-led"/>
+      </g>
+      <g class="nas-bay" data-bay="3" data-ejected="false" role="button" tabindex="0" focusable="true" aria-label="Eject NAS drive bay 3" aria-pressed="false">
+        <rect x="485" y="746" width="108" height="38" rx="6" class="bay-face"/>
+        <path d="M498 755 V775 M498 755 H508 M498 775 H508" class="bay-handle"/>
+        <path d="M524 759 H563 M524 769 H553" class="server-detail" stroke-width="1.7" opacity=".64"/>
+        <circle cx="578" cy="765" r="3.2" class="bay-led"/>
+      </g>
+      <g class="nas-bay" data-bay="4" data-ejected="false" role="button" tabindex="0" focusable="true" aria-label="Eject NAS drive bay 4" aria-pressed="false">
+        <rect x="606" y="746" width="108" height="38" rx="6" class="bay-face"/>
+        <path d="M619 755 V775 M619 755 H629 M619 775 H629" class="bay-handle"/>
+        <path d="M645 759 H684 M645 769 H674" class="server-detail" stroke-width="1.7" opacity=".64"/>
+        <circle cx="699" cy="765" r="3.2" class="bay-led"/>
+      </g>
+      <g class="nas-bay" data-bay="5" data-ejected="false" role="button" tabindex="0" focusable="true" aria-label="Eject NAS drive bay 5" aria-pressed="false">
+        <rect x="485" y="788" width="108" height="38" rx="6" class="bay-face"/>
+        <path d="M498 797 V817 M498 797 H508 M498 817 H508" class="bay-handle"/>
+        <path d="M524 801 H563 M524 811 H553" class="server-detail" stroke-width="1.7" opacity=".64"/>
+        <circle cx="578" cy="807" r="3.2" class="bay-led"/>
+      </g>
+      <g class="nas-bay" data-bay="6" data-ejected="false" role="button" tabindex="0" focusable="true" aria-label="Eject NAS drive bay 6" aria-pressed="false">
+        <rect x="606" y="788" width="108" height="38" rx="6" class="bay-face"/>
+        <path d="M619 797 V817 M619 797 H629 M619 817 H629" class="bay-handle"/>
+        <path d="M645 801 H684 M645 811 H674" class="server-detail" stroke-width="1.7" opacity=".64"/>
+        <circle cx="699" cy="807" r="3.2" class="bay-led"/>
+      </g>
+    <path class="hardware-secondary" stroke-width="3" d="M498 844 V851 M702 844 V851"/>
+  </g>
+  </g>
+
+  <!-- Tiny orbiting stars -->
+  <use href="#sparkle" xlink:href="#sparkle" x="875" y="486"/>
+  <use href="#sparkle" xlink:href="#sparkle" x="357" y="565"/>
+  <circle cx="789" cy="603" r="7" class="hardware-fill"/>
+  <!-- Vine-like cable physics: pass-through swishes, travelling waves, and inertia. -->
+  <script><![CDATA[
+    (() => {
+      const script = document.currentScript;
+      const svg = script && script.ownerSVGElement;
+      if (!svg || svg.dataset.cablePhysicsReady === 'true') return;
+      const ownerWindow = svg.ownerDocument?.defaultView || window;
+      const reduce = ownerWindow.matchMedia('(prefers-reduced-motion: reduce)');
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+      const groups = new Map();
+      svg.querySelectorAll('[data-swing]').forEach(node => {
+        const key = node.getAttribute('data-swing');
+        if (!groups.has(key)) groups.set(key, { key, paths: [] });
+        groups.get(key).paths.push({ node, original: node.getAttribute('d') });
+      });
+
+      // Sample the actual artist-drawn curves. Every sample is a tiny flexible
+      // joint; unlike cursor attraction, each joint has velocity and inertia.
+      const cableGroups = [...groups.values()];
+      const cables = [];
+      let cableCursor = 0;
+      function prepareNextCable() {
+        if (cableCursor >= cableGroups.length) { installInteractions(); return; }
+        const cable = cableGroups[cableCursor];
+        const index = cableCursor++;
+        const path = cable.paths[0].node;
+        const length = path.getTotalLength();
+        const count = length > 185 ? 22 : 10;
+        const points = Array.from({ length: count }, (_, i) => {
+          const t = i / (count - 1);
+          const p = path.getPointAtLength(length * t);
+          const p0 = path.getPointAtLength(length * Math.max(0, t - .012));
+          const p1 = path.getPointAtLength(length * Math.min(1, t + .012));
+          const vx = p1.x - p0.x, vy = p1.y - p0.y;
+          const mag = Math.hypot(vx, vy) || 1;
+          return { x: p.x, y: p.y, nx: -vy / mag, ny: vx / mag,
+                   displacement: 0, velocity: 0 };
+        });
+        cables.push({ ...cable, points, length, active: false, contact: false,
+                      lastHit: -Infinity, index });
+        setTimeout(prepareNextCable, 0);
+      }
+
+      // A smooth cubic path through the spring-mass joints. The endpoints
+      // remain connected to the raccoon/server; no entire-path rotation.
+      function renderCable(cable) {
+        const ps = cable.points;
+        const pts = ps.map((p, i) => {
+          // Ease motion to zero near both attachments, avoiding sharp kinks.
+          const fade = Math.sin(Math.PI * i / (ps.length - 1)) ** .7;
+          return { x: p.x + p.nx * p.displacement * fade,
+                   y: p.y + p.ny * p.displacement * fade };
+        });
+        let d = `M${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p0 = pts[Math.max(0, i - 1)];
+          const p1 = pts[i];
+          const p2 = pts[i + 1];
+          const p3 = pts[Math.min(pts.length - 1, i + 2)];
+          const x1 = p1.x + (p2.x - p0.x) / 6;
+          const y1 = p1.y + (p2.y - p0.y) / 6;
+          const x2 = p2.x - (p3.x - p1.x) / 6;
+          const y2 = p2.y - (p3.y - p1.y) / 6;
+          d += ` C${x1.toFixed(2)} ${y1.toFixed(2)} ${x2.toFixed(2)} ${y2.toFixed(2)} ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+        }
+        for (const path of cable.paths) path.node.setAttribute('d', d);
+      }
+
+      // Scroll acts like a small change of gravity direction, NOT repeated
+      // pushes that add up. The cable has mass, tension, and strong damping.
+      let scrollLean = 0;
+      let scrollGravity = 0;
+      let lastScrollImpulse = 0;
+      let raf = 0;
+      let lastFrame = 0;
+      function step(now) {
+        // Time-corrected integration, capped after tabs sleep/wake.
+        const dt = lastFrame ? clamp((now - lastFrame) / 16.667, .5, 1.65) : 1;
+        lastFrame = now;
+        // The temporary gravity tilt goes away after the scroll stops.
+        if (now - lastScrollImpulse > 65) scrollLean *= Math.pow(.93, dt);
+        if (now - lastScrollImpulse > 65) scrollGravity *= Math.pow(.91, dt);
+        if (Math.abs(scrollLean) < .015) scrollLean = 0;
+        if (Math.abs(scrollGravity) < .001) scrollGravity = 0;
+        let moving = false;
+        for (const cable of cables) {
+          if (!cable.active) continue;
+          const ps = cable.points;
+          const accelerations = ps.map((p, i) => {
+            if (i === 0 || i === ps.length - 1) return 0;
+            const wave = ps[i - 1].displacement + ps[i + 1].displacement - 2 * p.displacement;
+            // Normal projection creates a gentle sideways weight shift.
+            // Neighbor coupling preserves the cable shape without rippling wildly.
+            const hanging = Math.sin(Math.PI * i / (ps.length - 1));
+            const leanTarget = p.nx * scrollLean * hanging;
+            // Scroll speed briefly changes the vertical gravity on each joint.
+            const gravityPull = p.ny * scrollGravity * hanging;
+            return wave * .11 + (leanTarget - p.displacement) * .0195 + gravityPull;
+          });
+          let energy = 0;
+          for (let i = 1; i < ps.length - 1; i++) {
+            const p = ps[i];
+            p.velocity = (p.velocity + accelerations[i] * dt) * Math.pow(.84, dt);
+            p.displacement = clamp(p.displacement + p.velocity * dt, -16, 16);
+            energy += p.velocity ** 2 + (p.displacement * .06) ** 2;
+          }
+          if (energy < .005 && Math.abs(scrollLean) < .12 && Math.abs(scrollGravity) < .01) {
+            cable.active = false;
+            for (const p of ps) { p.velocity = 0; p.displacement = 0; }
+            for (const path of cable.paths) path.node.setAttribute('d', path.original);
+          } else {
+            renderCable(cable);
+            moving = true;
+          }
+        }
+        raf = moving ? requestAnimationFrame(step) : 0;
+        if (!moving) lastFrame = 0;
+      }
+
+      function localPoint(event) {
+        const ctm = svg.getScreenCTM();
+        if (!ctm) return null;
+        return new DOMPoint(event.clientX, event.clientY).matrixTransform(ctm.inverse());
+      }
+      function nearest(cable, x, y) {
+        let best = { d: Infinity, i: -1 };
+        const ps = cable.points;
+        // Proximity is against the CURRENT moving vine, never an imaginary
+        // magnetic point bound to the mouse's position.
+        for (let i = 1; i < ps.length - 1; i++) {
+          const p = ps[i];
+          const fade = Math.sin(Math.PI * i / (ps.length - 1)) ** .7;
+          const px = p.x + p.nx * p.displacement * fade;
+          const py = p.y + p.ny * p.displacement * fade;
+          const d = Math.hypot(px - x, py - y);
+          if (d < best.d) best = { d, i };
+        }
+        return best;
+      }
+      function swish(cable, i, pointerDX, pointerDY, proximity, time) {
+        const point = cable.points[i];
+        const normalSpeed = pointerDX * point.nx + pointerDY * point.ny;
+        if (Math.abs(normalSpeed) < 1.25) return;
+        const direction = Math.sign(normalSpeed);
+        // Quick pass = a stronger push; resting mouse = no force at all.
+        const kick = direction * clamp(Math.abs(normalSpeed) * .165, .55, 2.9) * proximity;
+        // A broader gentle swish makes the cable feel substantial, not whippy.
+        const spread = cable.points.length > 12 ? 2.7 : 1.75;
+        cable.points.forEach((p, j) => {
+          if (j === 0 || j === cable.points.length - 1) return;
+          const attenuation = Math.exp(-.5 * ((j - i) / spread) ** 2);
+          p.velocity += kick * attenuation;
+        });
+        cable.lastHit = time;
+        cable.active = true;
+        if (!raf) raf = requestAnimationFrame(step);
+      }
+
+      let previous = null;
+      function move(event) {
+        if (reduce.matches || (event.pointerType && event.pointerType !== 'mouse' && event.pointerType !== 'pen')) return;
+        const point = localPoint(event);
+        if (!point) return;
+        if (!previous) { previous = { x: point.x, y: point.y, time: performance.now() }; return; }
+        const time = performance.now();
+        const elapsed = time - previous.time;
+        if (elapsed > 150) { previous = { x: point.x, y: point.y, time }; return; }
+        const dx = point.x - previous.x;
+        const dy = point.y - previous.y;
+        // Ignore teleporting pointers rather than violently snapping a vine.
+        if (Math.hypot(dx, dy) > 135) { previous = { x: point.x, y: point.y, time }; return; }
+        const midX = (point.x + previous.x) / 2;
+        const midY = (point.y + previous.y) / 2;
+        for (const cable of cables) {
+          const curr = nearest(cable, point.x, point.y);
+          const prev = nearest(cable, previous.x, previous.y);
+          const middle = nearest(cable, midX, midY);
+          const hit = [curr, prev, middle].sort((a, b) => a.d - b.d)[0];
+          // Exit hysteresis: a cable is contacted once per pass, never every
+          // frame while the pointer lingers. No attraction or sticky dragging.
+          if (Math.min(curr.d, middle.d) > 39) cable.contact = false;
+          if (!cable.contact && hit.d < 26 && time - cable.lastHit > 180) {
+            cable.contact = true;
+            swish(cable, hit.i, clamp(dx, -35, 35), clamp(dy, -35, 35),
+                  clamp((36 - hit.d) / 28, .25, 1), time);
+          }
+        }
+        previous = { x: point.x, y: point.y, time };
+      }
+      function resetPointer() {
+        previous = null;
+        for (const cable of cables) cable.contact = false;
+        // Intentionally do NOT kill RAF: vines coast naturally after exit.
+      }
+      function readScrollY() {
+        return ownerWindow.scrollY ?? ownerWindow.pageYOffset ?? svg.ownerDocument.documentElement?.scrollTop ?? 0;
+      }
+      function isVisible() {
+        const rect = svg.getBoundingClientRect();
+        const vh = ownerWindow.innerHeight || svg.ownerDocument.documentElement?.clientHeight || 0;
+        const vw = ownerWindow.innerWidth || svg.ownerDocument.documentElement?.clientWidth || 0;
+        return rect.bottom > 0 && rect.right > 0 && rect.top < vh && rect.left < vw;
+      }
+      let lastScrollY = readScrollY();
+      let lastScrollTime = performance.now();
+      function onScroll() {
+        if (reduce.matches || !isVisible()) {
+          lastScrollY = readScrollY();
+          lastScrollTime = performance.now();
+          scrollLean = 0;
+          scrollGravity = 0;
+          return;
+        }
+        const now = performance.now();
+        const scrollY = readScrollY();
+        const delta = scrollY - lastScrollY;
+        const elapsed = Math.max(14, now - lastScrollTime);
+        lastScrollY = scrollY;
+        lastScrollTime = now;
+        if (Math.abs(delta) < 1.5) return;
+        const rawVelocity = clamp(delta / (elapsed / 16.667), -20, 20);
+        // Replace an accumulated impulse with a bounded, smoothed tilt.
+        scrollLean = clamp(scrollLean * .5 - rawVelocity * .29, -6.3, 6.3);
+        // Downward scroll pulls the vines; upward scroll gives them a lift.
+        scrollGravity = clamp(rawVelocity * .012, -0.24, 0.24);
+        lastScrollImpulse = now;
+        if (Math.abs(scrollLean) < .15 && Math.abs(scrollGravity) < .005) return;
+        for (const cable of cables) cable.active = true;
+        if (!raf) raf = requestAnimationFrame(step);
+      }
+      function installInteractions() {
+      svg.dataset.cablePhysicsReady = 'true';
+      svg.addEventListener('pointermove', move, { passive: true });
+      svg.addEventListener('pointerleave', resetPointer, { passive: true });
+      svg.addEventListener('pointercancel', resetPointer, { passive: true });
+      ownerWindow.addEventListener('scroll', onScroll, { passive: true });
+      ownerWindow.addEventListener('resize', () => { lastScrollY = readScrollY(); lastScrollTime = performance.now(); }, { passive: true });
+      function resetMotion() {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        lastFrame = 0;
+        scrollLean = 0;
+        scrollGravity = 0;
+        for (const cable of cables) {
+          cable.active = false;
+          cable.contact = false;
+          for (const p of cable.points) { p.displacement = 0; p.velocity = 0; }
+          for (const path of cable.paths) path.node.setAttribute('d', path.original);
+        }
+        resetPointer();
+      }
+      // NAS hotswap bays really eject and reseat via click, Enter, or Space.
+      svg.querySelectorAll('.nas-bay').forEach(bay => {
+        const toggle = () => {
+          const ejected = bay.getAttribute('data-ejected') !== 'true';
+          bay.setAttribute('data-ejected', String(ejected));
+          bay.setAttribute('aria-pressed', String(ejected));
+          bay.setAttribute('aria-label', `${ejected ? 'Reseat' : 'Eject'} NAS drive bay ${bay.dataset.bay}`);
+        };
+        bay.addEventListener('click', toggle);
+        bay.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
+        });
+      });
+      reduce.addEventListener?.('change', () => { if (reduce.matches) resetMotion(); });
+      svg.ownerDocument.addEventListener?.('visibilitychange', () => {
+        if (svg.ownerDocument.hidden) { lastScrollY = readScrollY(); lastScrollTime = performance.now(); }
+      });
+      }
+      const beginCableSetup = () => setTimeout(prepareNextCable, 0);
+      if (svg.ownerDocument.readyState === 'complete') beginCableSetup();
+      else ownerWindow.addEventListener('load', beginCableSetup, { once: true });
+    })();
+  ]]></script>
+</svg>
