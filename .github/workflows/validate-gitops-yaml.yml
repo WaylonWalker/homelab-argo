@@ -1,15 +1,6 @@
 name: Validate GitOps YAML changes
 on:
   pull_request:
-    paths:
-      - 'k8s/**/*.yaml'
-      - 'k8s/**/*.yml'
-      - 'argo-apps/**/*.yaml'
-      - 'argo-apps/**/*.yml'
-      - 'argocd/**/*.yaml'
-      - 'argocd/**/*.yml'
-      - 'system-upgrade/**/*.yaml'
-      - '.github/workflows/validate-gitops-yaml.yml'
 permissions:
   contents: read
 jobs:
@@ -62,3 +53,10 @@ jobs:
               print('\n'.join(errors), file=sys.stderr)
               sys.exit(1)
           PY
+      - name: Scan current source for secrets
+        run: |
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/repo:ro" \
+            --workdir /repo \
+            ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            detect --no-git --source /repo --config /repo/.gitleaks.toml --redact
