@@ -21,7 +21,7 @@ spec:
         - name: cluster-regcred
       initContainers:
         - name: cache-search-models
-          image: registry.wayl.one/stillframe@sha256:0ac0dff98681ec623f95d1b695856eddb7f10c05120b9560d2b06b628b6866b9
+          image: registry.wayl.one/stillframe@sha256:443c98a9bead207a0868d9765bcb470056647af54b608b4cdd3f0d27b3293710
           imagePullPolicy: IfNotPresent
           command:
             - /app/.venv/bin/python
@@ -62,7 +62,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: stillframe
-          image: registry.wayl.one/stillframe@sha256:0ac0dff98681ec623f95d1b695856eddb7f10c05120b9560d2b06b628b6866b9
+          image: registry.wayl.one/stillframe@sha256:443c98a9bead207a0868d9765bcb470056647af54b608b4cdd3f0d27b3293710
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -76,6 +76,8 @@ spec:
               value: /photos
             - name: STILLFRAME_EXCLUDED_PATHS
               value: stillframe
+            - name: STILLFRAME_EXCLUDED_DIR_NAMES
+              value: websites:output
             - name: STILLFRAME_MAP_STYLE_URL
               value: https://tiles.openfreemap.org/styles/dark
             - name: STILLFRAME_MAP_CONNECT_ORIGINS
