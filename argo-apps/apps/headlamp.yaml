@@ -10,10 +10,19 @@ spec:
     chart: headlamp
     targetRevision: 0.45.0
     helm:
+      # Chart 0.45.0 requires >=1 replica in its schema although its template accepts 0.
+      skipSchemaValidation: true
       values: |
+        # Retired for issue #174; keep the Application for reversible GitOps recovery.
+        replicaCount: 0
+        automountServiceAccountToken: false
+        serviceAccount:
+          create: false
+        clusterRoleBinding:
+          create: false
         ingress:
           # -- Enable ingress controller resource
-          enabled: true
+          enabled: false
           # -- Annotations for Ingress resource
           annotations:
             cert-manager.io/cluster-issuer: letsencrypt-prod
