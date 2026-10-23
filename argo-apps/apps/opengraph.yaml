@@ -17,7 +17,7 @@ spec:
         name: opengraph
         image:
           name: opengraph
-          tag: "0.3.16"
+          tag: "0.3.17"
         additionalDomains:
           - waylonwalker.com
   destination:
