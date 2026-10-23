@@ -46,3 +46,10 @@ Traefik calls the auth service; the protected application is not the caller.
 LibreSpeed is the next isolated policy candidate: its deployed manifest has
 only a timezone variable, no mounted app configuration, and no configured
 database or IP information service. Verify its backend routes during rollout.
+
+The LibreSpeed policy selects only its web pod. It allows Traefik ingress to
+TCP 80 and DNS egress to CoreDNS. The public page and the lightweight backend
+routes returned HTTP 200 before the policy. Other backend egress is denied.
+This rule depends on the deployed image continuing to use local results
+storage and no configured external IP information service. Recheck those
+settings before enabling optional LibreSpeed features or changing the image.
