@@ -11,6 +11,7 @@ metadata:
   annotations:
     cnpg.io/hibernation: "on"
 spec:
+  enablePDB: false
   instances: 1
   storage:
     storageClass: longhorn-backup
