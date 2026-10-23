@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: homelab-docs-tls
+spec:
+  secretName: homelab-docs-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-dns
+  dnsNames:
+    - homelab.waylonwalker.com
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: build-homelab-docs-tls
+spec:
+  secretName: build-homelab-docs-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-dns
+  dnsNames:
+    - build.homelab.waylonwalker.com

@@ -1,57 +1,8 @@
-# Automatic DNS through falcon
-
-## Current setup
-
-On 2026-10-02, the `falcon` tunnel configuration changed from version 92 to 93.
-Its final ingress rule now sends unmatched HTTP hostnames to
-`http://traefik.kube-system.svc.cluster.local:80`. The 63 earlier rules keep
-their order and destinations. These include the explicit SSH and TCP routes.
-
-ExternalDNS watches Traefik Ingresses. It creates proxied CNAME records that
-point to `1bdd7ce3-6476-43bc-a9e0-6e30167617e5.cfargotunnel.com`.
-Traefik publishes that tunnel hostname in Ingress status. ExternalDNS uses
-`create-only`, so it does not change or delete an existing DNS record.
-
-For a new subdomain in a zone listed in `k8s/external-dns/zone-ids.yaml`, add
-an Ingress with `ingressClassName: traefik` and a host under `spec.rules`.
-ExternalDNS creates the DNS record. The tunnel sends the request to Traefik.
-Traefik sends the request to the Service in the Ingress.
-
-The permanent canary is `external-dns-canary.wayl.one`. It uses the `whoami`
-Service in Kubernetes.
-
-## Limits
-
-- `create-only` preserves existing records. An existing record that points to
-  another tunnel needs a separate migration. The `fokais.com` and
-  `www.fokais.com` records still point to the `fokais` tunnel.
-- ExternalDNS uses the zones in `zone-ids.yaml`. Add a new Cloudflare zone to
-  that file and the sealed token before you use it for an Ingress.
-- The current policy manages CNAME records for Ingress hosts. A new apex host
-  or a host with a conflicting record needs separate DNS work.
-- Cloudflare certificates and Access policies are separate from DNS and tunnel
-  routing. Check them when a new hostname needs those services.
-
-## Check a new host
-
-Replace `HOST` with the new hostname.
-
-```bash
-kubectl get ingress -A -o wide
-kubectl logs -n external-dns deployment/external-dns --since=10m
-dig +short HOST
-curl -I https://HOST/
-```
-
-If the host has a proxied record, `dig` returns Cloudflare IP addresses.
-Use the Cloudflare DNS API or dashboard to inspect its CNAME target.
-The target must be the `falcon` tunnel UUID above.
-
-If the tunnel configuration changes, make sure that its last ingress rule
-still points to Traefik. Cloudflare stores this configuration outside Git.
-The prechange configuration is saved locally at
-`private/cloudflared/falcon-config-before-ingress-fallback-2026-10-02.json`.
-That private file is not in the repository.
-
-Cloudflare documents the [tunnel configuration API](https://developers.cloudflare.com/api/resources/zero_trust/subresources/tunnels/subresources/cloudflared/subresources/configurations/)
-and [ingress rule order](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/local-management/configuration-file/).
+---
+title: 'Automatic DNS through falcon'
+slug: '/automatic-dns/'
+published: true
+private: true
+---
+<!-- markata-encrypted-source:v1 key=default -->
+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

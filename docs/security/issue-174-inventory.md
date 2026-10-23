@@ -1,62 +1,8 @@
-# Security inventory: issue 174, first pass
-
-The graph in [issue-174-dependencies.yaml](issue-174-dependencies.yaml) records
-configured connections found in deployed manifests. It is a starting point for
-policy design, not a complete traffic trace. The scan also covered local
-repositories under `~/git`; Forgejo workflow files were found in
-`forgejo-runner-smoke`, `brainrot-lighthouse-release`, and
-`learn-forgejo-actions`. Jobs using `ubuntu-latest` will wait while the runner
-is paused. Other Forgejo-hosted repositories and scheduled jobs remain unknown.
-
-Live Kubernetes inventory before the first policy found 123 namespaces and 112
-Ingress resources. NetworkPolicies existed in 21 namespaces; eight policies
-declared egress isolation. Three Services used `LoadBalancer`: Traefik,
-registry, and Samba. External reachability and firewall boundaries were not
-tested. Thirty running pods included a privileged container, and 55 had a
-hostPath mount. These counts are a snapshot, not an exposure verdict.
-
-The K3s nodes use Flannel annotations. An isolated test namespace confirmed
-that an egress NetworkPolicy took effect: HTTP from a client pod to a server pod
-worked before the policy, failed after propagation, and worked again after
-policy removal. The test namespace was deleted. This verifies enforcement for
-that pod pair; it does not prove every CNI path or policy rule.
-
-The first target is `whoami`. Its Deployment defines no outbound application
-connection. Its Ingress and DNS canary route through Traefik. The policy allows
-the observed Traefik selector for ingress and CoreDNS for egress. Direct routes
-from other public apps to data, management, storage, and API services are still
-unverified. Do not infer internet reachability from an Ingress or a LAN-facing
-Service. Do not add broader egress policies until traces, logs, scheduled jobs,
-and failure paths have been checked.
-
-Next inventory work: collect traffic evidence for MinIO, PostgreSQL, Longhorn,
-NAS, Kubernetes API, registry, OTel, DNS, webhooks, and backup jobs; classify
-service-account token mounts and RBAC by workload; inspect privileged and
-hostPath workloads individually. Avoid publishing internal addresses or secret
-values. Check Cloudflare Access and application authentication separately from
-cluster routing.
-
-The second scan of `~/git` found more paths in app source repos. It confirmed
-that Brainrot has scheduled RSS and Dropper HTTP clients, Shot has Redis and S3
-clients, and Lantern Table uses Valkey for public-mode signaling. The public
-graph now includes only connections already visible in this GitOps repository.
-The detailed map for private app repositories is kept locally and is not
-published here. In particular, a forward-auth URL in an Ingress chart means
-Traefik calls the auth service; the protected application is not the caller.
-LibreSpeed is the next isolated policy candidate: its deployed manifest has
-only a timezone variable, no mounted app configuration, and no configured
-database or IP information service. Verify its backend routes during rollout.
-
-The LibreSpeed policy selects only its web pod. It allows Traefik ingress to
-TCP 80 and DNS egress to CoreDNS. The public page and the lightweight backend
-routes returned HTTP 200 before the policy. Other backend egress is denied.
-This rule depends on the deployed image continuing to use local results
-storage and no configured external IP information service. Recheck those
-settings before enabling optional LibreSpeed features or changing the image.
-
-The `themes.waylonwalker.com` static site is a separate policy target. Its
-nginx pod serves a mounted webroot and has no configured upstream proxy or
-application egress. The Faro telemetry script is inserted into HTML for the
-visitor's browser; it is not a connection from the nginx pod. The policy in
-that site's overlay allows Traefik ingress and CoreDNS egress only. Recheck
-the nginx template before adding server-side proxy features.
+---
+title: 'Security inventory: issue 174, first pass'
+slug: '/security/issue-174-inventory/'
+published: true
+private: true
+---
+<!-- markata-encrypted-source:v1 key=default -->
+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

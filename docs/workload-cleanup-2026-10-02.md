@@ -1,22 +1,8 @@
-# Workload cleanup
-
-This change removes obsolete runtime resources and retains their stored data.
-Private rollback inventories are in `private/deprecation-2026-10-02`.
-
-- Keep servers for `old.waylonwalker.com`, `goaccess.waylonwalker.com`, and `dev.waylonwalker.com`. Remove their legacy build and cache-cleaning CronJobs.
-- Keep the current notes sites, their builders, and `searchgo.waylonwalker.com`. Remove the unused Go development web deployment and maintenance builder.
-- Remove the orphan `image-updater-secret-*` Argo CD installation. Keep the current Argo CD installation, image updater, shared accounts, and Git credentials.
-- Remove the stopped Markata documentation workload and `go.markata.dev` route. Keep its site volume.
-- Remove PhotoPrism runtime definitions and its stale route. Keep its bound claim and photos.
-- Remove the broken Copyparty route, `walkershare.wayl.one`. Keep Filebrowser, Syncthing, Samba, and their storage.
-- Keep six Cloudflared replicas. Remove the broad toleration that permits scheduling onto nodes under disk pressure. Keep two old ReplicaSets and twenty terminal tunnel pods. A namespace-scoped cleanup job runs every thirty minutes; it checks pod ownership and uses UID deletion preconditions.
-
-## Temporarily disabled applications
-
-Postiz application and Redis deployments have zero replicas. Its database uses `cnpg.io/hibernation: "on"`. Claims and secrets remain intact.
-To resume, remove that annotation and restore both deployments to one replica.
-
-Perform Peoria has no Argo Application in this repository. Its production and development deployments are scaled to zero. Migration CronJobs and database backup schedules are suspended. Both databases have the hibernation annotation. A database must be healthy before the operator can finish hibernation.
-To resume, remove the hibernation annotations, restore deployments to one replica, and restore each schedule's original suspension state from the private inventory. Migration jobs were already suspended before this change.
-
-CloudNativePG hibernation retains claims. See the [operator documentation](https://cloudnative-pg.io/docs/1.25/declarative_hibernation/).
+---
+title: 'Workload cleanup'
+slug: '/workload-cleanup-2026-10-02/'
+published: true
+private: true
+---
+<!-- markata-encrypted-source:v1 key=default -->
+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
