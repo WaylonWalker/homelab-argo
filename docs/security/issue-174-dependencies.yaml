@@ -143,3 +143,10 @@ edges:
     confidence: medium
     observation: policy-allow-only
     proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: lantern-table, service: lantern-table, port: 8765, protocol: TCP}
+    reason: Public Lantern Table HTTP and WebSocket routes.
+    evidence: [k8s/lantern-table/ingress.yaml, k8s/lantern-table/app-networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow the live Traefik pod selector to the app pods on TCP 8765.
