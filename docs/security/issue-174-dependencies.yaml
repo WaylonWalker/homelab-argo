@@ -129,3 +129,17 @@ edges:
     confidence: medium
     observation: policy-allow-only
     proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: themes, service: web, port: 80, protocol: TCP}
+    reason: Public static site requests.
+    evidence: [k8s/static-sites/sites/themes.waylonwalker.com/kustomization.yaml, k8s/static-sites/sites/themes.waylonwalker.com/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only the live Traefik pod selector to the themes web pod.
+  - source: {namespace: themes, workload: web}
+    destination: {namespace: kube-system, service: kube-dns, port: 53, protocol: UDP/TCP}
+    reason: DNS access reserved for the isolated web pod.
+    evidence: [k8s/static-sites/sites/themes.waylonwalker.com/networkpolicy.yaml]
+    confidence: medium
+    observation: policy-allow-only
+    proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
