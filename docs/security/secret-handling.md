@@ -6,6 +6,7 @@ Use this guide when you add, move, or rotate a credential in this repository.
 
 - Do not commit a Kubernetes `Secret` with a real value. Base64 encoding does not protect a value.
 - Store encrypted values in a strict-scope `SealedSecret`. Its name and namespace must match the target `Secret`.
+- Before you adopt an existing Secret, add `sealedsecrets.bitnami.com/managed: "true"` to that Secret. The controller can then replace it and add an owner reference to the SealedSecret.
 - Do not put a password, token, private key, or encoded copy in a workflow file, example, log, or issue comment.
 - Do not print credentials from build scripts. Read them from a protected file or standard input.
 - Set local credential files to owner-only access. Remove temporary files after use.
