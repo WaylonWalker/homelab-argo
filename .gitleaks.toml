@@ -1,0 +1,20 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Sealed Secrets ciphertext is encrypted by the cluster controller and is not plaintext credential material."
+condition = "AND"
+regexTarget = "line"
+regexes = ['^\s*(?:#\s*)?[^:]+:\s*"?Ag[A-Za-z0-9+/=]{500,}"?,?\s*$']
+paths = [
+  '''(?i)(^|/)[^/]*(sealed|secret)[^/]*\.ya?ml$''',
+  '''(^|/)k8s/forgejo/deployment\.yaml$''',
+]
+
+[[allowlists]]
+description = "These committed Faro SDK bundles contain generated public client code, not server credentials."
+paths = [
+  '''(^|/)k8s/telemetry-bootstrap/assets/faro-bootstrap\.0807bf7fa55c\.js$''',
+  '''(^|/)k8s/telemetry-bootstrap/assets/faro-bootstrap\.js$''',
+  '''(^|/)k8s/telemetry-bootstrap/assets/faro-client\.js$''',
+]

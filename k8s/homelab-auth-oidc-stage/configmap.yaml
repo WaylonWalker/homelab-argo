@@ -23,5 +23,5 @@ data:
   HLAB_AUTH_PUBLIC_AUTH_ORIGIN: https://auth-oidc-stage.wayl.one
   HLAB_AUTH_OIDC_ENABLED: "true"
   HLAB_AUTH_OIDC_SIGNING_PRIVATE_KEY_FILE: /run/secrets/oidc/oidc-signing.pem
-  HLAB_AUTH_OIDC_SIGNING_KEY_ID: oidc-stage-f06d896
+  HLAB_AUTH_OIDC_SIGNING_KEY_ID: oidc-stage-f06d896  #gitleaks:allow
   HLAB_AUTH_OIDC_RESOURCE: https://mcp-oidc-stage.wayl.one/mcp
