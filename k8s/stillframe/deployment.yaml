@@ -19,6 +19,35 @@ spec:
       automountServiceAccountToken: false
       imagePullSecrets:
         - name: cluster-regcred
+      initContainers:
+        - name: cache-search-models
+          image: registry.wayl.one/stillframe@sha256:469835b7c95129ddb30a32ef8846a527ed736c40c27d24d18915514f3795f011
+          imagePullPolicy: IfNotPresent
+          command:
+            - /app/.venv/bin/python
+            - /app/scripts/install_models.py
+          env:
+            - name: STILLFRAME_DATA
+              value: /data
+            - name: HF_HOME
+              value: /data/models/huggingface
+            - name: HF_HUB_DISABLE_TELEMETRY
+              value: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          volumeMounts:
+            - name: data
+              mountPath: /data
       nodeSelector:
         kubernetes.io/hostname: falcon3
       securityContext:
@@ -33,7 +62,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: stillframe
-          image: registry.wayl.one/stillframe@sha256:a0e6c4da07818ede4c3dca934097c54aaf9e09b2b8cd324161b555b726255f6e
+          image: registry.wayl.one/stillframe@sha256:469835b7c95129ddb30a32ef8846a527ed736c40c27d24d18915514f3795f011
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -45,6 +74,10 @@ spec:
               value: /data
             - name: STILLFRAME_FOLDER
               value: /photos
+            - name: STILLFRAME_MAP_STYLE_URL
+              value: https://tiles.openfreemap.org/styles/dark
+            - name: STILLFRAME_MAP_CONNECT_ORIGINS
+              value: https://tiles.openfreemap.org
             - name: STILLFRAME_PUBLIC_URL
               value: https://stillframe.waylonwalker.com
             - name: STILLFRAME_TRUSTED_PROXY_CIDRS
@@ -53,6 +86,10 @@ spec:
               value: "true"
             - name: STILLFRAME_ENVIRONMENT
               value: production
+            - name: HF_HOME
+              value: /data/models/huggingface
+            - name: HF_HUB_DISABLE_TELEMETRY
+              value: "1"
             - name: OTEL_SERVICE_NAME
               value: stillframe
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
