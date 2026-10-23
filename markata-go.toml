@@ -12,3 +12,87 @@ use_gitignore = true
 
 [markata-go.layout]
 name = "docs"
+
+[markata-go.auto_feeds.tags]
+enabled = false
+
+[markata-go.components.nav]
+enabled = true
+position = "header"
+style = "horizontal"
+
+[[markata-go.components.nav.items]]
+label = "Operate"
+url = "/operate/"
+
+[[markata-go.components.nav.items]]
+label = "Recover"
+url = "/recover/"
+
+[[markata-go.components.nav.items]]
+label = "Understand"
+url = "/understand/"
+
+[[markata-go.components.nav.items]]
+label = "Change"
+url = "/change/"
+
+[[markata-go.feeds]]
+slug = "operate"
+title = "Operate"
+description = "Runbooks for routine homelab operations and service checks."
+filter = "'operate' in tags and published == True"
+sort = "title"
+include_private = true
+items_per_page = 0
+
+[[markata-go.feeds]]
+slug = "recover"
+title = "Recover"
+description = "Recovery procedures, backup checks, and restoration records."
+filter = "'recover' in tags and published == True"
+sort = "title"
+include_private = true
+items_per_page = 0
+
+[[markata-go.feeds]]
+slug = "understand"
+title = "Understand"
+description = "Inventories, architecture, and maps of the homelab."
+filter = "'understand' in tags and published == True"
+sort = "title"
+include_private = true
+items_per_page = 0
+
+[[markata-go.feeds]]
+slug = "change"
+title = "Change"
+description = "Plans and rollout guides for changing homelab systems."
+filter = "'change' in tags and published == True"
+sort = "title"
+include_private = true
+items_per_page = 0
+
+[markata-go.sidebar]
+multi_feed = true
+feeds = ["operate", "recover", "understand", "change"]
+
+[[markata-go.sidebar.feed_sections]]
+feed = "operate"
+title = "Operate"
+collapsed = false
+
+[[markata-go.sidebar.feed_sections]]
+feed = "recover"
+title = "Recover"
+collapsed = true
+
+[[markata-go.sidebar.feed_sections]]
+feed = "understand"
+title = "Understand"
+collapsed = true
+
+[[markata-go.sidebar.feed_sections]]
+feed = "change"
+title = "Change"
+collapsed = true

@@ -965,3 +965,6 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/vim,node,data,emacs,python,pycharm,executable,sublimetext,visualstudio,visualstudiocode
 private
+/.markata/
+/output/
+/site-assets/markata-tailwind.css
