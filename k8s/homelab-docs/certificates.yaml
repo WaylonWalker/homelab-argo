@@ -20,4 +20,4 @@ spec:
     kind: ClusterIssuer
     name: letsencrypt-dns
   dnsNames:
-    - build.homelab.waylonwalker.com
+    - build-homelab.waylonwalker.com
