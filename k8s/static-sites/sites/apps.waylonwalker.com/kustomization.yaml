@@ -9,6 +9,9 @@ resources:
   - ../../components/hostpath-webroot
   - site-config.yaml
 
+patches:
+  - path: deployment-security-refresh.yaml
+
 replacements:
   - source:
       kind: ConfigMap
