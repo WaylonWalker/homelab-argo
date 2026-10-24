@@ -112,18 +112,20 @@ spec:
               cpu: 100m
               memory: 1Gi
             limits:
-              cpu: 1500m
+              cpu: "2"
               memory: 4Gi
           readinessProbe:
             httpGet:
               path: /healthz
               port: http
+            timeoutSeconds: 5
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /healthz
               port: http
+            timeoutSeconds: 5
             initialDelaySeconds: 30
             periodSeconds: 20
           volumeMounts:
