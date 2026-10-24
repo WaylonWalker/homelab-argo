@@ -5,6 +5,7 @@ resources:
   - valkey.yaml
   - networkpolicy.yaml
   - app-networkpolicy.yaml
+  - registry-pull-sealed-secret.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
