@@ -8,3 +8,4 @@ resources:
 - hlab-auth-oidc-stage.yaml
 - www-fokais.yaml
 - dropper.yaml
+- notify-bridge.yaml
