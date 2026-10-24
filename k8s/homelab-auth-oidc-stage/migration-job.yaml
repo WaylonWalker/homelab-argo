@@ -14,7 +14,7 @@ spec:
       restartPolicy: OnFailure
       automountServiceAccountToken: false
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       securityContext:
         runAsNonRoot: true
         runAsUser: 999

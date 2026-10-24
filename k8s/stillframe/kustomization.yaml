@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: stillframe
 resources:
   - namespace.yaml
-  - sealed-regcred.yaml
   - deployment.yaml
   - ingress-auth.yaml
   - network-policy.yaml
