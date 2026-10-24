@@ -63,7 +63,7 @@ spec:
     spec:
       serviceAccountName: minecraft-admin
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       containers:
         - name: app
           image: registry.wayl.one/kraft-admin/app:0.3.10
