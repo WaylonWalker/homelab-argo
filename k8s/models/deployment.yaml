@@ -17,7 +17,7 @@ spec:
       labels: *labels
     spec:
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
