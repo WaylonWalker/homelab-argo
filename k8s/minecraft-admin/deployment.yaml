@@ -15,7 +15,7 @@ metadata:
   name: minecraft-admin-config
   namespace: minecraft-admin
 data:
-  ALLOWED_NAMESPACES: "kraft,magnet-smp"
+  ALLOWED_NAMESPACES: "magnet-smp"
   SERVER_CONFIG_PATH: "/app/config/servers.yaml"
   SESSION_HTTPS_ONLY: "true"
   MAX_PVC_SIZE_GI: "20"
@@ -28,15 +28,6 @@ metadata:
 data:
   servers.yaml: |
     servers:
-      - id: kraft
-        name: Kraft
-        namespace: kraft
-        deployment: kraft
-        service: kraft
-        container: kraft
-        data_volume_name: minecraft-data
-        storage_class_name: longhorn-backup
-        map_ingress_host: kraft-map.wayl.one
       - id: magnet-smp
         name: Magnet SMP
         namespace: magnet-smp
@@ -58,6 +49,8 @@ spec:
       app: minecraft-admin
   template:
     metadata:
+      annotations:
+        config-version: "remove-paused-kraft"
       labels:
         app: minecraft-admin
     spec:
@@ -155,39 +148,6 @@ spec:
         - kraft-admin.wayl.one
         - kraft.wayl.one
       secretName: kraft-admin-tls
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: minecraft-admin
-  namespace: kraft
-rules:
-  - apiGroups: ["apps"]
-    resources: ["deployments", "deployments/scale"]
-    verbs: ["get", "list", "watch", "patch", "update"]
-  - apiGroups: [""]
-    resources: ["pods", "pods/log", "pods/exec", "persistentvolumeclaims", "services", "events"]
-    verbs: ["get", "list", "watch", "create", "delete", "patch", "update"]
-  - apiGroups: [""]
-    resources: ["persistentvolumeclaims"]
-    verbs: ["create", "patch", "update"]
-  - apiGroups: [""]
-    resources: ["secrets"]
-    verbs: ["get"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: minecraft-admin
-  namespace: kraft
-subjects:
-  - kind: ServiceAccount
-    name: minecraft-admin
-    namespace: minecraft-admin
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: minecraft-admin
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
