@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: registry-pull-canary-opengraph
+  namespace: opengraph
+  labels:
+    app: registry-pull-canary
+    registry-pull-canary: 'true'
+spec:
+  automountServiceAccountToken: false
+  activeDeadlineSeconds: 900
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 5
+  imagePullSecrets:
+  - name: registry-pull
+  containers:
+  - name: pull-check
+    image: registry.wayl.one/opengraph:0.3.17
+    imagePullPolicy: Always
+    command:
+    - /bin/sh
+    - -c
+    args:
+    - sleep 600
+    resources:
+      requests:
+        cpu: 1m
+        memory: 8Mi
