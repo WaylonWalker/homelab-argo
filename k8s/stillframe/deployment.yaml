@@ -21,7 +21,7 @@ spec:
         - name: registry-pull
       initContainers:
         - name: cache-search-models
-          image: registry.wayl.one/stillframe@sha256:1202e79d757d1dd752fb7a4d1c6e22164511be33e9ff40ced5580e03fabdd549
+          image: registry.wayl.one/stillframe@sha256:8d9de31c91fef2db719c6e56f781f7edacb5f98ea75caf9124b10a64e3bb1ec9
           imagePullPolicy: IfNotPresent
           command:
             - /app/.venv/bin/python
@@ -62,7 +62,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: stillframe
-          image: registry.wayl.one/stillframe@sha256:1202e79d757d1dd752fb7a4d1c6e22164511be33e9ff40ced5580e03fabdd549
+          image: registry.wayl.one/stillframe@sha256:8d9de31c91fef2db719c6e56f781f7edacb5f98ea75caf9124b10a64e3bb1ec9
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -74,6 +74,12 @@ spec:
               value: /data
             - name: STILLFRAME_FOLDER
               value: /photos
+            - name: STILLFRAME_METADATA_WORKER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: stillframe-metadata-worker
+                  key: token
+                  optional: true
             - name: STILLFRAME_EXCLUDED_PATHS
               value: waylon/music:waylon/sites:stillframe:public/games:waylon/git/covers.waylonwalker.com:waylon/git/wyattbubbylee.com:waylon/git/screenshots.waylonwalker.com:waylon/git/waylonwalker.com:waylon/git/pype.dev:waylon/git/minecraft-recording.waylonwalker.com:waylon/git/neovimconf2022.waylonwalker.com:waylon/git/aylawalker.com:waylon/git/raft.waylonwalker.com:waylon/git/rhiannonwalker.com:waylon/git/fluffed-up.com:waylon/git/stable-diffusion-waylonwalker-com:waylon/git/stable-diffusion-pype-dev:wyatt/saved stuff/wyattbubbylee.com
             - name: STILLFRAME_EXCLUDED_DIR_NAMES
