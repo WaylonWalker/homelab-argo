@@ -341,7 +341,7 @@ spec:
             - name: dropper-cache
               emptyDir: {}
           imagePullSecrets:
-            - name: cluster-regcred
+            - name: registry-pull
           restartPolicy: OnFailure
 # ---
 # apiVersion: v1
