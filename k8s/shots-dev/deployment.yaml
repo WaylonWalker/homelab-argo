@@ -167,7 +167,7 @@ spec:
             - mountPath: /cache
               name: cache
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       restartPolicy: Always
       volumes:
         - name: cache
