@@ -24,3 +24,4 @@ resources:
 - performpeoria-prod.yaml
 - shots-dev.yaml
 - stillframe.yaml
+- dropper-prod-canary.yaml
