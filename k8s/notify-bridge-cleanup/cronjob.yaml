@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: notify-bridge-cleanup
+  namespace: notify-bridge
+spec:
+  schedule: "15 * * * *"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+            - name: registry-pull
+          restartPolicy: Never
+          containers:
+            - name: cleanup
+              image: registry.wayl.one/notify-bridge/app:0.1.105
+              command: ["sh", "-lc", "python -c 'from app.cleanup import cleanup_media; cleanup_media(\"/data/media\", 24)'"]
+              volumeMounts:
+                - name: media
+                  mountPath: /data/media
+          volumes:
+            - name: media
+              persistentVolumeClaim: {claimName: notify-bridge-media}
