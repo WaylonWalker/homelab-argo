@@ -52,7 +52,7 @@ spec:
       containers:
         - name: builder
           # Pinned to the verified successful upstream main docs workflow run 24.
-          image: ghcr.io/waylonwalker/markata-docs-builder:0.0.24
+          image: ghcr.io/waylonwalker/markata-docs-builder:0.0.148
           imagePullPolicy: IfNotPresent
           env:
             - name: DOCS_REPOSITORY
