@@ -9,4 +9,3 @@ resources:
 - www-fokais.yaml
 - dropper.yaml
 - notify-bridge.yaml
-- notify-bridge-canary.yaml
