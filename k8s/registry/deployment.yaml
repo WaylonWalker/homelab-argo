@@ -88,7 +88,7 @@ spec:
         kompose.service.type: loadbalancer
         kompose.version: 1.31.2 (a92241f79)
         diun.enable: "true"
-        homelab.waylonwalker.com/registry-password-revision: rollover-20261023-canary1
+        homelab.waylonwalker.com/registry-password-revision: rotation-20261024-1
       creationTimestamp: null
       labels:
         io.kompose.network/registry-ui-default: "true"
