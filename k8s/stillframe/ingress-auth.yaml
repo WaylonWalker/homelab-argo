@@ -88,6 +88,20 @@ spec:
   entryPoints:
     - websecure
   routes:
+    # The app validates a dedicated worker bearer token on these endpoints.
+    # Keep this route ahead of the general HLab-authenticated /api route.
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) && (Path(`/api/metadata/work/claim`) || Path(`/api/metadata/work/heartbeat`) || Path(`/api/metadata/work/result`) || Path(`/api/metadata/work/fail`))
+      priority: 4000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`) && (Path(`/api/metadata/work/claim`) || Path(`/api/metadata/work/heartbeat`) || Path(`/api/metadata/work/result`) || Path(`/api/metadata/work/fail`))
+      priority: 4000
+      services:
+        - name: stillframe
+          port: 8787
     - kind: Rule
       match: Host(`stillframe.waylonwalker.com`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
       priority: 3000
