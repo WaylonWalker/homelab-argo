@@ -9,3 +9,5 @@ resources:
 - www-fokais.yaml
 - dropper.yaml
 - notify-bridge.yaml
+- article-listener.yaml
+- kokoro.yaml
