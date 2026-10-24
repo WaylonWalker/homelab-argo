@@ -3,7 +3,7 @@ image:
   tag: "f107fc9-20261011160604"
   pullPolicy: IfNotPresent
 imagePullSecrets:
-  - name: regcred
+  - name: registry-pull
 privateRegistry:
   enabled: false
   encryptedDockerConfig: ""
