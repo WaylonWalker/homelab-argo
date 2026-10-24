@@ -13,3 +13,14 @@ resources:
 - article-listener.yaml
 - kokoro.yaml
 - aylawalker.yaml
+- brainrot.yaml
+- dropper-dev.yaml
+- family-dashboard.yaml
+- hyzar-wyattbubbylee-com.yaml
+- minecraft-admin.yaml
+- models.yaml
+- models-dev.yaml
+- performpeoria-dev.yaml
+- performpeoria-prod.yaml
+- shots-dev.yaml
+- stillframe.yaml

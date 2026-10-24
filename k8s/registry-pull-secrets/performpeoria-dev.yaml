@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  namespace: performpeoria-dev
+spec:
+  encryptedData:
+    .dockerconfigjson: AgAzUl5sTO7HSDr1t4AKvwF/xIKmFO4F9wajhk82cQFalDT/aB3KxaMLSMSmvOiUJQAnOw8W21hwqgs8z7Zsgrzc5N1cRErU+EvJsOwZTC6O4+fzIr/8/Lknrw41szz+3HBbS4Qswq5Q7pehYEh8nsHyJN3CYHQDdhXYRPxfUyHw83ndxOziMdmhhIwFXSqE4IXmlxSKIO70Bk572xaTUXXLbcp76DcmN/yCSHnEr8BA7b0RajW6Zc0GxT9A6O6GeMUp+OK6zUUStBffQQcPKpIUS0/898WGUW6vpbKdLCIOSpu5QaTQTgz45YxJWYNQSvT1GiS3YQCboHlef6Rgiwqtu5g/eBRFMAqLDjdf8OuGbU0t7qW/7TlSy3W9cKBuuyDH9D65ynvwi91kLbLhLMsgImIUMSI7TwkKxX9cxBy/pslgaC9GEeVjye5TszONTK4yLdIzGpVE5Ri3gSZzY6SN2wxPBwkJVlWjI9Y41VX/B0l45UlGp3gcgrdXleqUihnXJ1Uh274ybN6P9KPiT1NV3RVsTIAQLmAbG654M7fzXGKpUKo93V0OoC/oZXdrJ/e8zHpdYlA++j3SCaZQIfLU/K6B529c9WueqOWt+gswy4DVwWZJ1hYFOp/u+JDLOxGiLKnRhXFJWdEqUC2PeAhUiGwNFjh+Hfo5jxwleXMfY1uI2X20DGpWOWhy6d4zOUr0QNCooDSwoGfuBfG5Jz87k4jEU9iYk6TqORJsLNWWKMavU5sznnSYo+fgXKU4KT+/RNPHVztqXI2KAVf/x3okfkL/6tdEcuTMDXZkBR2uEOwcQHsVk8zK8N9Vu6BxQFT4lePzb6LyYiGwzp6yn9mSoN5WFwSW3fK4oKX+t/Q8GR1T2MWZyCO73HwXcY9W8zETWkkYHPCVVu6a93yACSLuV+r52VTrJ2trClNDv2popruUzreABFfAvtOVbGyqnRIBxHPwkGCokjPAq5fUlpQFyP20vmGu/vWuDJEqwGFFD1mUCMw8ARYXQJfJ6N7RaIt8O2jnV7eE2KjqksOlbpDz7h5baDGQqAdNyhMFcYwFqBlPto51JZCfpaY9s5lUZzqFUitG
+  template:
+    metadata:
+      name: registry-pull
+      namespace: performpeoria-dev
+    type: kubernetes.io/dockerconfigjson
