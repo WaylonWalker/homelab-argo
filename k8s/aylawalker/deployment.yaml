@@ -266,7 +266,7 @@ spec:
             - containerPort: 8000
               protocol: TCP
       imagePullSecrets:
-        - name: 'cluster-regcred'
+        - name: 'registry-pull'
       restartPolicy: Always
       volumes:
         - name: aylawalker-config
