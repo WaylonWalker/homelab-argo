@@ -13,3 +13,4 @@ resources:
 - article-listener.yaml
 - kokoro.yaml
 - aylawalker.yaml
+- hlab-auth-canary.yaml
