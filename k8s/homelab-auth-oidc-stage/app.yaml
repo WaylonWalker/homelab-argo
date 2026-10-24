@@ -17,7 +17,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       securityContext:
         seccompProfile:
           type: RuntimeDefault
