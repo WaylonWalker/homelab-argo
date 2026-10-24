@@ -10,6 +10,9 @@ spec:
     targetRevision: HEAD
     path: helm-chart
     helm:
+      parameters:
+        - name: imagePullSecret
+          value: registry-pull
       values: |
         name: linker
         image:

@@ -43,6 +43,8 @@ A sealed manifest does not deploy unless an active Argo Application manages its 
 
 The `article-listener`, `brainrot`, and `kokoro-service` charts support `privateRegistry.enabled`. The default is `false`. Existing pull-secret settings stay active until you enable the option.
 
+The shared `k8s-basic` chart uses the `imagePullSecret` Helm value instead. Set this value to `registry-pull` in the Argo Application parameters. Keep the namespace-local SealedSecret in an active Argo path and wait for its target Secret before syncing the workload.
+
 1. Create a Docker config that uses a runtime pull identity. Keep its source file owner-only.
 2. Seal the Docker config for the release namespace and the name `registry-pull`:
 

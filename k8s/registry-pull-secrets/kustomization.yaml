@@ -4,3 +4,6 @@ resources:
 - avatars.yaml
 - opengraph.yaml
 - linker.yaml
+- pull-canary-avatars.yaml
+- pull-canary-opengraph.yaml
+- pull-canary-linker.yaml
