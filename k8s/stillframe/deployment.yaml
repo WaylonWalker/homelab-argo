@@ -18,7 +18,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       initContainers:
         - name: cache-search-models
           image: registry.wayl.one/stillframe@sha256:1202e79d757d1dd752fb7a4d1c6e22164511be33e9ff40ced5580e03fabdd549
