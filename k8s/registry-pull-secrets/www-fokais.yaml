@@ -1,0 +1,17 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  namespace: www-fokais
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  encryptedData:
+    .dockerconfigjson: AgDLIQ+H+VM5FN5HdFMtkNdRruQZ0hOgWoCUJQ8qCMyLvJKK2jDYPopAQBw/+G2S9PxUpTAI0bzSE/LiMilFIG/sENipbu/kWp3ggZM1acQ8wiQ3Lw5zeC20ZmBx42cu2SdmtLabDkgKoas313M8yyOOOYhxHIUy+CmLYS++LJaIjzhL4D4SyNbWRtZRO6tJOvUvm7eXiwUEg2DQPLm1MRf9i8Ph4bcIaZ0rmQ65FYjwME0q6rSmt+fkMffoUv8rk4HPA+osfl18VWin2G5Ksr9w8W2VWk0Ukp6kS/ivoNCXaY+AG1MoZMrQgN6L9aE4k759X2jHWQotxTjmF5jhr6GAqwaHzPSee91AyMbKiY95g5uTppo0TYO7KaPCJrEdgNrsBv6JXAj0tt7ypilgGsnXX/JnwO0W3HP+RTg1Djg6lEXW/+ZZCkbwBbAnb6M3v+wXgJsADSAaZlFWFpXupapiSbs62DHmeq107Rwn3bq0G9OFgLsG3fekZeijK+kHrXMc3BYlB1Lut6XsSiwaHBnauAUQF2wL4MaTuSfsU7EcXPUi4MMRWbHwZ6wnk3mAdih2cbtyEvZnU607tkO27M88g1yZVrJFBpfu7zuDQJBBInsxzSkau7qilWUPh4bFnxeaHeyqvghRWxCWs0VvlS4r5Vt0ORIcxmo3WSvGf3mtXKuEsvPgnTMtp/4zWtWBSEr3M9Y9UyyyVktKcdGsYM3ECjrfEKerCXSdOLOkERxcfgQRQNXVDGP2X9Cg2YY+0tO8iTWPEUkYTIgdOBSkoguecVJLIbWN9SLk/QMm6qwMc8LTqVGGborCn1KErvQ2Pqb41leJipt9qF15x8n4XZUWSyoObLgsMAdi+K+yEK7pZ0T/6uwRq6aHsv7nlPPhGzElKKnmmipUODAMNPYfMBrXVYziszYGcj1jdv0pLNOsdHaW9PAiU3UA93NB9WOZVb4kwhDxeoZsSuugs3hUmsnl1YtUR7f3U6iwhbhwHGLb9zY/EaENUd+UKVrCL6Jq7S63eoC9/ppBA171ZcLfP63oZwSTR2g0jPXEaa/YVvjsAawbFq7nLiup/cgktBrnR/tahU2R
+  template:
+    metadata:
+      name: registry-pull
+      namespace: www-fokais
+      annotations:
+        sealedsecrets.bitnami.com/managed: 'true'
+    type: kubernetes.io/dockerconfigjson

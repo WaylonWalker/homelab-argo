@@ -6,3 +6,5 @@ resources:
 - linker.yaml
 - reader.yaml
 - hlab-auth-oidc-stage.yaml
+- www-fokais.yaml
+- www-fokais-pull-canary.yaml
