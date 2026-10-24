@@ -267,8 +267,6 @@ spec:
             - containerPort: 80
               protocol: TCP
           resources: {}
-      imagePullSecrets:
-        - name: regcred
       restartPolicy: Always
 status: {}
 

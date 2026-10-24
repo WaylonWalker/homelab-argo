@@ -5,7 +5,6 @@ resources:
   - hlab-auth-stage-pg-app-sealed-secret.yaml
   - hlab-auth-stage-runtime-secrets-sealed-secret.yaml
   - hlab-auth-stage-oidc-signing-sealed-secret.yaml
-  - cluster-regcred-sealed-secret.yaml
   - cnpg-cluster.yaml
   - redis.yaml
   - migration-job.yaml
