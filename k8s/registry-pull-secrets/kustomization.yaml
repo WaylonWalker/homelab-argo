@@ -11,5 +11,3 @@ resources:
 - notify-bridge.yaml
 - article-listener.yaml
 - kokoro.yaml
-- article-listener-canary.yaml
-- kokoro-canary.yaml
