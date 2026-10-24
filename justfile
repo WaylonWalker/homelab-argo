@@ -614,6 +614,48 @@ seal name:
     git add {{name}}/{{name}}-sealed-secret.yaml
     git commit -vm "seal {{name}}"
 
+# Log Podman into the private registry using a namespace-local pull Secret.
+registry-login namespace="thoughts":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    python3 - {{quote(namespace)}} <<'PY'
+    import base64
+    import json
+    import re
+    import subprocess
+    import sys
+
+    namespace = sys.argv[1]
+    if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", namespace):
+        raise SystemExit("Namespace must be a DNS-compatible Kubernetes name.")
+
+    try:
+        result = subprocess.run(
+            ["kubectl", "get", "secret", "registry-pull", "--namespace", namespace, "-o", "json"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        secret = json.loads(result.stdout)
+        if secret.get("type") != "kubernetes.io/dockerconfigjson":
+            raise ValueError
+        config = json.loads(base64.b64decode(secret["data"][".dockerconfigjson"]))
+        entry = config["auths"]["registry.wayl.one"]
+        username, password = base64.b64decode(entry["auth"]).decode().split(":", 1)
+    except Exception:
+        raise SystemExit(f"Could not read registry-pull credentials from namespace {namespace}.")
+
+    result = subprocess.run(
+        ["podman", "login", "--username", username, "--password-stdin", "registry.wayl.one"],
+        input=password,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode:
+        raise SystemExit("Podman login failed; no credential data was displayed.")
+    print(f"Podman logged into registry.wayl.one using registry-pull from namespace {namespace}.")
+    PY
+
 regcred name:
     #!/bin/bash
     set -euxo pipefail
