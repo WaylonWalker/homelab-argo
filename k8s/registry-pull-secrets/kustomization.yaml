@@ -6,6 +6,7 @@ resources:
 - linker.yaml
 - reader.yaml
 - hlab-auth-oidc-stage.yaml
+- hlab-auth.yaml
 - www-fokais.yaml
 - dropper.yaml
 - notify-bridge.yaml
