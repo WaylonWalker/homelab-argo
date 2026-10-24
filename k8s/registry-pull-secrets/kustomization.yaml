@@ -7,3 +7,5 @@ resources:
 - reader.yaml
 - hlab-auth-oidc-stage.yaml
 - www-fokais.yaml
+- dropper.yaml
+- dropper-pull-canary.yaml

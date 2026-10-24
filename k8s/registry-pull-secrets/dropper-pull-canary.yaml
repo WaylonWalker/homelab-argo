@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: registry-pull-canary
+  namespace: dropper
+  labels:
+    app.kubernetes.io/name: registry-pull-canary
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  automountServiceAccountToken: false
+  restartPolicy: Never
+  activeDeadlineSeconds: 900
+  imagePullSecrets:
+    - name: registry-pull
+  containers:
+    - name: pull-check
+      image: registry.wayl.one/dropper:0.0.14dev33
+      imagePullPolicy: Always
+      command: ["/bin/bash", "-c", "sleep 600"]
