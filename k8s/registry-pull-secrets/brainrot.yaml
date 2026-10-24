@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  namespace: brainrot
+spec:
+  encryptedData:
+    .dockerconfigjson: AgB0FE+mDNa1dvHMOdetBEvvUEMR7bLrOsKArZXMs1+V8XUJJKXUy1YGUOBkl9TMf4h1cfVF3PVEOlacO47kehTAg935EX+J9V26xGd9UTIe8d7j3Kjq/LIVs6hVdVfCmC0MGXNz7CYC4WIySDFPa9XBKusN1zDsZwMw8/Fnf1a1xsFYZIm/v6d4xWCLM2FUrGR5G0LAkks7rKbDfdi1m1Mnqr9onPwCXEr20iMMi3PCL9olCKYn5vR25q438BXLjE5xE842e0TdEUaNPP1NLfvvU3lFfwImwSLcFSRHSlZYBiFb2myKlEzPzedtC41/9uXAsZvOm4GH1aE5iycu81cgUpxYWyYxLwmgeL3RxuJqEHkdExbIzUrT3ETZ+u6QNPaOd3VEG03HLAAyFuAKTEnqXKmXIZnjO2qn9HL82IZv29X6dSrPOXpvsneO9go1dgau9TJEZnmO/X1vRoDTuPUP8N9lR3PWx0Swk4OZoQoOjYDrB421y1rHNGcWi0upYfC8CqE1U6x7dA7q6Q0ynsl4y69htq4Ok4RWfTtDgpeDWz6bJ10SktewG0W9tCOQtCqYGSP/PRATDJ498pS5gw21b2Vmmba12TnMhX3WPkK57wviZLYb05YBDn1OHmOBMbozf90+0ceOb5hkalZ82cvo4Deur3jOhw7PwcTEh/Pcft7n1EozLzysHMz2jTFGDmCQAOoBoVCZy9/8MyN9VkuvDeMM04Vs2B7Cx4sTkJNw1Vr56Beqn5ScQmWWR/CIuNcbPuXHg33hy8wCfWRCSa3yuhR9En6P6EPKhA/N219IiKWDo5w0pZGZ9nYRMHbSV+OlOGPzJ8FLYAI460F2L6LR+yhWnKn8Mz+K0Lus/xO09EP9X98b/zOJzZ5ahTDwQfWo/HbfYtElC4T1VEohEBCYEJnD779Ucy8HG7aVf1UUuRi+YXwGUHqQ7yDoEPlbv9m856hMfytekp9CRcaGSqeUN3Zc2mTHqOHIWzlK5ezazj3iMf/iWAq/2IOFABqATvjkylwG+ZXBSKopxBkKhgBWKbeD+7Yl9VhMERDlGay/pgXHM8vMKiQxFwgWv1GN8kNopYXw
+  template:
+    metadata:
+      name: registry-pull
+      namespace: brainrot
+    type: kubernetes.io/dockerconfigjson
