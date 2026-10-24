@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  namespace: hlab-auth
+spec:
+  encryptedData:
+    .dockerconfigjson: AgDCKqvdkNFi8VOtxl5MtnWcV3CeJRdWZKn9n7Lacyf9LH6DpfpqF3oE0yUUVRlornQY55n1wniM3Ne8TcD3N3zum71Puh4IIUzwV6JpXW9vN5xJJHQqyIEVYWgNSXwYaf9IghL03H2bJySFWCmV6f0N9gAP/KcTs0uLkr+7f1XJ8oYGs165hfCcX7mh68jEPNaAeeTgJiMqMRTQFjdKWIjlfO3Sm5mNyCmC/V6VWluibKbwLZUFC8RbdWiqc1qQChGUgPinSJ+MY7WrastqnuemQ6UKxiRVrGyvmoTHkzxfSa+dc0yRT+BzWxVeh8TwiG3d8+nowpwC27piZQOsYmdo41iwIsFPa7BoaB3KxWrd+dUJhjR5W3yjSGb0dewuRONrH2QiOd3bnzn+OKHwt1fr40Qc9XhTW9csoAuItaQcJBnY6GOJ4ALIXP6ZGqh/b8bVO7IfVj27ea1pYVY04XLHBIeC2k+EV+Ta4dJ+yoi5rbtaRpUQB9Eomy2f1UyvVDacqlgR1agDJS7TH7V/igIwHvQ+Mf5wh3oPKINSSvb6D8H8z0jjVdMlMrAiFGrw2cpchYGuuIvWs0yTNZrgjOyTpj1vEd979b4KFC59dV7wNmQpEDVhT4Cpe7ONe0cu+PFfgx4eHEQVXuWUovAnLyJU2V70IKaoOkq9WW6DtHYvPQZ5dQyIUuWzLrBNOqCNDPzT+6RuYts9Fx5SCLw5Hts1wXIK89oqbEp82m0tDCk0J7jaI+xsn1VRi37e5zgRmi+KiyW94fg7Tvh9PRROYyDfltuuHtWJj6kq8dSiYnPbcYV5ZxZPsLV9PG7x6byqEMce0NIp7vObcK2JR23Q46Sg/4XJOQQTm9XIaMx4+QFEwklG+jWLHVnuHv6CnBZVaFqD11VQ3ToVvIvYC4mh3eldCub0eTwLaOcxnUCa9AMYjMsy1NK10MtUi65T0oc68SRGl/Q9dBHDpaDVMImEA8q+tpVbKVlqorKfRaeywNgd79USdGuRIYFnr0ahibOFjffECl6X1x6KuOX40GfyxSuGEDpmiJYFUAUtng8y7Nkc+boP6G/MSseHbFCx9Hm7Igg6hpij
+  template:
+    metadata:
+      name: registry-pull
+      namespace: hlab-auth
+    type: kubernetes.io/dockerconfigjson
