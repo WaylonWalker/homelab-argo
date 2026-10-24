@@ -11,3 +11,4 @@ resources:
 - notify-bridge.yaml
 - article-listener.yaml
 - kokoro.yaml
+- aylawalker.yaml
