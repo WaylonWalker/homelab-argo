@@ -6,5 +6,3 @@ resources:
 - linker.yaml
 - reader.yaml
 - hlab-auth-oidc-stage.yaml
-- reader-pull-canary.yaml
-- hlab-auth-stage-pull-canary.yaml
