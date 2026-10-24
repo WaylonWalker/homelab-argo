@@ -12,4 +12,3 @@ resources:
 - article-listener.yaml
 - kokoro.yaml
 - aylawalker.yaml
-- aylawalker-canary.yaml
