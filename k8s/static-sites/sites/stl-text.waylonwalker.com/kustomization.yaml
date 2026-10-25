@@ -92,3 +92,6 @@ replacements:
           kind: PersistentVolume
         fieldPaths:
           - spec.hostPath.path
+
+patches:
+  - path: deployment-security-refresh.yaml
