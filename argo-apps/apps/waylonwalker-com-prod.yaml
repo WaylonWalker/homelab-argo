@@ -80,9 +80,9 @@ spec:
             # Disable the archive-based CronJob because no source archive is configured.
             enabled: false
             fetchImage:
-              tag: sha-bcf08b4
+              tag: sha-35b5906
             builderImage:
-              tag: sha-bcf08b4
+              tag: sha-35b5906
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -195,7 +195,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-bcf08b4
+              tag: sha-35b5906
             resources:
               requests:
                 # Fit the rolling search replacement before the builder starts.
