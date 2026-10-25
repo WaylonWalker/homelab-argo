@@ -21,7 +21,7 @@ spec:
         - name: registry-pull
       initContainers:
         - name: cache-search-models
-          image: registry.wayl.one/stillframe@sha256:831240055301d5c1219295025d138243c679c42d9172803b3b8dfeed624dc882
+          image: registry.wayl.one/stillframe@sha256:534be9b309f637b696b7b218534aef01cc670afe6fc697287d3723add6a554b1
           imagePullPolicy: IfNotPresent
           command:
             - /app/.venv/bin/python
@@ -62,7 +62,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: stillframe
-          image: registry.wayl.one/stillframe@sha256:831240055301d5c1219295025d138243c679c42d9172803b3b8dfeed624dc882
+          image: registry.wayl.one/stillframe@sha256:534be9b309f637b696b7b218534aef01cc670afe6fc697287d3723add6a554b1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
