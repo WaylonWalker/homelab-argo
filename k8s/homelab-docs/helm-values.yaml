@@ -52,9 +52,9 @@ storage:
 build:
   enabled: false
   fetchImage:
-    tag: sha-449289a
+    tag: sha-4147602
   builderImage:
-    tag: sha-449289a
+    tag: sha-4147602
   fast: false
   activeDeadlineSeconds: 1800
   releases:

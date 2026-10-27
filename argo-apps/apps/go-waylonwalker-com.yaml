@@ -67,9 +67,9 @@ spec:
 
           build:
             fetchImage:
-              tag: sha-225b9dc
+              tag: sha-4147602
             builderImage:
-              tag: sha-225b9dc
+              tag: sha-4147602
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
@@ -184,7 +184,7 @@ spec:
           search:
             enabled: true
             image:
-              tag: sha-225b9dc
+              tag: sha-4147602
             mode: watch-content
             localCache:
               enabled: true
