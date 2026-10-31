@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: seed
-          image: alpine/git:2.47.2
+          image: alpine/git:v2.54.0
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-ceu"]
           args:
