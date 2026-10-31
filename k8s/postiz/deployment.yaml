@@ -222,7 +222,7 @@ spec:
     spec:
       containers:
         - name: postiz-redis
-          image: redis:7.4
+          image: redis:7.2
           livenessProbe:
             exec:
               command:
