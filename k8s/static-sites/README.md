@@ -13,7 +13,8 @@ Create a production and development site with Copier:
 just new-static-site example
 ```
 
-Install `copier` and `fzf` first. The recipe checks namespace and directory
+Install `uv` and `fzf` first. The recipe runs Copier with `uvx`, so Copier does
+not need a persistent installation. The recipe checks namespace and directory
 availability, asks for a domain, and creates both `example` and `example-dev`.
 It writes manifests locally; review them before committing.
 Run `just static-sites-validate` to render every site.
@@ -22,7 +23,7 @@ The Copier template lives in `templates/static-site`. To generate a site
 without the interactive picker:
 
 ```bash
-copier copy templates/static-site k8s/static-sites/sites/example.waylonwalker.com \
+uvx --from copier copier copy templates/static-site k8s/static-sites/sites/example.waylonwalker.com \
   --data site=example --data namespace=example \
   --data host=example.waylonwalker.com \
   --data webroot_path=/mnt/main/walkershare/waylon/sites/example.waylonwalker.com \

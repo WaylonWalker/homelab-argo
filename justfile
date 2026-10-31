@@ -34,6 +34,11 @@ new-static-site site_dir="":
       exit 1
     fi
 
+    if ! command -v uvx >/dev/null 2>&1; then
+      echo "Error: uvx is required to run Copier (install uv first)" >&2
+      exit 1
+    fi
+
     site_names=("$short_name" "${short_name}-dev")
     for site_name in "${site_names[@]}"; do
       namespace_result="$(kubectl get namespace "$site_name" --ignore-not-found -o name)"
@@ -72,6 +77,11 @@ new-static-site site_dir="":
       exit 1
     fi
 
+    webroot_owner="waylon"
+    if [[ "$domain" == "wyattbubbylee.com" ]]; then
+      webroot_owner="wyatt"
+    fi
+
     for site_name in "${site_names[@]}"; do
       host="$site_name.$domain"
       destination="k8s/static-sites/sites/$host"
@@ -89,11 +99,11 @@ new-static-site site_dir="":
       if [[ "$site_name" == *-dev ]]; then
         telemetry_environment="development"
       fi
-      copier copy templates/static-site "$destination" \
+      uvx --from copier copier copy templates/static-site "$destination" \
         --data "site=$site_name" \
         --data "namespace=$site_name" \
         --data "host=$host" \
-        --data "webroot_path=/mnt/main/walkershare/waylon/sites/$host" \
+        --data "webroot_path=/mnt/main/walkershare/$webroot_owner/sites/$host" \
         --data "telemetry_enabled=true" \
         --data "telemetry_app_name=$telemetry_app_name" \
         --data "telemetry_environment=$telemetry_environment" \
