@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  namespace: aylawalker
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  encryptedData:
+    .dockerconfigjson: AgAd+pFmryybUQ+xXGUl34l0MMWDva/ExRDgoY2OILjJy916xLfj6aPauyA8S14VbAdDGRoqGG9A5LNc3yyGsXacHmHIgdGHHQSx0PBfnjO0vBRapqdgmGCJ7Zdv9SIK/eveSMQ6ODoUNx6MCmGdB8QxH71vt358U2oVRTv31Hvo4oQbSSkotypzhOW3wWwBOWUgIIwGmO6qydmvE9G4YDMCtJysbo/cW8UaZJm2dIVUsgr50Kd0J+y04ip5XtZTy8hGK2P78k7pkjSSfMo4McTT8aJbw51lRln7QjLUzFjnjiSMukq/w+MK5xGah2Y9p0nSf/BmWDm0M1dIaTwQnMviSeHm/rDKmrj/5pSQnbeyRZrDRe0akpUVcnHHyW1REBWdhHcluw3i3vp3Z5fEZXsfJtScrbv+v6OBRmAdy0DX6WhqW5RCIYF/xV4QzKz0VgFylzTLDTdAMad8ma28SzGFhXI4uNpqjqqTyWXY8Bv+SAmdrEyh9uO/otgtuaS02ZJqGZGPSKuLI76wo4zKWuhHuy3+ShvH7zhDsRIN/KlTj8KWvGVWTwCvvv5Pz3GDi7fhZLV7oIOLxYn9fI/LoxBGc16RMSgNEAw00vsp0gtw+L3UUZVneA4hw4BlvzT8mDrtqTQzeXtN16SQ2St+5puzo6cA3ftZZkGeVr2HscF0m/F0tDrsBeDySyIhbVSHWvjcbLdXC7civ+G1Xaj5aDphsMEBVpvaZ0Cr23XJn7ccg0yCiMUeqVU/VN0vd0b9HeqFzpsqpxmjv2Qj0EONnGlN5XaClG4vZ3tRFjSaMFT52UIvrfgBXPvwdfqApObckpQQuGxGgAj5rTc8QphzwOJLREpEYSvLlo3WDafEWPxYcewnTC9DkXAs6RmZMvR111gGjmemJrBfjZsLraLoG0C+48q+Jr5RptS0Vmp3Jl4tgLysYRx/qTTVEKkoGe94lwkyv+6MkTEZ0nz7fUkTvX3lwwe1CAJKQEOIm0/ors8Efu8raLsuTwdBQEDQzwboJcof8Irym/1Vho5pVvoIy1TFp4lQXBJ1IH8ZL0OvN/DyH/uOTQ2g6RLFqGcYaOobJc8ixoIq
+  template:
+    metadata:
+      name: registry-pull
+      namespace: aylawalker
+    type: kubernetes.io/dockerconfigjson

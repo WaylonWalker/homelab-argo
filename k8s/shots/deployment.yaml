@@ -103,7 +103,7 @@ spec:
         io.kompose.service: shot-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.49
+        - image: registry.wayl.one/shot-scraper-api:0.0.51
           command:
             - "/bin/bash"
             - "-c"
@@ -150,7 +150,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.49"
+              value: "deployment.environment=production,service.version=0.0.51"
             - name: REDIS_URL
               value: redis://shots-redis.shot.svc.cluster.local:6379/0
             - name: AWS_ENDPOINT_URL
@@ -164,7 +164,7 @@ spec:
             - mountPath: /cache
               name: cache
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       restartPolicy: Always
       volumes:
         - name: cache
@@ -194,7 +194,7 @@ spec:
         app: shot-wayl-one-worker
     spec:
       containers:
-        - image: registry.wayl.one/shot-scraper-api:0.0.49
+        - image: registry.wayl.one/shot-scraper-api:0.0.51
           command:
             - "/bin/bash"
             - "-c"
@@ -207,6 +207,7 @@ spec:
                 - python
                 - -m
                 - shot_scraper_api.worker_health
+                - --local-file
             initialDelaySeconds: 45
             periodSeconds: 10
             failureThreshold: 6
@@ -217,6 +218,7 @@ spec:
                 - python
                 - -m
                 - shot_scraper_api.worker_health
+                - --local-file
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
@@ -268,7 +270,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: "none"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=production,service.version=0.0.49"
+              value: "deployment.environment=production,service.version=0.0.51"
             - name: WORKER_HEARTBEAT_INTERVAL_SECONDS
               value: "10"
             - name: WORKER_HEARTBEAT_TIMEOUT_SECONDS
@@ -288,7 +290,7 @@ spec:
             - mountPath: /cache
               name: cache
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       restartPolicy: Always
       volumes:
         - name: cache
@@ -343,6 +345,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            app: shot-wayl-one-cleanup
         spec:
           restartPolicy: Never
           containers:
@@ -352,7 +357,8 @@ spec:
                 - /bin/sh
                 - -lc
                 - >-
-                  curl --fail --show-error --silent
+                  curl --fail --show-error --silent --retry 5
+                  --retry-connrefused --retry-delay 2 --connect-timeout 5
                   -X POST
                   "http://shot-wayl-one.shot.svc.cluster.local:5000/queue/cleanup?completed_age_hours=24&stale_age_minutes=30"
 

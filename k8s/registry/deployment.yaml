@@ -21,7 +21,9 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -44,7 +46,9 @@ spec:
     io.kompose.service: registry-ui
 status:
   loadBalancer: {}
+
 ---
+
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -53,7 +57,9 @@ metadata:
   namespace: registry
 spec: {}
 status: {}
+
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -82,6 +88,7 @@ spec:
         kompose.service.type: loadbalancer
         kompose.version: 1.31.2 (a92241f79)
         diun.enable: "true"
+        homelab.waylonwalker.com/registry-password-revision: rotation-20261024-1
       creationTimestamp: null
       labels:
         io.kompose.network/registry-ui-default: "true"
@@ -137,7 +144,9 @@ spec:
           secret:
             secretName: registry-password
 status: {}
+
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -153,7 +162,9 @@ spec:
     requests:
       storage: 100Mi
 status: {}
+
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -169,7 +180,9 @@ spec:
     requests:
       storage: 100Mi
 status: {}
+
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -185,7 +198,9 @@ spec:
     requests:
       storage: 100Mi
 status: {}
+
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -252,11 +267,11 @@ spec:
             - containerPort: 80
               protocol: TCP
           resources: {}
-      imagePullSecrets:
-        - name: regcred
       restartPolicy: Always
 status: {}
+
 ---
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -289,7 +304,9 @@ spec:
       secretName: registry-ui-cert-tls
 status:
   loadBalancer: {}
+
 ---
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

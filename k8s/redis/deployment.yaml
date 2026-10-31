@@ -26,6 +26,8 @@ spec:
     matchLabels:
       app: redis
   replicas: 1
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -36,7 +38,7 @@ spec:
     spec:
       initContainers:
         - name: restore-backup
-          image: amazon/aws-cli:2.26.1
+          image: amazon/aws-cli:2.39.3
           command:
             - /bin/sh
             - -c
@@ -97,15 +99,21 @@ spec:
                   key: REDIS_PASSWORD_WS_PLAYGROUND
       containers:
         - name: redis
-          image: redis:7.4.2
+          image: redis:7.4.12
           command:
             - /bin/sh
             - -c
             - |
               redis-server /etc/redis/redis.conf &
               sleep 5
-              redis-cli -a "${REDIS_PASSWORD}" CONFIG SET appendonly yes
+              REDISCLI_AUTH="${REDIS_PASSWORD}" redis-cli --user admin CONFIG SET appendonly yes
               wait
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-acl-secret
+                  key: REDIS_PASSWORD
           ports:
             - containerPort: 6379
           volumeMounts:

@@ -10,7 +10,8 @@ data:
   namespace: recipes-waylonwalker-com
   host: recipes.waylonwalker.com
   webrootPath: /mnt/main/walkershare/waylon/sites/recipes.waylonwalker.com
-  vaultPath: /mnt/main/walkershare/waylon/vaults/recipes.waylonwalker.com
-  builderImage: ghcr.io/waylonwalker/markata-go-builder:latest
-  pollSeconds: "5"
+  sourceRepository: https://git.waylonwalker.com/waylon/recipes.waylonwalker.com
+  sourceBranch: main
+  builderImage: ghcr.io/waylonwalker/markata-go-builder:sha-46d6215
+  webhookPath: /webhook
   keepReleases: "5"

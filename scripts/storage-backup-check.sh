@@ -13,7 +13,7 @@ s3_mode="${STORAGE_BACKUP_CHECK_S3:-auto}"
 service_dns="${object_store_service}.${object_store_namespace}.svc.cluster.local"
 expected_endpoint="${BACKUP_OBJECT_STORE_ENDPOINT:-${BACKUP_MINIO_ENDPOINT:-http://${service_dns}:9000}}"
 
-longhorn_access_key=""
+longhorn_access_key="" #gitleaks:allow -- intentionally empty test value
 longhorn_secret_key=""
 longhorn_endpoint=""
 longhorn_bucket=""

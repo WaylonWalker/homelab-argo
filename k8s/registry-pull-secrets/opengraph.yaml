@@ -1,0 +1,17 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  namespace: opengraph
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  encryptedData:
+    .dockerconfigjson: AgC05j1Ee/11dx7KizzpyZ1Skd9FaRnCceGJMXJF+4Df25LO4LSLBihv+YOcLaMZbIRXuwpcCVeG4Fo+baiKfCtbTxPD3pXuC5MUQpVTUeVWfL+w+3ZTDSe1t9nfmCYi0wnlATKUMQuQ/QOBQ1LEPD5BvkG0l+lqOY692gI5FWUWznA2rQg/G/I42O+7MoAvF0Blb08BePWqFBwnsE62ck3Paaz3XSNXfMFzbfbh9v+jz10vapMs+DDXmfjWLOkl2FifqAhHQQXtNp5U97F6XSrD/vEAoqtFI3eWcFu/BMo4qUx3Fpp/J4jDrIiuGK9NRx0U+deVMq65ZXq80HOOgERcccpTpo8pXEYNdwpdjIzM+Jyb2T0cTbqbpuheMTAyyL0o1kQ3NLKez04ARHRez1q4bz3UlO8t+sgvY0oTV/GlKMruwEFInTwfHv6BHoHWlY5bgaBi3f63q5ftAV/2C8sydcXLoP3wsOLfyZ50G7nsgtMfjgDJBpoSrEPAR6Ire2nx9+MS0kx0nzPVQ62H/eoJ5QfAiJ1ArA/EOuhRh5XqeyV/2yQLfwmIJHeU8QwKrpT7Kl7n5f3YOJDS1txHU4TSRwrerVd31n0AenFls87ru0bwr9knJ2OU/WRpHm3VqQf3yj0r6BqVQV9pXg/X85XdHw8UWHXZ/nXg/rgZMwG0lBlImHKO+hEVwy+oZMWlorVnryyi2iyZOOBlZR9mnaHToVdcg0i2iv5qN+6ON7jm6nsobhEs9fkYWrsrXM7U5gD73PF8sruMYEl31ztUpxNLoy7F6fiQKi659SkenWHxjpnOn21Rc6Uo5yHzV4kZmvBvJkbH6Gog7cG9N6Olv4n1qb1BW2EdFy145klv6Kb64TX5I/yqtxfBMikIahnCC+ZGSqSlGAYN0MrovsgKtW45Q0CCNLslmSGvWlNvpbIk1IVopgPTx0JJ8m3z0ZD8CpjdCCG+l9aBUAl1544CAViHi71teiBh/iQYWfFLrB2HD73ZQqp9JfxCiYhKvzoIpp3XHxqNYWv6yyk5TPxPPH2S8Y91QIwxh+HUOOSTasSlgBO4AGgQDFrhRKvcmxN4bFcIquEs
+  template:
+    metadata:
+      name: registry-pull
+      namespace: opengraph
+      annotations:
+        sealedsecrets.bitnami.com/managed: 'true'
+    type: kubernetes.io/dockerconfigjson

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: grove
+  namespace: grove
+  host: grove.wyattbubbylee.com
+  webrootPath: /mnt/main/walkershare/wyatt/sites/grove.wyattbubbylee.com
+  TELEMETRY_ENABLED: "enabled"
+  TELEMETRY_APP_NAME: "grove"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"

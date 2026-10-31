@@ -1,0 +1,185 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stillframe-strip-hlab-identity
+spec:
+  headers:
+    customRequestHeaders:
+      X-Hlab-User-Id: ""
+      X-Hlab-Username: ""
+      X-Hlab-Display-Name: ""
+      X-Hlab-Email: ""
+      X-Hlab-Groups: ""
+      X-Hlab-Roles: ""
+      X-Hlab-Scopes: ""
+      X-Hlab-Auth-Method: ""
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stillframe-forward-auth
+spec:
+  forwardAuth:
+    address: http://hlab-auth.hlab-auth.svc.cluster.local:8000/api/v1/forward-auth
+    trustForwardHeader: false
+    addAuthCookiesToResponse:
+      - __Host-hlab-app-session
+    authResponseHeaders:
+      - X-Hlab-User-Id
+      - X-Hlab-Username
+      - X-Hlab-Display-Name
+      - X-Hlab-Email
+      - X-Hlab-Groups
+      - X-Hlab-Roles
+      - X-Hlab-Scopes
+      - X-Hlab-Auth-Method
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stillframe-auth
+spec:
+  chain:
+    middlewares:
+      - name: stillframe-strip-hlab-identity
+      - name: stillframe-forward-auth
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stillframe-public
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - stillframe.waylonwalker.com
+        - stillframe.wayl.one
+      secretName: stillframe-tls
+  rules:
+    - host: stillframe.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: stillframe
+                port:
+                  name: http
+    - host: stillframe.wayl.one
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: stillframe
+                port:
+                  name: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: stillframe-protected-routes
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # The app validates a dedicated worker bearer token on these endpoints.
+    # Keep this route ahead of the general HLab-authenticated /api route.
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) && (Path(`/api/metadata/work/claim`) || Path(`/api/metadata/work/heartbeat`) || Path(`/api/metadata/work/result`) || Path(`/api/metadata/work/fail`))
+      priority: 4000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`) && (Path(`/api/metadata/work/claim`) || Path(`/api/metadata/work/heartbeat`) || Path(`/api/metadata/work/result`) || Path(`/api/metadata/work/fail`))
+      priority: 4000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 3000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 3000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`)
+      priority: 2000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`)
+      priority: 2000
+      services:
+        - name: stillframe
+          port: 8787
+  tls:
+    secretName: stillframe-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: stillframe-tunnel-routes
+spec:
+  entryPoints:
+    - web
+  routes:
+    # Public worker calls arrive through the Cloudflare tunnel on `web`.
+    # Stillframe validates the token before allowing these exact endpoints.
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) && (Path(`/api/metadata/work/claim`) || Path(`/api/metadata/work/heartbeat`) || Path(`/api/metadata/work/result`) || Path(`/api/metadata/work/fail`))
+      priority: 4000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`) && (Path(`/api/metadata/work/claim`) || Path(`/api/metadata/work/heartbeat`) || Path(`/api/metadata/work/result`) || Path(`/api/metadata/work/fail`))
+      priority: 4000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 3000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`) && (PathPrefix(`/app`) || PathPrefix(`/api`))
+      priority: 3000
+      middlewares:
+        - name: stillframe-auth
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.waylonwalker.com`)
+      priority: 2000
+      services:
+        - name: stillframe
+          port: 8787
+    - kind: Rule
+      match: Host(`stillframe.wayl.one`)
+      priority: 2000
+      services:
+        - name: stillframe
+          port: 8787

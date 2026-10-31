@@ -22,7 +22,7 @@ spec:
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 90
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       securityContext:
         seccompProfile:
           type: RuntimeDefault

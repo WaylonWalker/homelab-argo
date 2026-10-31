@@ -50,9 +50,9 @@ storage:
 
 build:
   fetchImage:
-    tag: sha-496b42a
+    tag: sha-4147602
   builderImage:
-    tag: sha-496b42a
+    tag: sha-4147602
   fast: false
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -167,7 +167,7 @@ builderAdmin:
 search:
   enabled: true
   image:
-    tag: sha-eada09f
+    tag: sha-4147602
   mode: watch-content
   localCache:
     enabled: true

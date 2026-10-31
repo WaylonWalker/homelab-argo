@@ -1,6 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# Opt-in dev hibernation: the site files/PV/PVC/Ingress remain retained.
+# Change count to 1 to resume this dev site through Argo CD.
+replicas:
+  - name: web
+    count: 0
+
 components:
   - ../../components/telemetry
 

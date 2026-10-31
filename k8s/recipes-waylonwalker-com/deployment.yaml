@@ -21,86 +21,74 @@ spec:
     spec:
       containers:
         - name: builder
-          image: ghcr.io/waylonwalker/markata-go-builder:latest
+          image: ghcr.io/waylonwalker/markata-go-builder:sha-46d6215
           imagePullPolicy: IfNotPresent
           command:
-            - /bin/sh
-            - -ceu
-            - |
-              hash_tree() {
-                # Polling hash so this works on SMB/NFS mounts.
-                # Excludes noisy/derived folders.
-                find "${VAULT_DIR}" \
-                  -path "${VAULT_DIR}/.obsidian" -prune -o \
-                  -path "${VAULT_DIR}/.git" -prune -o \
-                  -path "${VAULT_DIR}/.stfolder" -prune -o \
-                  -path "${VAULT_DIR}/.stversions" -prune -o \
-                  -type f -print0 \
-                  | sort -z \
-                  | xargs -0 sha256sum \
-                  | sha256sum \
-                  | awk '{print $1}'
-              }
-
-              publish() {
-                ts="$(date -u +%Y%m%d%H%M%S)"
-                rel="${WEBROOT_DIR}/releases/${ts}"
-                out="${WORK_DIR}/output"
-                mkdir -p "${WEBROOT_DIR}/releases" "${rel}"
-
-                rm -rf "${out}" || true
-                mkdir -p "${out}"
-
-                # Vault is mounted read-only; build output goes to a writable emptyDir.
-                ( cd "${VAULT_DIR}" && markata-go build --clean-all -o "${out}" )
-
-                rsync -a --delete "${out}/" "${rel}/"
-                ln -sfn "releases/${ts}" "${WEBROOT_DIR}/current"
-
-                # Keep last N releases.
-                keep="${KEEP_RELEASES}"
-                if [ "${keep}" -gt 0 ] 2>/dev/null; then
-                  ls -1dt "${WEBROOT_DIR}/releases/"* 2>/dev/null \
-                    | tail -n +$((keep + 1)) \
-                    | xargs -r rm -rf
-                fi
-              }
-
-              prev=""
-              while true; do
-                cur="$(hash_tree || true)"
-                if [ "${cur}" != "${prev}" ]; then
-                  publish
-                  prev="${cur}"
-                fi
-                sleep "${POLL_SECONDS}"
-              done
+            - markata-go
+            - builder-admin
+          args:
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - --source-dir
+            - /data/source
+            - --release-dir
+            - /webroot
+            - --work-dir
+            - /work/build
+            - --history-dir
+            - /webroot/.builder-admin
+            - --releases-keep
+            - "5"
+            - --watch=false
+            - --webhook-enabled
+            - --webhook-branch
+            - main
           env:
-            - name: VAULT_DIR
-              value: /vault
-            - name: WORK_DIR
-              value: /work
-            - name: WEBROOT_DIR
-              value: /webroot
-            - name: POLL_SECONDS
-              value: "5"
-            - name: KEEP_RELEASES
-              value: "5"
+            - name: MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: builder-webhook
+                  key: MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET
+            - name: GIT_CONFIG_COUNT
+              value: "1"
+            - name: GIT_CONFIG_KEY_0
+              value: safe.directory
+            - name: GIT_CONFIG_VALUE_0
+              value: /data/source
+            - name: MARKATA_GO_URL
+              value: https://recipes.waylonwalker.com
+            - name: MARKATA_GO_CONCURRENCY
+              value: "2"
+            - name: MARKATA_GO_BUILDER_ADMIN_STARTUP_REBUILD
+              value: "true"
+            - name: GIT_SSH_COMMAND
+              value: ssh -i /ssh-key/id_ed25519 -o UserKnownHostsFile=/ssh-known-hosts/known_hosts -o StrictHostKeyChecking=yes
           resources:
-            limits:
-              cpu: "1"
-              memory: 1Gi
             requests:
-              cpu: 50m
-              memory: 128Mi
+              cpu: 25m
+              memory: 512Mi
+            limits:
+              memory: 4Gi
           volumeMounts:
             - name: webroot
               mountPath: /webroot
             - name: work
               mountPath: /work
-            - name: vault
-              mountPath: /vault
+            - name: source
+              mountPath: /data/source
+              subPath: source
+            - name: source-ssh-key
+              mountPath: /ssh-key
               readOnly: true
+            - name: source-ssh-known-hosts
+              mountPath: /ssh-known-hosts
+              readOnly: true
+          ports:
+            - name: builder-admin
+              containerPort: 8080
+              protocol: TCP
         - name: nginx
           image: nginx:stable-alpine
           imagePullPolicy: IfNotPresent
@@ -126,13 +114,46 @@ spec:
               subPath: default.conf
       nodeSelector:
         kubernetes.io/hostname: falcon3
+      initContainers:
+        - name: clone-source
+          image: ghcr.io/waylonwalker/markata-go-builder:sha-46d6215
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ceu
+          args:
+            - |
+              install -m 0700 -d /root/.ssh
+              install -m 0600 /ssh/id_ed25519 /root/.ssh/id_ed25519
+              install -m 0644 /ssh-known-hosts/known_hosts /root/.ssh/known_hosts
+              git clone --branch main --single-branch \
+                ssh://git@forgejo.forgejo.svc.cluster.local:22/waylon/recipes.waylonwalker.com \
+                /data/source
+              chown -R 65532:65532 /data/source
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: source
+              mountPath: /data
+            - name: source-ssh-key
+              mountPath: /ssh
+              readOnly: true
+            - name: source-ssh-known-hosts
+              mountPath: /ssh-known-hosts
+              readOnly: true
       volumes:
-        - name: vault
-          hostPath:
-            path: /mnt/main/walkershare/waylon/vaults/recipes.waylonwalker.com
-            type: DirectoryOrCreate
+        - name: source
+          emptyDir: {}
         - name: work
           emptyDir: {}
+        - name: source-ssh-key
+          secret:
+            secretName: builder-source-ssh
+            defaultMode: 0400
+        - name: source-ssh-known-hosts
+          configMap:
+            name: forgejo-ssh-known-hosts
+            defaultMode: 0444
         - name: webroot
           persistentVolumeClaim:
             claimName: webroot

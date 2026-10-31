@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stillframe
+  labels:
+    app.kubernetes.io/name: stillframe
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stillframe
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stillframe
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: registry-pull
+      initContainers:
+        - name: cache-search-models
+          image: registry.wayl.one/stillframe@sha256:5e0382c70b94905e37670005f0f9a038b98bdc20621558040995d9c8ce938c3a
+          imagePullPolicy: IfNotPresent
+          command:
+            - /app/.venv/bin/python
+            - /app/scripts/install_models.py
+          env:
+            - name: STILLFRAME_DATA
+              value: /data
+            - name: HF_HOME
+              value: /data/models/huggingface
+            - name: HF_HUB_DISABLE_TELEMETRY
+              value: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      nodeSelector:
+        kubernetes.io/hostname: falcon3
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        # The Walkershare SMB mount is uid/gid 1000 and mode 0775.
+        # Keep the app unprivileged while granting read access through this group.
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: stillframe
+          image: registry.wayl.one/stillframe@sha256:5e0382c70b94905e37670005f0f9a038b98bdc20621558040995d9c8ce938c3a
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8787
+          env:
+            - name: STILLFRAME_MODE
+              value: hosted
+            - name: STILLFRAME_DATA
+              value: /data
+            - name: STILLFRAME_FOLDER
+              value: /photos
+            - name: STILLFRAME_METADATA_WORKER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: stillframe-metadata-worker
+                  key: token
+                  optional: true
+            - name: STILLFRAME_EXCLUDED_PATHS
+              value: waylon/music:waylon/sites:stillframe:public/games:waylon/git/covers.waylonwalker.com:waylon/git/wyattbubbylee.com:waylon/git/screenshots.waylonwalker.com:waylon/git/waylonwalker.com:waylon/git/pype.dev:waylon/git/minecraft-recording.waylonwalker.com:waylon/git/neovimconf2022.waylonwalker.com:waylon/git/aylawalker.com:waylon/git/raft.waylonwalker.com:waylon/git/rhiannonwalker.com:waylon/git/fluffed-up.com:waylon/git/stable-diffusion-waylonwalker-com:waylon/git/stable-diffusion-pype-dev:wyatt/saved stuff/wyattbubbylee.com
+            - name: STILLFRAME_EXCLUDED_DIR_NAMES
+              value: websites:output
+            - name: STILLFRAME_MAP_STYLE_URL
+              value: https://tiles.openfreemap.org/styles/dark
+            - name: STILLFRAME_MAP_CONNECT_ORIGINS
+              value: https://tiles.openfreemap.org
+            - name: STILLFRAME_PUBLIC_URL
+              value: https://stillframe.waylonwalker.com
+            - name: STILLFRAME_TRUSTED_PROXY_CIDRS
+              value: 10.42.0.0/24
+            - name: STILLFRAME_OTEL_ENABLED
+              value: "true"
+            - name: STILLFRAME_ENVIRONMENT
+              value: production
+            - name: HF_HOME
+              value: /data/models/huggingface
+            - name: HF_HUB_DISABLE_TELEMETRY
+              value: "1"
+            - name: OTEL_SERVICE_NAME
+              value: stillframe
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            timeoutSeconds: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            timeoutSeconds: 5
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: photos
+              mountPath: /photos
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          hostPath:
+            path: /mnt/main/walkershare/stillframe
+            type: Directory
+        - name: photos
+          hostPath:
+            path: /mnt/main/walkershare
+            type: Directory
+        - name: tmp
+          emptyDir:
+            sizeLimit: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stillframe
+spec:
+  selector:
+    app.kubernetes.io/name: stillframe
+  ports:
+    - name: http
+      port: 8787
+      targetPort: http
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: stillframe-data
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: longhorn

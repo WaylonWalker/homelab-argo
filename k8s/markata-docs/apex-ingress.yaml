@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: markata-docs-apex
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+    # Create-only: ExternalDNS must not overwrite existing apex DNS records.
+    external-dns.alpha.kubernetes.io/hostname: markata.dev
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: markata.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: markata-docs
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - markata.dev
+      secretName: markata-dev-tls

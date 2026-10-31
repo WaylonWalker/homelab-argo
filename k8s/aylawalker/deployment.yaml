@@ -131,6 +131,7 @@ metadata:
   namespace: aylawalker
   annotations:
     minio-last-rotated: "2025-07-16 08:41:58"
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
 spec:
   containers:
     - name: watch
@@ -168,7 +169,7 @@ spec:
               name: aylawalker-minio-secret
               key: AWS_ENDPOINT_URL
   imagePullSecrets:
-    - name: 'cluster-regcred'
+    - name: 'registry-pull'
   restartPolicy: Always
   volumes:
     - name: aylawalker-config
@@ -266,7 +267,7 @@ spec:
             - containerPort: 8000
               protocol: TCP
       imagePullSecrets:
-        - name: 'cluster-regcred'
+        - name: 'registry-pull'
       restartPolicy: Always
       volumes:
         - name: aylawalker-config

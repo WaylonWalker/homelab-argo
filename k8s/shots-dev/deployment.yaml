@@ -90,7 +90,7 @@ metadata:
   name: shot-wayl-one
   namespace: shots-dev
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: shot-wayl-one
@@ -167,7 +167,7 @@ spec:
             - mountPath: /cache
               name: cache
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       restartPolicy: Always
       volumes:
         - name: cache
@@ -182,7 +182,7 @@ metadata:
   name: shot-wayl-one-worker
   namespace: shots-dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: shot-wayl-one-worker
@@ -253,7 +253,7 @@ spec:
             - mountPath: /cache
               name: cache
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       restartPolicy: Always
       volumes:
         - name: cache

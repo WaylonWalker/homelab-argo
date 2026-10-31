@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: forgejo-mcp-oidc-stage
+  namespace: argocd
+spec:
+  description: Isolated HLab Auth OIDC and Forgejo MCP staging
+  sourceRepos:
+    - https://github.com/WaylonWalker/homelab-argo.git
+  destinations:
+    - namespace: hlab-auth-oidc-stage
+      server: https://kubernetes.default.svc
+    - namespace: forgejo-mcp-oidc-stage
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+      name: hlab-auth-oidc-stage
+    - group: ""
+      kind: Namespace
+      name: forgejo-mcp-oidc-stage
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+    - group: ""
+      kind: Service
+    - group: apps
+      kind: Deployment
+    - group: batch
+      kind: Job
+    - group: postgresql.cnpg.io
+      kind: Cluster
+    - group: networking.k8s.io
+      kind: Ingress
+    - group: bitnami.com
+      kind: SealedSecret
+    - group: traefik.io
+      kind: Middleware

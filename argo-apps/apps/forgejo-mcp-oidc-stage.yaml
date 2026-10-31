@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: forgejo-mcp-oidc-stage
+  namespace: argocd
+spec:
+  project: forgejo-mcp-oidc-stage
+  source:
+    repoURL: https://github.com/WaylonWalker/homelab-argo.git
+    targetRevision: HEAD
+    path: k8s/forgejo-mcp-oidc-stage
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: forgejo-mcp-oidc-stage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

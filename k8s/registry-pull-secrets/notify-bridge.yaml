@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  namespace: notify-bridge
+spec:
+  encryptedData:
+    .dockerconfigjson: AgDM+p09Tx9TXtjco08UVUpkm40px4d+he4k9lonyizH+2mkYj9a66KGOQcZ2UuHGZM6AE0oSOA2zpU1N7wtUylR9l3fB1Rk5LEp7ZgrKwv+/ktcGhzig9Cz3GlAGjAKKzPSDns9lQxqF6TANXovjTOvSTUlHjyD8Dipu2o9elrCLSm0UVe+Zv3cHpCZ0fa6dZ6P1amWmqfxh+MM+OjIkXIgQgdk+kU2zO0Go/xoJhOPMzGc4x1Xs9kxUA4YaE66ocZrMTAqNDNyIt0vXyHA5gSe1EPANyoFzwt9OcVHze0wGbDUZEwKwlayWU6fX3Ave8noQ3xdAVbqNx/VA5OY6hRKK1ygoyz/fEQho4LhXgFPP4+SAPQ9DIZuE3mAgvt7DPcgaLIAkwt5dbpDkBaJhb7cBsQfAnKyCIzbHCMg4Lug8lfffkOwOTDpX8azHH1gp1tBrn0mlfInQzhRM/I+bBMtudGhuzRPHZdpUS1SL4MCF6sdpfP5Gq6HEAZgh8ihlNxjin3NXVgmsNNw3BZ4vxSoLaxNFssEGaHQFiZJ99i4ZZ+Zr+mN1fq35G31WcvoLpZ/dogsIfTUJtfRtNz12FOj6Vtqfqlxj4O29fG2gloOeJUretK+wQEFPfmoIUmAuTlm+hQAvJafTca49vAq5O2djPzGTrGuAF2KUcFC3xoxY4y8xtEB89jEmEQX9H8NZYH0ApGge3osQFuE9BsemsO4yvU2m/h71CdjkD6UuzgLpB7OlyPWc4vdqMzhk0EROA7aV5AlwLPW9+9mNlPPJjz54VhyAaP/k5HcVxFUi8q7vF6urTMBXrfq9cG4Tq4TrD2b8gr1Ttq7sWJkun2lz7mlFz6hBbPzpyIP74hMJmVVTslu6c2liarUb3N1EcIRNYu2UUEE8iUDKOYPQE2IBsK0x1g+47m3X4jJ5l+M0D+brabVNvQHsJOoRd+Hjng1x+ma3sKh49eJvkB8mGISY4WCoZAizoG64LuauBjMUYOlxHfZbWibayGZ2A8fp5tXXCfi+tP6Ly5hpo6kFcyYQhD9E1fofoPt66Jk8nXlHptZMcJbhhh/f5s8DBQXqskRxZpDAXfa
+  template:
+    metadata:
+      name: registry-pull
+      namespace: notify-bridge
+    type: kubernetes.io/dockerconfigjson

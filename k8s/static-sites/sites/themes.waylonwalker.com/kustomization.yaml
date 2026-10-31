@@ -8,6 +8,7 @@ resources:
   - ../../base
   - ../../components/hostpath-webroot
   - site-config.yaml
+  - networkpolicy.yaml
 
 # This site uses the editor's remote motif image picker, so keep its checked
 # security and validator policy local to this deployment.
@@ -110,6 +111,9 @@ patches:
       kind: Deployment
       name: web
     patch: |-
+      - op: add
+        path: /spec/template/spec/automountServiceAccountToken
+        value: false
       - op: add
         path: /spec/template/metadata/annotations/themes.waylonwalker.com~1headers-revision
         value: "2026-10-08-v3"

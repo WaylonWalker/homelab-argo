@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hlab-auth
+  namespace: hlab-auth-oidc-stage
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hlab-auth
+  template:
+    metadata:
+      labels:
+        app: hlab-auth
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: registry-pull
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: registry.wayl.one/hlab-auth@sha256:db7e4d4ae4d565e98883b636c3f5a63fe3d3bf851ce1d19dc88bb78b4ff4b214
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: hlab-auth-stage-config
+            - secretRef:
+                name: hlab-auth-stage-runtime-secrets
+          ports:
+            - containerPort: 8000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: oidc-signing
+              mountPath: /run/secrets/oidc
+              readOnly: true
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: oidc-signing
+          secret:
+            secretName: hlab-auth-stage-oidc-signing
+            items:
+              - key: oidc-signing.pem
+                path: oidc-signing.pem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hlab-auth
+  namespace: hlab-auth-oidc-stage
+spec:
+  selector:
+    app: hlab-auth
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

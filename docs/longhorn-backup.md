@@ -1,76 +1,9 @@
-# Longhorn backup transport
-
-## S3-compatible contract
-
-Longhorn sends backups to an S3-compatible backup object store.
-
-```text
-Longhorn
-   │
-   │ S3-compatible API
-   ▼
-backup-object-store
-   │
-   ├── current: MinIO
-   └── future: RustFS
-```
-
-The current object store runs in the `minio-longhorn-backup` namespace. Longhorn
-uses the Kubernetes Service endpoint:
-
-```text
-http://minio-longhorn-backup.minio-longhorn-backup.svc.cluster.local:9000
-```
-
-The backup target remains `s3://longhorn-system@us-east-1/`. The bucket name is
-`longhorn-system`. The Longhorn credential Secret is
-`longhorn-system/minio-longhorn-backup-secret`.
-
-The Longhorn Helm values in `argo-apps/core-apps/longhorn.yaml` own the target
-Settings. Keep one target source instead of adding a second Setting manifest.
-
-The internal endpoint keeps signed S3 requests inside the cluster. It avoids the
-Cloudflare proxy that can change a signed header and cause `SignatureDoesNotMatch`.
-This diagnosis remains unproven until the endpoint change is synced and a new
-backup succeeds.
-
-## Bucket provisioning
-
-The object-store Deployment runs a pinned `minio/mc` sidecar. The sidecar waits
-for the MinIO S3 API, creates `longhorn-system` with an idempotent command, and
-stays alive after provisioning. The sidecar reports Ready only after the bucket
-operation succeeds. The MinIO server and client images use explicit release tags
-and immutable image digests.
-
-## Read-only diagnostic
-
-Run this command from a GNU/Linux workstation with an authorized Kubernetes
-context. The workstation needs `kubectl`, `jq`, `base64`, and GNU `date`.
-
-```bash
-just storage-backup-check
-```
-
-The command reads Services, endpoints, pod readiness, the health endpoint,
-Secret key names, credential identities, endpoint values, bucket names, the
-Longhorn BackupTarget, and recent Backup objects. It does not print plaintext
-credentials. It does not apply resources, create a backup, or restore a volume.
-
-**This command is diagnostic only. A successful diagnostic is not the backup
-safety gate. It does not prove that a new backup works or that a restore works.**
-
-## Backup safety gate
-
-After this repair is approved and synced:
-
-1. Wait for the Longhorn BackupTarget to become Available.
-2. Create a disposable test PVC.
-3. Write a known sentinel file to the PVC.
-4. Create a **new** Longhorn backup.
-5. Restore that backup to a **new** volume and PVC.
-6. Read the sentinel from the restored PVC.
-7. Pass the gate only when the sentinel matches the original content.
-
-Do not migrate production storage until this gate passes. Do not perform the
-RustFS migration in this change. RustFS can be evaluated later behind the same
-S3-compatible contract.
+---
+title: 'Longhorn backup transport'
+slug: '/longhorn-backup/'
+published: true
+private: true
+tags: [operate, recover, storage]
+---
+<!-- markata-encrypted-source:v1 key=default -->
+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

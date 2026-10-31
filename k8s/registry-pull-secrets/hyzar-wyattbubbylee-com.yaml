@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  namespace: hyzar-wyattbubbylee-com
+spec:
+  encryptedData:
+    .dockerconfigjson: AgC4NZ34pf97EGFPQTipDeopdJ/ddwIY1oIlwNfXHM5iSXUsNACHjEZ6CJVAWw72jTnwWERsfraydZ7xpjz5JX/3ODZWuL5G9brHted17n8Omjvbwqe+DmITslnAOnrRiaLoTJtfpE+kMD++bAR8mTQJmdpdrZmYKJKxFW9CLCuQ/QBcJgMviBuP+e8mBUKDCKwJGs9Sex9xbxdSEO4kIcmFRRm06AkfxRRGVnwetrzOOnoJlMaxIXAQ2nhjADATK0+XiqlBp72nVANbhSqjYGWt6eoDihrP06TOFL8aVvTEEhOzM5yJ1TwIvEvuY6LDiqQfqJ3KJGmd4UQHD3mqJmZdtP4JR2RtJIKLch7ytEENP9EffqjyES9APcaxh8ngDGXnhBLeABbeO9Y/SozpY5MklK76vajiTqbx1HeoyXYH74GshX2zTkPZmc01EbWdDarnu9+KsA0mmuHh4idd6NFIHUhRMUe24pfVA/nGUm1BqczBAxct2narh4lAH0ot7T7LQGNCCjK5DLocH6D2BLSKoiHZ9IEbG3ZVy/1ce1YJRvcsYjw0rlengxcF8mqtJWJDVQ0SE2m8/4fnKj9PmUpszjOs+YqlHRNV0rPdUhd1kULcu/n8nPRMp9+6GDuu5szkB3vGvIeVWKsC3QfFfORP9Ubb19L0+tmp+7zvBpL4BaqJB5PmV1iJJvdUVhoszTRrpZAZIvQKEz9Rs6Vur7df65S/s5qmiDkC8wbObm5P3CfY8Or3UQ8O1CVEYXezwutiqMF1f3jRI18pFSPLmQ3FYOpqljOid/bTUgfRA3kerXTxdjDK7Nz1bizO1iMGvsLkxbOixg/p/z/ZGm32/DrvXOb+Uox5H6fIetDsHyDXe8frMP+Secvas4strXrzM4xeXienUCnwqQzdDyonlSAdo15sFp0PIKocV6pgQjWqNi3G6sGdGJxQCMPgYnEZRjW0ftuOpc71thFjXDwSYtd9XN6LvNkdWIpk6LRDNJa1EUsQ+LIhyBSWkGXeao49JfJhyiCuRk5NVRBwpVrughd+p7BI5yS+hY9FP81LAm7F5PeQeYhD6Q6ZHNXzxIDGuwefW8X0
+  template:
+    metadata:
+      name: registry-pull
+      namespace: hyzar-wyattbubbylee-com
+    type: kubernetes.io/dockerconfigjson

@@ -1,30 +1,9 @@
-# Renovate for homelab-argo
-
-This repository uses [Renovate](https://docs.renovatebot.com/) to propose version updates in Git. Renovate does **not** deploy directly to the cluster; merging Git changes may trigger Argo CD automated reconciliation.
-
-## Enable the hosted bot
-
-1. Install the [Mend Renovate GitHub App](https://github.com/apps/renovate) under the WaylonWalker account.
-2. Choose **Only select repositories**, then select **homelab-argo**.
-3. Review the requested GitHub App permissions and install.
-4. After the first Renovate run, review the Dependency Dashboard issue and open PRs.
-
-The app installation must be approved by a repository owner; adding `renovate.json` alone does not start Renovate.
-
-## Policy
-
-- Renovate opens normal update PRs, but never auto-merges them.
-- Major-version updates must be approved via the Dependency Dashboard before a PR is created.
-- Updates to critical infrastructure and stateful components require dashboard approval even for minor/patch changes.
-- Keep only a small backlog of active PRs (`prConcurrentLimit: 5`).
-- Images from `registry.wayl.one` stay under the existing application build/deployment pipeline.
-- Disabled resources, historical backup manifests, upgrade plans, and the vendored cert-manager release manifest are excluded.
-- Native Argo CD, Kubernetes, Helm, Docker, and other supported managers discover version references. Some custom manifests may require additional extractors.
-
-## Deployment safety
-
-An approved or merged PR is **not** a guarantee of compatibility. Argo CD can auto-sync merged changes immediately.
-
-For Longhorn, CNPG, cert-manager, Argo CD, DNS, networking, and other stateful components: read upstream upgrade notes, ensure current tested backups, check CRD/API compatibility, and coordinate a maintenance window as needed. A config validator workflow checks Renovate JSON configuration only; it does not test cluster health or ensure Helm charts are deployable.
-
-Node/OS upgrades, k3s runtime upgrades, and whole vendored upstream manifest bundles require separate procedures.
+---
+title: 'Renovate for homelab-argo'
+slug: '/renovate/'
+published: true
+private: true
+tags: [operate, change, automation]
+---
+<!-- markata-encrypted-source:v1 key=default -->
+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

@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier
+_src_path: templates/static-site
+host: app-dev.waylonwalker.com
+namespace: app-dev
+site: app-dev
+telemetry_app_name: apps
+telemetry_enabled: 'true'
+telemetry_environment: development
+telemetry_version: unknown
+webroot_path: /mnt/main/walkershare/waylon/sites/app-dev.waylonwalker.com

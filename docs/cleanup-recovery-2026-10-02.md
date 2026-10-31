@@ -1,88 +1,9 @@
-# Recovery of preserved repository work — 2026-10-02
-
-The previous dirty checkout was archived privately and saved in a named Git
-stash before recovery. Session exports and local databases remain private.
-This report records which work was recovered and which proposals need a
-separate operational decision.
-
-## Later storage evidence
-
-The September 20 and 21 inventories are historical snapshots. Their disk
-capacity figures and failure statuses are not current operating instructions.
-The September 20 architecture document is a proposal, not deployed policy.
-
-Later evidence from the recovery sessions and live checks:
-
-- The Longhorn backup target repair and disposable backup/restore gate passed
-  on September 21. The target remains available in the October 2 live check.
-- Frigate retention was changed to 14 days for continuous/motion footage.
-  Alert/detection retention remains 120 days. All eight cameras record.
-- Frigate now uses a pinned image, a 4 GiB memory request, and a 6 GiB limit.
-  Its durability exporter is live and all 19 Prometheus rules evaluate.
-- All five Longhorn disks currently permit scheduling, including Falcon2 vault.
-  This differs from the old proposal to keep vault scheduling disabled.
-- Daily and weekly Longhorn jobs still select the default group. The proposed
-  critical/HA StorageClasses are kept under `docs/examples/`, outside Argo.
-- The production site moved to fast Longhorn storage. The September 28 matrix
-  records measurements under the placement and load present at that time.
-- The old Frigate cache contained unprocessed footage. Preserve its quarantine
-  and decide historical recovery needs before retiring the loop image.
-
-## Recovered work
-
-- Dated storage inventories and the historical architecture proposal.
-- Production storage measurements and the disposable-filesystem benchmark.
-- Copier static-site templates required by the existing creation recipe.
-- Clipboard encryption helper with current manifest paths and merge behavior
-  that preserves other keys in an existing sealed secret.
-
-## Review of the remaining preserved files
-
-| Original work | Disposition |
-| --- | --- |
-| MinIO deployment conflict markers | Superseded by the repaired, pinned sidecar already on main; original patch retained privately |
-| Old Prometheus manifest deletion | Completed; no repository or Argo source referenced the malformed legacy ingress |
-| Traefik auth-cookie schema | Recovered; both schema groups include the field already used by Models middleware |
-| Walkershare manifests | Reconciled with live Filebrowser, Samba, Syncthing and storage; credentials sealed; manual Argo adoption with no automatic pruning |
-| Old Walkershare Copyparty ingress | Excluded from recovered manifests; live hostname still points to an absent service; owner decision needed for replacement or retirement |
-| Cloudflare token helper and controller secret | Private proposal; there is no controller deployment or active namespace; do not create another tunnel from this unfinished experiment |
-| Markata docs deployment | Private historical prototype; live deployment is scaled to zero and the build CronJob is suspended |
-| Omada copy manifest | Historical commented-out migration; current deployment already uses the Longhorn claims |
-| Jellyfin transcode Job | Private prototype; existing scripts/transcode.py provides inventory-driven transcoding; Job can publish partial output on failure and should not be deployed |
-| CoreOS bootstrap and generated Ignition | Private host-rebase prototype with no repository references; generated configuration is not a cluster cleanup step |
-| Thoughts and Longhorn sealed secrets | Retained privately; no proven need to replace current credentials |
-| new-frigate.yaml and krayt.yaml | Retained privately; untracked configuration is not the live Frigate source of truth |
-| status/create_status.py | Private login/status snippet, not a finished status provisioning workflow |
-| listen.py | Private MQTT debugging snippet; no deployment references |
-| requirements.txt | Empty placeholder; no dependency declaration to recover |
-| media_inventory.db | Local runtime data; preserve privately rather than committing the database |
-| Codex/OpenCode session exports | Private incident history; may contain credentials and host details |
-| Local skill symlink | Machine-specific tooling; keep outside the published repository |
-
-The reconciled Walkershare pod templates match live state in server dry-run.
-Its shared hostPath PV still lacks node affinity; adding affinity to an existing
-PV requires a planned storage change. Do not recreate the PV during adoption.
-The proposed storage classes remain examples outside live Argo sources.
-
-## Validation
-
-- Every existing static site and the recipe-based generated site renders.
-- Generated resources have the expected namespace and hostPath.
-- Encryption helper uses the moved paths and merges both default and named keys.
-- Benchmark rejects invalid limits, symlink escapes, and path traversal.
-- Mock benchmark success and failure both remove their private test directory.
-- Walkershare server dry-run and sealed-secret validation pass.
-- Three reconciled Walkershare pod templates equal the running templates.
-
-## Pending operational work
-
-Recurring Frigate state backups and cache migration remain separate tasks.
-Storage cleanup requires current ownership and backup/restore evidence for each
-workload. Historical inventories alone do not establish safe deletion sets.
-
-## Private preservation
-
-The original files remain in `private/cleanup-2026-10-02/working-files.tar.gz`.
-The original tracked patch and inventory are in the same directory. The named
-stash is `preserved pre-cleanup work 2026-10-02`. Keep these until all remaining
-work has been reviewed. Do not apply the whole stash over current manifests.
+---
+title: 'Recovery of preserved repository work — 2026-10-02'
+slug: '/cleanup-recovery-2026-10-02/'
+published: true
+private: true
+tags: [recover, operate]
+---
+<!-- markata-encrypted-source:v1 key=default -->
+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

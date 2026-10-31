@@ -1,43 +1,9 @@
-# Markata-Go Faro feature plan
-
-Markata-Go renders shared `<head>` content through its `HeadConfig`. The
-default theme renders `config.head.text`, `config.head.meta`,
-`config.head.link`, and `config.head.script`. `ScriptTag` only stores `src`, so
-it cannot add the Faro app, environment, and version attributes.
-
-Add a native `[markata-go.telemetry.faro]` config section:
-
-```toml
-[markata-go.telemetry.faro]
-enabled = true
-endpoint = "https://telemetry.wayl.one/collect"
-bootstrap = "https://telemetry.wayl.one/assets/faro-bootstrap.js"
-app_name = "waylonwalker-com"
-environment = "production"
-version = "unknown"
-```
-
-The feature should add one escaped script element to generated HTML head
-content. It should use the shared bootstrap and stable app name. The version
-must use a release value when the build provides one. Otherwise, it must use
-`unknown`.
-
-The build environment must override the configured environment for preview
-builds. Preview output must use `preview`; production output must use
-`production`. App names must remain the same across those environments.
-
-The feature must preserve existing custom `head.text` and head tags. It must
-not change RSS, JSON, text, or other non-HTML output. It must use the same
-privacy behavior as the shared bootstrap. It must add an explicit
-`enabled = false` opt-out for admin, sensitive, or unusual sites.
-
-The implementation belongs in Markata-Go because HTML generation owns the
-`<head>`. The homelab nginx filter is not the long-term Markata integration.
-Markata-Go requires a tracked GitHub issue and a spec update before code
-changes. No Markata-Go source was changed in this pass.
-
-The existing Argo apps that use the Markata-Go Helm chart are
-`go.waylonwalker.com`, `waylonwalker.com`, `rhiannonwalker.com`, and
-`wyattbubbylee.com`. Their builder-admin and webhook hosts are not browser-site
-targets. `recipes.waylonwalker.com` also uses the Markata-Go builder, but it
-has a separate static deployment manifest.
+---
+title: 'Markata-Go Faro feature plan'
+slug: '/markata-go-telemetry-plan/'
+published: true
+private: true
+tags: [change, understand, observability]
+---
+<!-- markata-encrypted-source:v1 key=default -->
+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

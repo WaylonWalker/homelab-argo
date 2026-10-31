@@ -58,7 +58,7 @@ metadata:
   name: dropper-wayl-one
   namespace: dropper-dev
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -73,7 +73,7 @@ spec:
         service: dropper-wayl-one
     spec:
       containers:
-        - image: registry.wayl.one/dropper:0.0.94
+        - image: registry.wayl.one/dropper:0.0.96
           imagePullPolicy: IfNotPresent
           name: dropper-wayl-one
           command:
@@ -171,7 +171,7 @@ spec:
         - name: dropper-cache
           emptyDir: {}
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       restartPolicy: Always
 ---
 apiVersion: networking.k8s.io/v1

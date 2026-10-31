@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homelab-docs
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: markata
+    app.kubernetes.io/environment: production
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/WaylonWalker/homelab-argo.git
+      targetRevision: HEAD
+      path: k8s/homelab-docs
+      ref: values
+    - repoURL: https://github.com/WaylonWalker/markata.git
+      targetRevision: main
+      path: helm-chart
+      helm:
+        valueFiles:
+          - $values/k8s/homelab-docs/helm-values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homelab-docs-notes
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

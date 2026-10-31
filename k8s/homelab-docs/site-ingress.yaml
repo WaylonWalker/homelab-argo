@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homelab-docs-site
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: homelab.waylonwalker.com
+    traefik.ingress.kubernetes.io/router.middlewares: homelab-docs-notes-homelab-docs-site-auth@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - homelab.waylonwalker.com
+      secretName: homelab-docs-tls
+  rules:
+    - host: homelab.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homelab-docs-notes-site
+                port:
+                  number: 80

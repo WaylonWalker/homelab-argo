@@ -1,0 +1,194 @@
+# Public-safe first-pass dependency graph. Configured edges are not proof of live traffic.
+# Add a rule only after checking selectors, runtime traffic, and background jobs.
+version: 1
+issue: 174
+edges:
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: whoami, service: whoami, port: 5678, protocol: TCP}
+    reason: Public echo routes, including the DNS canary.
+    evidence: [k8s/whoami/deployment.yaml, k8s/whoami/external-dns-canary.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only the live Traefik pod selector to whoami TCP 80.
+  - source: {namespace: whoami, workload: whoami}
+    destination: {namespace: kube-system, service: kube-dns, port: 53, protocol: UDP/TCP}
+    reason: DNS access reserved for the first isolated workload.
+    evidence: [k8s/whoami/networkpolicy.yaml]
+    confidence: medium
+    observation: policy-allow-only
+    proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
+  - source: {namespace: forgejo, workload: forgejo}
+    destination: {namespace: forgejo, service: forgejo-db-rw, port: 5432, protocol: TCP}
+    reason: Application database.
+    evidence: [k8s/forgejo/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Forgejo.
+  - source: {namespace: forgejo-mcp, workload: forgejo-mcp}
+    destination: {namespace: forgejo, service: forgejo, port: 3000, protocol: TCP}
+    reason: User-scoped Forgejo API requests.
+    evidence: [k8s/forgejo-mcp/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Forgejo MCP.
+  - source: {namespace: recipes-waylonwalker-com, workload: web}
+    destination: {namespace: forgejo, service: forgejo, port: 22, protocol: TCP}
+    reason: Source checkout over SSH.
+    evidence: [k8s/recipes-waylonwalker-com/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve for builder jobs, including infrequent runs.
+  - source: {namespace: shot, workload: shot-wayl-one-and-worker}
+    destination: {namespace: shot, service: shots-redis, port: 6379, protocol: TCP}
+    reason: Queue state.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve for API and worker pods.
+  - source: {namespace: shot, workload: shot-wayl-one-and-worker}
+    destination: {namespace: minio, service: minio, port: 9000, protocol: TCP}
+    reason: Object storage.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating shot workloads.
+  - source: {namespace: shot, workload: shot-wayl-one-and-worker}
+    destination: {namespace: observability, service: otel-collector-opentelemetry-collector, port: 4317, protocol: TCP}
+    reason: OTLP traces.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve telemetry egress.
+  - source: {namespace: brainrot, workload: brainrot}
+    destination: {namespace: kokoro, service: kokoro, port: 80, protocol: TCP}
+    reason: Text-to-speech requests.
+    evidence: [k8s/brainrot/helm-chart/values.yaml]
+    confidence: medium
+    observation: configured
+    proposed_rule: Verify service port and live usage before a policy.
+  - source: {namespace: brainrot, workload: brainrot}
+    destination: {namespace: observability, service: otel-collector-opentelemetry-collector, port: 4317, protocol: TCP}
+    reason: OTLP traces.
+    evidence: [k8s/brainrot/helm-chart/values.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve telemetry egress.
+  - source: {namespace: lantern-table, workload: lantern-table}
+    destination: {namespace: lantern-table, service: lantern-valkey, port: 6379, protocol: TCP}
+    reason: Shared state for public mode and multi-replica signaling.
+    evidence: [k8s/lantern-table/deployment.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Lantern Table.
+  - source: {namespace: article-listener, workload: article-listener}
+    destination: {namespace: kokoro, service: kokoro, port: 80, protocol: TCP}
+    reason: Text-to-speech requests.
+    evidence: [k8s/article-listener/helm-chart/values.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve before isolating Article Listener.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: hlab-auth, service: hlab-auth, port: 8000, protocol: TCP}
+    reason: Forward authentication for protected app routes.
+    evidence: [k8s/brainrot/helm-chart/values.yaml, k8s/article-listener/helm-chart/values.yaml]
+    confidence: high
+    observation: configured
+    proposed_rule: Preserve Traefik to auth before changing protected app ingress.
+  - source: {namespace: shot, workload: shot-wayl-one-cleanup}
+    destination: {namespace: shot, service: shot-wayl-one, port: 5000, protocol: TCP}
+    reason: Scheduled queue cleanup endpoint.
+    evidence: [k8s/shots/deployment.yaml]
+    confidence: high
+    observation: configured-batch-job
+    proposed_rule: Preserve the CronJob path even if short traffic samples show none.
+  - source: {namespace: forgejo, workload: forgejo-runner}
+    destination: {namespace: forgejo, service: forgejo, port: 3000, protocol: TCP}
+    reason: Runner registration and job polling when resumed.
+    evidence: [k8s/forgejo/runner.yaml]
+    confidence: high
+    observation: configured-paused
+    proposed_rule: Keep in the recovery design; runner currently has zero replicas.
+  - source: {namespace: brainrot, workload: brainrot}
+    destination: {namespace: external, service: public-rss-feeds, port: 443, protocol: TCP}
+    reason: Scheduled feed polling and user-added public feeds.
+    evidence: [k8s/brainrot/helm-chart/values.yaml]
+    confidence: medium
+    observation: configured-dynamic-egress
+    proposed_rule: Defer policy until feed hosts, redirects, and DNS behavior are measured.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: librespeed, service: librespeed, port: 80, protocol: TCP}
+    reason: Public speed test routes and backend requests.
+    evidence: [k8s/librespeed/librespeed.yaml, k8s/librespeed/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only the live Traefik pod selector to LibreSpeed TCP 80.
+  - source: {namespace: librespeed, workload: librespeed}
+    destination: {namespace: kube-system, service: kube-dns, port: 53, protocol: UDP/TCP}
+    reason: DNS access reserved for the isolated backend.
+    evidence: [k8s/librespeed/networkpolicy.yaml]
+    confidence: medium
+    observation: policy-allow-only
+    proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: themes, service: web, port: 80, protocol: TCP}
+    reason: Public static site requests.
+    evidence: [k8s/static-sites/sites/themes.waylonwalker.com/kustomization.yaml, k8s/static-sites/sites/themes.waylonwalker.com/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only the live Traefik pod selector to the themes web pod.
+  - source: {namespace: themes, workload: web}
+    destination: {namespace: kube-system, service: kube-dns, port: 53, protocol: UDP/TCP}
+    reason: DNS access reserved for the isolated web pod.
+    evidence: [k8s/static-sites/sites/themes.waylonwalker.com/networkpolicy.yaml]
+    confidence: medium
+    observation: policy-allow-only
+    proposed_rule: Allow only CoreDNS pods on UDP and TCP 53.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: lantern-table, service: lantern-table, port: 8765, protocol: TCP}
+    reason: Public Lantern Table HTTP and WebSocket routes.
+    evidence: [k8s/lantern-table/ingress.yaml, k8s/lantern-table/app-networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow the live Traefik pod selector to the app pods on TCP 8765.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: shot, service: shot-wayl-one, port: 5000, protocol: TCP}
+    reason: Public screenshot API routes.
+    evidence: [k8s/shots/deployment.yaml, k8s/shots/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200
+    proposed_rule: Allow only Traefik and the cleanup CronJob pod to the API.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: opengraph, service: opengraph, port: 8000, protocol: TCP}
+    reason: Public metadata analysis API routes.
+    evidence: [argo-apps/apps/opengraph.yaml]
+    confidence: high
+    observation: traefik-only-policy-healthy-and-http-200; unrelated-pod-blocked
+    proposed_rule: Allow only the live Traefik pod selector on TCP 8000; implemented in k8s-basic Forgejo PR #1.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: avatars, service: avatars, port: 8000, protocol: TCP}
+    reason: Public avatar image routes.
+    evidence: [argo-apps/apps/avatars.yaml]
+    confidence: high
+    observation: ingress-configured-and-http-200; chart-render-diff-is-networkpolicy-only
+    proposed_rule: Allow only the live Traefik pod selector on TCP 8000; use the active k8s-basic Forgejo chart.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: models, service: models, port: 8080, protocol: TCP}
+    reason: Authenticated public model catalog routes.
+    evidence: [k8s/models/ingress.yaml, k8s/models/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-auth-redirect
+    proposed_rule: Allow only the live Traefik pod selector on TCP 8080.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: models-dev, service: models-dev, port: 8080, protocol: TCP}
+    reason: Authenticated development model catalog routes.
+    evidence: [k8s/models-dev/ingress.yaml, k8s/models-dev/networkpolicy.yaml]
+    confidence: high
+    observation: ingress-configured-and-auth-redirect
+    proposed_rule: Allow only the live Traefik pod selector on TCP 8080.
+  - source: {namespace: kube-system, workload: traefik}
+    destination: {namespace: linker, service: linker, port: 8000, protocol: TCP}
+    reason: Public Linker routes.
+    evidence: [argo-apps/apps/linker.yaml]
+    confidence: high
+    observation: health-and-ready-http-200;root-route-has-app-error
+    proposed_rule: Allow only the live Traefik pod selector on TCP 8000; use the active k8s-basic Forgejo chart.

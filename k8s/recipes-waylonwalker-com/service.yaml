@@ -12,5 +12,8 @@ spec:
     - name: http
       port: 80
       targetPort: 80
+    - name: builder-admin
+      port: 8080
+      targetPort: builder-admin
   selector:
     app: web

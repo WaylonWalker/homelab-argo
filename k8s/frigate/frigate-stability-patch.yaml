@@ -14,10 +14,10 @@ spec:
           image: ghcr.io/blakeblackshear/frigate@sha256:9678a83a76e4730ac7d9ea7428370e32ae656d6b312aaad30d6c69f3fef14d35
           resources:
             requests:
-              memory: 4Gi
+              memory: 6Gi
               cpu: "1"
             limits:
-              memory: 6Gi
+              memory: 12Gi
               cpu: "2"
         - name: frigate-monitor
           # Reuse the already-pinned Frigate image: it contains Python + sqlite3 and avoids

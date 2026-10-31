@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hlab-auth-stage-migrate
+  namespace: hlab-auth-oidc-stage
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: registry-pull
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: registry.wayl.one/hlab-auth@sha256:9b21c4a6da20ed344c32586bd3151a1788057aa550c5f70d52714060a1b3e73c
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - secretRef:
+                name: hlab-auth-stage-runtime-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]

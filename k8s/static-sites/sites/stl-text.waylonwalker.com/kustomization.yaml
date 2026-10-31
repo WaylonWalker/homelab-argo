@@ -8,6 +8,7 @@ resources:
   - ../../base
   - ../../components/hostpath-webroot
   - site-config.yaml
+  - networkpolicy.yaml
 
 replacements:
   - source:
@@ -92,3 +93,6 @@ replacements:
           kind: PersistentVolume
         fieldPaths:
           - spec.hostPath.path
+
+patches:
+  - path: deployment-security-refresh.yaml

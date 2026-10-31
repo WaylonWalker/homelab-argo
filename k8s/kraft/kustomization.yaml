@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - kraft.yaml
   - kraft-playit-sealed-secret.yaml
+  - magnet-smp.yaml

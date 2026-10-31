@@ -1,9 +1,12 @@
 image:
   repository: registry.wayl.one/article-listener
-  tag: "0006341-20261016181958"
+  tag: "2529649-20261022200855"
   pullPolicy: IfNotPresent
 imagePullSecrets:
-  - name: regcred
+  - name: registry-pull
+privateRegistry:
+  enabled: false
+  encryptedDockerConfig: ""
 ingress:
   hosts:
     - listen.waylonwalker.com

@@ -1,0 +1,18 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: hlab-auth-stage
+  namespace: hlab-auth-oidc-stage
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  instances: 1
+  storage:
+    size: 2Gi
+    storageClass: longhorn-cache
+  bootstrap:
+    initdb:
+      database: hlab_auth
+      owner: hlab_auth
+      secret:
+        name: hlab-auth-stage-pg-app

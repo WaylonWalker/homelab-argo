@@ -69,7 +69,7 @@ spec:
                       #   - name: markata-cache
                       #     mountPath: /app/.markata.cache
           imagePullSecrets:
-            - name: regcred
+            - name: registry-pull
           # if needed for force pull, turn this on
           # imagePullPolicy: Always
           restartPolicy: OnFailure

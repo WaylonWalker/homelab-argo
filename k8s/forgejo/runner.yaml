@@ -44,7 +44,8 @@ metadata:
   labels:
     app: forgejo-runner
 spec:
-  replicas: 1
+  # Paused for issue #174. Keep the PVC, registration Secret, and config for recovery.
+  replicas: 0
   selector:
     matchLabels:
       app: forgejo-runner

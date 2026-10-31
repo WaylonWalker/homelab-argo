@@ -34,6 +34,11 @@ new-static-site site_dir="":
       exit 1
     fi
 
+    if ! command -v uvx >/dev/null 2>&1; then
+      echo "Error: uvx is required to run Copier (install uv first)" >&2
+      exit 1
+    fi
+
     site_names=("$short_name" "${short_name}-dev")
     for site_name in "${site_names[@]}"; do
       namespace_result="$(kubectl get namespace "$site_name" --ignore-not-found -o name)"
@@ -72,6 +77,11 @@ new-static-site site_dir="":
       exit 1
     fi
 
+    webroot_owner="waylon"
+    if [[ "$domain" == "wyattbubbylee.com" ]]; then
+      webroot_owner="wyatt"
+    fi
+
     for site_name in "${site_names[@]}"; do
       host="$site_name.$domain"
       destination="k8s/static-sites/sites/$host"
@@ -89,11 +99,11 @@ new-static-site site_dir="":
       if [[ "$site_name" == *-dev ]]; then
         telemetry_environment="development"
       fi
-      copier copy templates/static-site "$destination" \
+      uvx --from copier copier copy templates/static-site "$destination" \
         --data "site=$site_name" \
         --data "namespace=$site_name" \
         --data "host=$host" \
-        --data "webroot_path=/mnt/main/walkershare/waylon/sites/$host" \
+        --data "webroot_path=/mnt/main/walkershare/$webroot_owner/sites/$host" \
         --data "telemetry_enabled=true" \
         --data "telemetry_app_name=$telemetry_app_name" \
         --data "telemetry_environment=$telemetry_environment" \
@@ -614,6 +624,48 @@ seal name:
     git add {{name}}/{{name}}-sealed-secret.yaml
     git commit -vm "seal {{name}}"
 
+# Log Podman into the private registry using a namespace-local pull Secret.
+registry-login namespace="thoughts":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    python3 - {{quote(namespace)}} <<'PY'
+    import base64
+    import json
+    import re
+    import subprocess
+    import sys
+
+    namespace = sys.argv[1]
+    if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", namespace):
+        raise SystemExit("Namespace must be a DNS-compatible Kubernetes name.")
+
+    try:
+        result = subprocess.run(
+            ["kubectl", "get", "secret", "registry-pull", "--namespace", namespace, "-o", "json"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        secret = json.loads(result.stdout)
+        if secret.get("type") != "kubernetes.io/dockerconfigjson":
+            raise ValueError
+        config = json.loads(base64.b64decode(secret["data"][".dockerconfigjson"]))
+        entry = config["auths"]["registry.wayl.one"]
+        username, password = base64.b64decode(entry["auth"]).decode().split(":", 1)
+    except Exception:
+        raise SystemExit(f"Could not read registry-pull credentials from namespace {namespace}.")
+
+    result = subprocess.run(
+        ["podman", "login", "--username", username, "--password-stdin", "registry.wayl.one"],
+        input=password,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode:
+        raise SystemExit("Podman login failed; no credential data was displayed.")
+    print(f"Podman logged into registry.wayl.one using registry-pull from namespace {namespace}.")
+    PY
+
 regcred name:
     #!/bin/bash
     set -euxo pipefail
@@ -703,12 +755,14 @@ update-markata-image-pin image_tag="" scope="all":
       argo-apps/apps/waylonwalker-com-prod.yaml
       argo-apps/apps/wyattbubbylee-com-prod.yaml
       argo-apps/apps/rhiannonwalker-com-prod.yaml
+      k8s/homelab-docs/helm-values.yaml
     )
     case "$scope" in
       all) files=("${all_files[@]}") ;;
       prod-builder) files=(argo-apps/apps/waylonwalker-com-prod.yaml) ;;
+      homelab-docs) files=(k8s/homelab-docs/helm-values.yaml) ;;
       *)
-        echo "Usage: just update-markata-image-pin [sha-<published-commit>] [all|prod-builder]" >&2
+        echo "Usage: just update-markata-image-pin [sha-<published-commit>] [all|prod-builder|homelab-docs]" >&2
         exit 1
         ;;
     esac
@@ -764,8 +818,12 @@ update-markata-image-pin image_tag="" scope="all":
 
     for file in "${files[@]}"; do
       tag_count="$(grep -Ec '^[[:space:]]+tag: sha-[0-9a-f]+$' "$file")"
-      if [[ "$tag_count" != 3 ]]; then
-        echo "Expected three Markata image tags in $file; found $tag_count." >&2
+      expected_tag_count=3
+      if [[ "$file" == "k8s/homelab-docs/helm-values.yaml" ]]; then
+        expected_tag_count=2
+      fi
+      if [[ "$tag_count" != "$expected_tag_count" ]]; then
+        echo "Expected $expected_tag_count Markata image tags in $file; found $tag_count." >&2
         exit 1
       fi
     done
@@ -803,7 +861,7 @@ update-markata-image-pin image_tag="" scope="all":
       application/1-apps -n argocd --timeout=600s
 
     kubectl annotate application 1-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
-    apps=(go-waylonwalker-com waylonwalker-com-prod wyattbubbylee-com-prod rhiannonwalker)
+    apps=(go-waylonwalker-com waylonwalker-com-prod wyattbubbylee-com-prod rhiannonwalker homelab-docs)
     for app in "${apps[@]}"; do
       kubectl annotate application "$app" -n argocd argocd.argoproj.io/refresh=hard --overwrite
       kubectl wait \

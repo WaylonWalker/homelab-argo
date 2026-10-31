@@ -78,7 +78,7 @@ spec:
         # - image: registry.wayl.one/dropper:0.0.14dev23
         # - image: registry.wayl.one/dropper:0.0.14dev28
         # - image: registry.wayl.one/dropper:0.0.14dev32
-        - image: registry.wayl.one/dropper:0.0.82
+        - image: registry.wayl.one/dropper:0.0.96
           name: dropper-wayl-one
           command:
             - "/bin/sh"
@@ -212,7 +212,7 @@ spec:
         - name: dropper-cache
           emptyDir: {}
       imagePullSecrets:
-        - name: cluster-regcred
+        - name: registry-pull
       restartPolicy: Always
 ---
 apiVersion: networking.k8s.io/v1
@@ -341,7 +341,7 @@ spec:
             - name: dropper-cache
               emptyDir: {}
           imagePullSecrets:
-            - name: cluster-regcred
+            - name: registry-pull
           restartPolicy: OnFailure
 # ---
 # apiVersion: v1

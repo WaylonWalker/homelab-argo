@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: registry-pull
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  namespace: minecraft-admin
+spec:
+  encryptedData:
+    .dockerconfigjson: AgBfErH15QIzas60pUiqK+c4SaabcGuOQAO/tgRnOgk4wcsZijMQ85YqCvgiZPKUws0BXXkaXlBzRAl8UteivZCC/qX8Lu8GI78ZiaP2ToRBGhfXmHo4m6q6ehnJCvgJqG+uxYTFTsxUGbLvKNw6rLmy7xXb6h7I6vLYKD1t4ivZK9wAuGk7of7O4yOivGeg2xS5J5kuSVkE6PC0rq7yg8sJyNRKrLvW/DcCvkgmCfx//DuHLrR5HnMMiJmmL1oFjeMjnDlFhT6wPTOdNibYXrjQ/T7lI72vUSJRoSCynK26iZMDVZijCv1eUFIQlZQMqh+a4+gucl/X/pTXGIUu0lb9iPFPQB76Vo5Kl0oKejdX3cxxGPiyK6oescyJqzBolCsf1H4xKx/uPhrRz5t4iFAPO+uEYuTzO/OENS5CnVMnuy0hOUkMp8M1HubCKZNRFpCHsJdOHnbg11NKGnnOLFgZtgldD7BEF5nVJ08ont/WSuKxpy+4UOYskCEWLIduwOP6R2x+O53CdCupgsWVGlvO2ia9MpI0THW72vPt6x0GeJrKHb+EcQn2yF5OdrkI46oQWO+mzai20D3axfT4RIMLbCKSLzgCYdypuG6ZB4BG+7RQKCYZ0mNLfc++Y/tyHuU9cNT9FNvdw2Z8DGdnnviGv82VWa5XuOJWDf4PYX6KfZPw9rpkQstC+M9QTlLqFmB+HKNad6xMbyf/w6uHwCaVXyfqam4j4dIna3ql6N2pvRKNhMujWuNIOPiN4CvUDEhhuVFnVZDilgqimCpRfrvgEtmbxGCykV/DLXtxLlaUQ/ujiiqOmuVYrLKjBbSc0cQcfYs95G/OLEw+MYr/ZRxG2rMktXBliuPW96kHYfYnOygS8uTKl4dMrpQCHBcB7LmJZd7CdVvjPTYM7K0y789Pox4rpeBRPhmcdUX3QGnD7qJZ8cVFMjPYd/zqPqsS3zbM33cdg1RlRxB9uqiUTNTVAU8snt+q9ZNlxLEXfTyz1vX7VC4jAhPxRPLR2F7F7/eJ8pkxbJ6vhY7YQO6MKlTu0rKIlLruBMoeSYqrlz4XjatE3/u3IXlc4e8PVMIyQDRuCiTX
+  template:
+    metadata:
+      name: registry-pull
+      namespace: minecraft-admin
+    type: kubernetes.io/dockerconfigjson

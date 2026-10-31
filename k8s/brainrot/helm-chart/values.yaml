@@ -1,9 +1,12 @@
 image:
   repository: registry.wayl.one/brainrot
-  tag: "c32bba9-20261016150200"
+  tag: "857e47c-20261022205946"
   pullPolicy: IfNotPresent
 imagePullSecrets:
-  - name: cluster-regcred
+  - name: registry-pull
+privateRegistry:
+  enabled: false
+  encryptedDockerConfig: ""
 telemetry:
   endpoint: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
   sampleRatio: "1.0"
