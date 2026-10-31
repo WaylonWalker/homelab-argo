@@ -11,12 +11,14 @@ kubectl create secret generic minecraft-admin-secret \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-The deployment uses:
+Both hosts route to the `minecraft-admin` service:
 
 - `kraft-admin.wayl.one`
 - `kraft.wayl.one`
 
-Managed namespaces for this PoC:
+The app currently manages:
 
-- `kraft`
 - `magnet-smp`
+
+Kraft is paused, so the admin app does not list or manage it. The two hosts
+remain available for the admin UI.
