@@ -51,7 +51,7 @@ spec:
               mountPath: /data/site
       containers:
         - name: builder
-          # Pinned to the verified successful upstream main docs workflow run 24.
+          # Version-pinned docs builder; verify published image and rollout health before advancing.
           image: ghcr.io/waylonwalker/markata-docs-builder:0.0.290
           imagePullPolicy: IfNotPresent
           env:
