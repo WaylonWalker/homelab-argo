@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: redis
-          image: docker.io/library/redis@sha256:519f0189dfdee3bc0bad61fb265fe73d864b5c64020e6579ad48a45c49965635
+          image: docker.io/library/redis@sha256:10b9c2c0711fdeb667f4bcbf5b1175d9dc926674479c9c9f83d7675e98cd89cb
           args: ["--save", "", "--appendonly", "no"]
           ports:
             - name: redis
