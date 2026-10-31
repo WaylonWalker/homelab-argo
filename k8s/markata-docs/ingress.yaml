@@ -4,7 +4,7 @@ metadata:
   name: markata-docs
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
-    external-dns.alpha.kubernetes.io/hostname: markata.waylonwalker.com
+    external-dns.alpha.kubernetes.io/hostname: markata.waylonwalker.com,markata.dev
 spec:
   ingressClassName: traefik
   rules:
@@ -18,7 +18,18 @@ spec:
                 name: markata-docs
                 port:
                   name: http
+    - host: markata.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: markata-docs
+                port:
+                  name: http
   tls:
     - hosts:
         - markata.waylonwalker.com
+        - markata.dev
       secretName: markata-docs-tls
