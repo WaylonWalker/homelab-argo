@@ -52,7 +52,7 @@ spec:
       containers:
         - name: builder
           # Version-pinned docs builder; verify published image and rollout health before advancing.
-          image: ghcr.io/waylonwalker/markata-docs-builder:0.0.290
+          image: ghcr.io/waylonwalker/markata-docs-builder:0.0.314
           imagePullPolicy: IfNotPresent
           env:
             - name: DOCS_REPOSITORY
@@ -70,7 +70,7 @@ spec:
             - name: DOCS_BUILD_TIMEOUT_SECONDS
               value: "900"
             - name: DOCS_BUILDER_ORIGIN
-              value: https://build.markata.waylonwalker.com
+              value: https://markata-builder.waylonwalker.com
             - name: DOCS_TRUSTED_PROXY_CIDRS
               value: 10.42.0.0/24,10.42.2.0/24
           ports:

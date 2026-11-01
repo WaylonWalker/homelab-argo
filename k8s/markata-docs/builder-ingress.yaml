@@ -4,16 +4,27 @@ metadata:
   name: markata-docs-builder
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
-    external-dns.alpha.kubernetes.io/hostname: build.markata.waylonwalker.com
+    external-dns.alpha.kubernetes.io/hostname: build.markata.waylonwalker.com,markata-builder.waylonwalker.com
     traefik.ingress.kubernetes.io/router.middlewares: markata-docs-markata-docs-builder-auth@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
     - hosts:
         - build.markata.waylonwalker.com
+        - markata-builder.waylonwalker.com
       secretName: markata-docs-builder-tls
   rules:
     - host: build.markata.waylonwalker.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: markata-docs-builder
+                port:
+                  name: http
+    - host: markata-builder.waylonwalker.com
       http:
         paths:
           - path: /
