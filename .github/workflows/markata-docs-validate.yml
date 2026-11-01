@@ -66,7 +66,10 @@ jobs:
           existing = indexed[('Ingress', 'markata-docs')]
           apex = indexed[('Ingress', 'markata-docs-apex')]
           assert existing['spec']['rules'][0]['host'] == 'markata.waylonwalker.com'
-          assert existing['spec']['tls'][0]['hosts'] == ['markata.waylonwalker.com']
+          tls_hosts = set(existing['spec']['tls'][0]['hosts'])
+          rule_hosts = {rule['host'] for rule in existing['spec']['rules']}
+          assert 'markata.waylonwalker.com' in tls_hosts
+          assert tls_hosts == rule_hosts
           assert apex['spec']['ingressClassName'] == 'traefik'
           assert apex['spec']['rules'][0]['host'] == 'markata.dev'
           assert apex['spec']['tls'][0]['hosts'] == ['markata.dev']
