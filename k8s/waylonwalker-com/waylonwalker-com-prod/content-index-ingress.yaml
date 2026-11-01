@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: waylonwalker-com-prod-content-index
+  namespace: waylonwalker-com-prod-notes
+  labels:
+    environment: production
+    app.kubernetes.io/environment: production
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: waylonwalker-com-prod-notes-waylonwalker-com-prod-site-cors@kubernetescrd
+    traefik.ingress.kubernetes.io/router.priority: "1000"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - waylonwalker.com
+      secretName: waylonwalker-com-prod-tls
+  rules:
+    - host: waylonwalker.com
+      http:
+        paths:
+          - path: /content-index.json
+            pathType: Exact
+            backend:
+              service:
+                name: waylonwalker-com-prod-notes-site
+                port:
+                  number: 80
