@@ -4,7 +4,8 @@ The documentation uses the same **separated builder / public Nginx site** patter
 
 - **Public (primary):** https://markata.dev
 - **Public (existing alias):** https://markata.waylonwalker.com
-- **Authenticated builder:** https://build.markata.waylonwalker.com
+- **Authenticated builder:** https://markata-builder.waylonwalker.com
+- **Legacy nested alias:** `build.markata.waylonwalker.com` remains routed, but Cloudflare’s current `*.waylonwalker.com` edge certificate does not cover this two-level hostname. The builder also rejects POST actions from this host because its same-origin check accepts only the primary builder URL.
 - **Source:** https://github.com/WaylonWalker/markata `main` branch, watched every 45 seconds
 - **Image:** `ghcr.io/waylonwalker/markata-docs-builder:0.0.24` (pin the published version)
 - **Persistent releases:** `markata-docs-site` Longhorn RWO 3 GiB (builder and both public replicas pinned to `falcon3`)
