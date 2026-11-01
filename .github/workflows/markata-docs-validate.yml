@@ -3,11 +3,13 @@ name: Markata Docs Kubernetes
 on:
   pull_request:
     paths:
+      - 'argo-apps/apps/markata-docs.yaml'
       - 'k8s/markata-docs/**'
       - '.github/workflows/markata-docs-validate.yml'
   push:
     branches: [main]
     paths:
+      - 'argo-apps/apps/markata-docs.yaml'
       - 'k8s/markata-docs/**'
       - '.github/workflows/markata-docs-validate.yml'
   workflow_dispatch:
@@ -21,61 +23,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: azure/setup-kubectl@v4
-      - name: Render Kustomize
-        run: kubectl kustomize k8s/markata-docs > /tmp/markata-docs.yaml
-      - name: Validate required resources and safety defaults
+      - uses: azure/setup-helm@v4
+      - name: Render the homelab overlay
+        run: kubectl kustomize k8s/markata-docs > /tmp/markata-docs-overlay.yaml
+      - name: Render and lint the Markata Helm chart
         run: |
-          python -m pip install --quiet 'PyYAML==6.0.3'
-          python - <<'PY'
-          import yaml
-          resources = [r for r in yaml.safe_load_all(open('/tmp/markata-docs.yaml')) if r]
-          indexed = {(r['kind'], r['metadata']['name']): r for r in resources}
-          required = [
-              ('Deployment', 'markata-docs'),
-              ('Deployment', 'markata-docs-builder'),
-              ('PersistentVolumeClaim', 'markata-docs-site'),
-              ('Service', 'markata-docs'),
-              ('Service', 'markata-docs-builder'),
-              ('Ingress', 'markata-docs'),
-              ('Ingress', 'markata-docs-apex'),
-              ('Ingress', 'markata-docs-builder'),
-              ('Middleware', 'markata-docs-builder-auth'),
-              ('Middleware', 'markata-docs-builder-strip-identity'),
-              ('Middleware', 'markata-docs-builder-forward-auth'),
-              ('NetworkPolicy', 'markata-docs-builder-ingress'),
-              ('ConfigMap', 'markata-docs-nginx'),
-          ]
-          missing = [key for key in required if key not in indexed]
-          assert not missing, f'Missing resources: {missing}'
-          assert all(r['metadata'].get('namespace') == 'markata-docs' for r in resources), 'Wrong namespace'
-          deploy = indexed[('Deployment','markata-docs')]
-          builder = indexed[('Deployment','markata-docs-builder')]
-          pvc = indexed[('PersistentVolumeClaim','markata-docs-site')]
-          assert pvc['spec']['accessModes'] == ['ReadWriteOnce']
-          for obj in (deploy, builder):
-              pod = obj['spec']['template']['spec']
-              assert pod['nodeSelector']['kubernetes.io/hostname'] == 'falcon3'
-              assert pod['automountServiceAccountToken'] is False
-          pod = builder['spec']['template']['spec']
-          assert pod['containers'][0]['securityContext']['allowPrivilegeEscalation'] is False
-          assert not pod['containers'][0]['securityContext'].get('runAsUser') == 0
-          assert builder['spec']['replicas'] == 1
-          ingress = indexed[('Ingress','markata-docs-builder')]
-          assert ingress['metadata']['annotations']['traefik.ingress.kubernetes.io/router.middlewares'].endswith('-auth@kubernetescrd')
-          assert ingress['spec']['tls'][0]['hosts'] == ['build.markata.waylonwalker.com']
-          existing = indexed[('Ingress', 'markata-docs')]
-          apex = indexed[('Ingress', 'markata-docs-apex')]
-          assert existing['spec']['rules'][0]['host'] == 'markata.waylonwalker.com'
-          assert existing['spec']['tls'][0]['hosts'] == ['markata.waylonwalker.com']
-          assert apex['spec']['ingressClassName'] == 'traefik'
-          assert apex['spec']['rules'][0]['host'] == 'markata.dev'
-          assert apex['spec']['tls'][0]['hosts'] == ['markata.dev']
-          assert apex['spec']['tls'][0]['secretName'] == 'markata-dev-tls'
-          assert apex['metadata']['annotations']['cert-manager.io/cluster-issuer'] == 'letsencrypt-dns'
-          assert apex['metadata']['annotations']['external-dns.alpha.kubernetes.io/hostname'] == 'markata.dev'
-          backend = apex['spec']['rules'][0]['http']['paths'][0]['backend']['service']
-          assert backend['name'] == 'markata-docs' and backend['port']['name'] == 'http'
-          policy = indexed[('NetworkPolicy','markata-docs-builder-ingress')]
-          assert policy['spec']['policyTypes'] == ['Ingress']
-          print(f'Validated {len(resources)} Kubernetes objects')
-          PY
+          git clone --depth=1 https://github.com/WaylonWalker/markata.git /tmp/markata
+          helm lint /tmp/markata/helm-chart \
+            --values k8s/markata-docs/helm-values.yaml
+          helm template markata-docs /tmp/markata/helm-chart \
+            --namespace markata-docs \
+            --values k8s/markata-docs/helm-values.yaml > /tmp/markata-docs-chart.yaml
+      - name: Check rendered resources and routes
+        run: |
+          for expected in \
+            'name: markata-docs-site' \
+            'markata-docs-notes-site' \
+            'markata-docs-notes-builder-admin' \
+            'name: markata-docs-builder-webhook' \
+            'https://github.com/WaylonWalker/markata.git' \
+            'fsGroup: 1000' \
+            'MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET' \
+            'markata.waylonwalker.com' \
+            'markata.dev'; do
+            grep -Fq "$expected" /tmp/markata-docs-overlay.yaml /tmp/markata-docs-chart.yaml || {
+              echo "Expected rendered resource value missing: $expected" >&2
+              exit 1
+            }
+          done

@@ -16,7 +16,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: markata-docs
+                name: markata-docs-notes-site
                 port:
                   name: http
   tls:
