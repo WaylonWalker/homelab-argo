@@ -1,0 +1,46 @@
+# Apply after creating the disposable Longhorn restore volumes and before
+# syncing the arm A chart application. The reclaim policy preserves the
+# Longhorn volumes when the canary PVCs are removed.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: issue-143-ab-a-site-pv
+  labels:
+    issue143: disposable-restore
+spec:
+  capacity:
+    storage: 30Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: longhorn
+  volumeMode: Filesystem
+  claimRef:
+    name: waylonwalker-com-prod-nvme-ab-a-notes-site-pvc
+    namespace: waylonwalker-com-prod-nvme-ab-a-notes
+  csi:
+    driver: driver.longhorn.io
+    fsType: ext4
+    volumeHandle: issue-143-site-restore-20261021
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: issue-143-ab-a-source-pv
+  labels:
+    issue143: disposable-restore
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: longhorn
+  volumeMode: Filesystem
+  claimRef:
+    name: waylonwalker-com-prod-nvme-ab-a-notes-source-pvc
+    namespace: waylonwalker-com-prod-nvme-ab-a-notes
+  csi:
+    driver: driver.longhorn.io
+    fsType: ext4
+    volumeHandle: issue-143-source-restore-20261021
