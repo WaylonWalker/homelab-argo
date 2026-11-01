@@ -62,7 +62,12 @@ jobs:
           assert builder['spec']['replicas'] == 1
           ingress = indexed[('Ingress','markata-docs-builder')]
           assert ingress['metadata']['annotations']['traefik.ingress.kubernetes.io/router.middlewares'].endswith('-auth@kubernetescrd')
-          assert ingress['spec']['tls'][0]['hosts'] == ['build.markata.waylonwalker.com']
+          builder_hosts = {rule['host'] for rule in ingress['spec']['rules']}
+          builder_tls_hosts = set(ingress['spec']['tls'][0]['hosts'])
+          assert builder_hosts == {'build.markata.waylonwalker.com', 'markata-builder.waylonwalker.com'}
+          assert builder_tls_hosts == builder_hosts
+          external_hosts = set(ingress['metadata']['annotations']['external-dns.alpha.kubernetes.io/hostname'].split(','))
+          assert external_hosts == builder_hosts
           existing = indexed[('Ingress', 'markata-docs')]
           apex = indexed[('Ingress', 'markata-docs-apex')]
           assert existing['spec']['rules'][0]['host'] == 'markata.waylonwalker.com'
