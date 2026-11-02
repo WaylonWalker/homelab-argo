@@ -44,6 +44,7 @@ jobs:
             'https://github.com/WaylonWalker/markata.git' \
             'fsGroup: 1000' \
             'MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET' \
+            '/webhook' \
             'markata.waylonwalker.com' \
             'markata.dev'; do
             grep -Fq "$expected" /tmp/markata-docs-overlay.yaml /tmp/markata-docs-chart.yaml || {
