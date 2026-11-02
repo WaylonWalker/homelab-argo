@@ -40,7 +40,7 @@ jobs:
             'name: markata-docs-site' \
             'markata-docs-notes-site' \
             'markata-docs-notes-builder-admin' \
-            'name: markata-docs-builder-webhook' \
+            'markata-docs-builder-webhook' \
             'https://github.com/WaylonWalker/markata.git' \
             'fsGroup: 1000' \
             'MARKATA_GO_BUILDER_ADMIN_WEBHOOK_SECRET' \
