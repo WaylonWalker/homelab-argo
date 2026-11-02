@@ -5,4 +5,5 @@ resources:
   - ingress.yaml
   - apex-ingress.yaml
   - preview-ingress.yaml
+  - webhook-ingress.yaml
   - site-pvc.yaml

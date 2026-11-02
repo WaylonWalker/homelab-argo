@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: markata-docs-webhook
+  annotations:
+    traefik.ingress.kubernetes.io/router.priority: "100"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: markata.waylonwalker.com
+      http:
+        paths:
+          - path: /webhook
+            pathType: Exact
+            backend:
+              service:
+                name: markata-docs-notes-builder-admin
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - markata.waylonwalker.com
+      secretName: markata-docs-tls

@@ -18,7 +18,7 @@ retired.
 
 On first startup, the chart initializes its Git checkout from the public repo.
 GitHub Push events to `main` reach
-`https://build.markata.waylonwalker.com/webhook`; Builder Admin verifies the
+`https://markata.waylonwalker.com/webhook`; Builder Admin verifies the
 HMAC, fast-forwards the checkout, and queues a normal Markata build. Failed
 builds leave the current public release in place.
 
