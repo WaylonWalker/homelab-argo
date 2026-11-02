@@ -24,16 +24,15 @@ builds leave the current public release in place.
 
 ## Before rollout
 
-1. Merge the Markata repo changes and wait for its Docker workflow to publish a
-   builder image that contains those changes. Pin `build.builderImage.tag` in
-   `helm-values.yaml` to the verified image tag before syncing Argo.
+1. Confirm the Markata Docker workflow published the builder image pinned in
+   `helm-values.yaml` (`sha-5017ab5`) before allowing Argo to reconcile.
 2. Create the `markata-docs-builder-webhook` Kubernetes Secret in namespace
    `markata-docs`. It must contain a `webhook-secret` key with a random HMAC
    secret. Keep the value out of Git.
 3. Add a GitHub repository webhook for Push events at the URL above. Set the
    same HMAC secret and use JSON payloads.
-4. Validate the Argo manifests and Helm output, then enable/sync the
-   `markata-docs` Application.
+4. Validate the Argo manifests and Helm output. Argo CD will reconcile the
+   `markata-docs` Application after this change merges.
 
 ## Verify rollout
 
