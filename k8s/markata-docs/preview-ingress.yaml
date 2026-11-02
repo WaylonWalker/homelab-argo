@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: markata-docs-preview
+  annotations:
+    traefik.ingress.kubernetes.io/router.priority: "100"
+    traefik.ingress.kubernetes.io/router.middlewares: markata-docs-markata-docs-notes-builder-admin-auth@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: markata.waylonwalker.com
+      http:
+        paths:
+          - path: /__preview/
+            pathType: Prefix
+            backend:
+              service:
+                name: markata-docs-notes-site
+                port:
+                  name: http
+    - host: markata.dev
+      http:
+        paths:
+          - path: /__preview/
+            pathType: Prefix
+            backend:
+              service:
+                name: markata-docs-notes-site
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - markata.waylonwalker.com
+      secretName: markata-docs-tls
+    - hosts:
+        - markata.dev
+      secretName: markata-dev-tls

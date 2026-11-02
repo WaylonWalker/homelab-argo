@@ -8,10 +8,19 @@ metadata:
     app.kubernetes.io/environment: production
 spec:
   project: default
-  source:
-    repoURL: https://github.com/WaylonWalker/homelab-argo.git
-    targetRevision: main
-    path: k8s/markata-docs
+  sources:
+    - repoURL: https://github.com/WaylonWalker/homelab-argo.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/WaylonWalker/homelab-argo.git
+      targetRevision: main
+      path: k8s/markata-docs
+    - repoURL: https://github.com/WaylonWalker/markata.git
+      targetRevision: main
+      path: helm-chart
+      helm:
+        valueFiles:
+          - $values/k8s/markata-docs/helm-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: markata-docs

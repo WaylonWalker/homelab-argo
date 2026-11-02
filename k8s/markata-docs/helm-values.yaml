@@ -1,0 +1,106 @@
+project_identifier: markata-docs
+project_name: markata-docs
+environment: prod
+namespaceOverride: markata-docs
+
+podSecurityContext:
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+
+nodeSelector:
+  kubernetes.io/hostname: falcon3
+
+offline:
+  enabled: true
+
+ingress:
+  enabled: false
+  host: markata.waylonwalker.com
+  ingressClassName: traefik
+
+storage:
+  source:
+    mode: pvc
+    storageClassName: longhorn-build-fast
+    size: 3Gi
+    accessModes:
+      - ReadWriteOnce
+  site:
+    mode: pvc
+    existingClaimName: markata-docs-site
+    accessModes:
+      - ReadWriteOnce
+  cache:
+    enabled: false
+  search:
+    size: 1Gi
+    storageClassName: longhorn-build-fast
+    accessModes:
+      - ReadWriteOnce
+
+build:
+  enabled: false
+  builderImage:
+    tag: sha-5017ab5
+  fast: false
+
+builderAdmin:
+  enabled: true
+  fast: false
+  buildOnStartupRevisionChange: true
+  releases:
+    keep: 7
+  history:
+    successfulBuilds: 30
+    failedBuilds: 30
+    refreshRuns: 30
+  buildTimeoutSeconds: 1800
+  historyDir: /data/site/.builder-admin
+  watch:
+    enabled: false
+  sourceGit:
+    enabled: true
+    repository: https://github.com/WaylonWalker/markata.git
+    branch: main
+    depth: 1
+    image: alpine/git:2.47.2
+  webhook:
+    enabled: true
+    branch: main
+    existingSecretName: markata-docs-builder-webhook
+    existingSecretKey: webhook-secret
+  auth:
+    trustedProxyCIDRs:
+      - 10.42.0.0/24
+      - 10.42.2.0/24
+  ingress:
+    enabled: true
+    host: build.markata.waylonwalker.com
+    ingressClassName: traefik
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: build.markata.waylonwalker.com
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      enabled: true
+      secretName: markata-docs-builder-tls
+    auth:
+      enabled: true
+      internalUrl: http://hlab-auth.hlab-auth.svc.cluster.local:8000
+      publicAuthOrigin: https://auth.waylonwalker.com
+  networkPolicy:
+    enabled: true
+    traefikNamespace: kube-system
+    traefikNamespaceSelector:
+      kubernetes.io/metadata.name: kube-system
+    traefikPodSelector:
+      app.kubernetes.io/name: traefik
+      app.kubernetes.io/instance: traefik-kube-system
+
+search:
+  enabled: false
+  configPath: /data/source/markata-docs.toml
+
+site:
+  replicaCount: 2
+  healthPath: /
+  use404Page: true
