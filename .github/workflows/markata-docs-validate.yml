@@ -51,3 +51,7 @@ jobs:
               exit 1
             }
           done
+          if grep -Fq 'markata-go-encryption' /tmp/markata-docs-chart.yaml; then
+            echo 'The docs builder must not require an encryption Secret' >&2
+            exit 1
+          fi

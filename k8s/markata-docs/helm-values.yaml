@@ -13,6 +13,10 @@ nodeSelector:
 offline:
   enabled: true
 
+# The documentation content does not use encrypted posts.
+markataEncryption:
+  secretName: ""
+
 ingress:
   enabled: false
   host: markata.waylonwalker.com
