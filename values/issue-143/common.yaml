@@ -1,0 +1,144 @@
+project_name: waylonwalker-com
+environment: issue-143-canary
+
+imagePullSecrets: []
+
+nodeSelector:
+  kubernetes.io/hostname: falcon3
+
+offline:
+  enabled: false
+
+ingress:
+  enabled: true
+  host: issue-143.invalid
+  ingressClassName: issue-143-disabled
+  tls:
+    enabled: true
+    secretName: waylonwalker-com-prod-tls
+
+site:
+  use404Page: true
+  cacheHtmlAtEdge: true
+  image:
+    name: nginx
+    tag: 1.27.5-alpine
+
+markataEncryption:
+  secretName: markata-go-encryption
+
+aws:
+  existingSecretName: ""
+
+storage:
+  search:
+    size: 1Gi
+    storageClassName: longhorn
+  cache:
+    size: 1Gi
+    storageClassName: longhorn
+
+build:
+  enabled: false
+  fetchImage:
+    tag: sha-8682b60
+  builderImage:
+    tag: sha-8682b60
+  fast: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  ttlSecondsAfterFinished: 604800
+  activeDeadlineSeconds: 7200
+  cacheDir: /data/cache/xdg
+  notify:
+    enabled: false
+  releases:
+    keep: 10
+  resources:
+    requests:
+      cpu: 100m
+      memory: 4Gi
+      ephemeral-storage: 8Gi
+    limits:
+      memory: 16Gi
+      ephemeral-storage: 20Gi
+  extraEnv:
+    - name: GIT_CONFIG_COUNT
+      value: "1"
+    - name: GIT_CONFIG_KEY_0
+      value: safe.directory
+    - name: GIT_CONFIG_VALUE_0
+      value: /data/source
+    - name: MARKATA_GO_CONCURRENCY
+      value: "16"
+    - name: MARKATA_GO_URL
+      value: https://waylonwalker.com
+    - name: MARKATA_GO_SEARCH_ENDPOINT
+      value: https://waylonwalker.com/api/search
+    - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
+      value: https://waylonwalker.com/api/search
+
+builderAdmin:
+  enabled: true
+  buildOnStartupRevisionChange: false
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  fast: false
+  auth:
+    trustedProxyCIDRs:
+      - 10.42.0.0/24
+      - 10.42.2.0/24
+  ingress:
+    enabled: true
+    host: issue-143.invalid
+    ingressClassName: issue-143-disabled
+    tls:
+      enabled: true
+      secretName: build-waylonwalker-com-prod-tls
+    auth:
+      enabled: true
+      internalUrl: http://hlab-auth.hlab-auth.svc.cluster.local:8000
+      publicAuthOrigin: https://auth.waylonwalker.com
+  networkPolicy:
+    enabled: true
+    traefikPodSelector:
+      issue-143-trigger: "true"
+  mermaidMode: client
+  workspace:
+    enabled: false
+  watch:
+    enabled: false
+    debounce: 2s
+  releases:
+    keep: 5
+  history:
+    successfulBuilds: 60
+    failedBuilds: 100
+    refreshRuns: 100
+  buildTimeoutSeconds: 7200
+  historyDir: /data/site/.builder-admin
+  webhook:
+    enabled: true
+    branch: main
+    existingSecretKey: webhook-secret
+  resources:
+    requests:
+      cpu: 50m
+      memory: 4Gi
+      ephemeral-storage: 8Gi
+    limits:
+      memory: 16Gi
+      ephemeral-storage: 20Gi
+  refreshTasks: []
+
+search:
+  enabled: false
+  waitForSource:
+    enabled: false
+
+sourceArchive:
+  bucket: unused-in-hostpath-mode
+  location: /unused-in-hostpath-mode
