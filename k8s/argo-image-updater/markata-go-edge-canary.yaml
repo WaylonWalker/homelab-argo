@@ -1,0 +1,31 @@
+# Opt-in Edge canary ONLY. Production remains pinned.
+# Requires argocd-image-updater v1 CRDs and a write-capable Argo CD Git credential.
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: markata-go-edge-canary
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: git
+    gitConfig:
+      repository: https://github.com/WaylonWalker/homelab-argo.git
+      branch: main
+      # Only mutate the canary's dedicated Helm values file.
+      # Argo CD consumes this file via $values in the multi-source Application.
+      writeBackTarget: helmvalues:/argo-apps/values/go-waylonwalker-com.yaml
+  applicationRefs:
+    - namePattern: go-waylonwalker-com
+      images:
+        - alias: builder
+          imageName: ghcr.io/waylonwalker/markata-go-builder:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+            # First reconciliation starts from the existing SHA-tagged image.
+            forceUpdate: true
+            platforms:
+              - linux/amd64
+          manifestTargets:
+            helm:
+              name: build.builderImage.name
+              tag: build.builderImage.tag
