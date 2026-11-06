@@ -38,7 +38,7 @@ spec:
     spec:
       initContainers:
         - name: restore-backup
-          image: amazon/aws-cli:2.39.3
+          image: amazon/aws-cli:2.39.6
           command:
             - /bin/sh
             - -c
