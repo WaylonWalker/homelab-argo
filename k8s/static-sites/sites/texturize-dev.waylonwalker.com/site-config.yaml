@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  site: "texturize-dev"
+  namespace: "texturize-dev"
+  host: "texturize-dev.waylonwalker.com"
+  webrootPath: "/mnt/main/walkershare/waylon/sites/texturize-dev.waylonwalker.com"
+  TELEMETRY_ENABLED: "enabled"
+  TELEMETRY_APP_NAME: "texturize"
+  TELEMETRY_ENVIRONMENT: "development"
+  TELEMETRY_VERSION: "unknown"

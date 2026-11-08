@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier
+_src_path: templates/static-site
+host: texturize.waylonwalker.com
+namespace: texturize
+site: texturize
+telemetry_app_name: texturize
+telemetry_enabled: 'true'
+telemetry_environment: production
+telemetry_version: unknown
+webroot_path: /mnt/main/walkershare/waylon/sites/texturize.waylonwalker.com
