@@ -128,7 +128,7 @@ spec:
             - name: DROPPER_BASE_URL
               value: "https://dropper.waylonwalker.com/"
             - name: DROPPER_TRUSTED_PROXY_NETWORKS
-              value: "10.42.0.0/24,10.42.2.0/24,10.42.3.0/24"
+              value: "10.42.0.0/16"
             - name: DROPPER_TRUSTED_PROXY_HOST_ALIASES
               value: "dropper.wayl.one"
             - name: DROPPER_TELEMETRY_ENVIRONMENT

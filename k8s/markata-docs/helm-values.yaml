@@ -75,8 +75,7 @@ builderAdmin:
     existingSecretKey: webhook-secret
   auth:
     trustedProxyCIDRs:
-      - 10.42.0.0/24
-      - 10.42.2.0/24
+      - 10.42.0.0/16
   ingress:
     enabled: true
     host: build.markata.waylonwalker.com

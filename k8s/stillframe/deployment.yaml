@@ -91,7 +91,7 @@ spec:
             - name: STILLFRAME_PUBLIC_URL
               value: https://stillframe.waylonwalker.com
             - name: STILLFRAME_TRUSTED_PROXY_CIDRS
-              value: 10.42.0.0/24
+              value: 10.42.0.0/16
             - name: STILLFRAME_OTEL_ENABLED
               value: "true"
             - name: STILLFRAME_ENVIRONMENT
