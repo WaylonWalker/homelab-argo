@@ -11,6 +11,6 @@
     "@grafana/faro-web-tracing": "2.12.1"
   },
   "devDependencies": {
-    "esbuild": "0.25.10"
+    "esbuild": "0.28.2"
   }
 }
