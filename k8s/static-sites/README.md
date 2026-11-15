@@ -7,6 +7,11 @@ Application for each config. Render a site with:
 kubectl kustomize k8s/static-sites/sites/test.waylonwalker.com
 ```
 
+Site Applications use the `default` AppProject unless `site-config.yaml` sets
+the `argocd-project` metadata label. Add a matching AppProject under
+`argo-apps/apps/` when a site needs a narrower source, namespace, or resource
+policy.
+
 Create a production and development site with Copier:
 
 ```bash

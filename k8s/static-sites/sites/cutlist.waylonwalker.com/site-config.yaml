@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+  labels:
+    argocd-project: cutlist
+data:
+  site: cutlist
+  namespace: cutlist
+  host: cutlist.waylonwalker.com
+  webrootPath: /mnt/main/walkershare/waylon/sites/cutlist.waylonwalker.com
+  TELEMETRY_ENABLED: "enabled"
+  TELEMETRY_APP_NAME: "cutlist"
+  TELEMETRY_ENVIRONMENT: "production"
+  TELEMETRY_VERSION: "unknown"

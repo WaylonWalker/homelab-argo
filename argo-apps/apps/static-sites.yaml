@@ -17,7 +17,7 @@ spec:
     metadata:
       name: static-site-{{.path.basenameNormalized}}
     spec:
-      project: default
+      project: '{{ if hasKey .metadata "labels" }}{{ if hasKey .metadata.labels "argocd-project" }}{{ index .metadata.labels "argocd-project" }}{{ else }}default{{ end }}{{ else }}default{{ end }}'
       source:
         repoURL: https://github.com/waylonwalker/homelab-argo.git
         targetRevision: HEAD
