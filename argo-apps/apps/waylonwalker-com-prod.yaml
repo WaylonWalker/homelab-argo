@@ -13,7 +13,7 @@ spec:
       targetRevision: HEAD
       path: k8s/waylonwalker-com/waylonwalker-com-prod
     - repoURL: 'https://github.com/WaylonWalker/markata.git'
-      targetRevision: aac5b49752518ab84b7541385d0d42706e79a41d
+      targetRevision: 3bc1d71edeb2810b1b56fa0df88b38559e15ae4f
       path: helm-chart
       helm:
         values: |
@@ -128,6 +128,7 @@ spec:
                 maxUnavailable: 1
                 maxSurge: 0
             fast: false
+            pageWeight: false
             auth:
               trustedProxyCIDRs:
                 - 10.42.0.0/24
