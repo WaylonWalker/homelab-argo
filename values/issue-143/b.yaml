@@ -1,0 +1,29 @@
+project_identifier: waylonwalker-com-prod-nvme-ab-b
+
+builderAdmin:
+  webhook:
+    existingSecretName: issue-143-webhook-b
+  networkPolicy:
+    traefikNamespace: waylonwalker-com-prod-nvme-ab-b-notes
+    traefikNamespaceSelector:
+      kubernetes.io/metadata.name: waylonwalker-com-prod-nvme-ab-b-notes
+
+storage:
+  source:
+    mode: hostPath
+    hostPath:
+      path: /var/lib/markata-go/issue-143/ab-b/source
+      type: Directory
+  site:
+    mode: hostPath
+    hostPath:
+      path: /var/lib/markata-go/issue-143/ab-b/site
+      type: Directory
+  cache:
+    enabled: true
+    mode: hostPath
+    hostPath:
+      path: /var/lib/markata-go/issue-143/ab-b/cache
+      type: Directory
+    accessModes:
+      - ReadWriteOnce
