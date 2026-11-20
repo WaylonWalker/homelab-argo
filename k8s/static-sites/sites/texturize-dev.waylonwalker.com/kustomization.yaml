@@ -9,6 +9,24 @@ resources:
   - ../../components/hostpath-webroot
   - site-config.yaml
 
+# The webroot is currently empty and the readiness probe fails. Allow this
+# unavailable dev pod to be replaced so it does not retain the old Nginx image.
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: web
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: web
+      spec:
+        strategy:
+          rollingUpdate:
+            maxUnavailable: 1
+
 replacements:
   - source:
       kind: ConfigMap
