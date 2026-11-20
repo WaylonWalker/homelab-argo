@@ -48,7 +48,9 @@ spec:
         - env:
             - name: TZ
               value: UTC
-          image: lscr.io/linuxserver/librespeed:5.4.1
+          # LinuxServer v6.3.1-ls303; verified Nginx 1.30.7
+          image: lscr.io/linuxserver/librespeed:v6.3.1-ls303@sha256:ad54c25a773cd7bfad5fd5dd82a4987a899edb0a9762e285c842eeb16bef4244
+          imagePullPolicy: IfNotPresent
           name: librespeed
           ports:
             - containerPort: 80
