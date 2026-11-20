@@ -34,6 +34,10 @@ spec:
               secretName: rhiannonwalker-com-prod-tls
 
           site:
+            image:
+              name: nginx
+              tag: "1.30.7-alpine@sha256:4d1d4ce08432dc7dfe4af762cb224ce6b5273ae878f41e020ea2425d02ea91a4"
+              pullPolicy: IfNotPresent
             use404Page: true
 
           markataEncryption:
