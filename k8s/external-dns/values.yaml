@@ -27,6 +27,9 @@ managedRecordTypes:
   - CNAME
 
 extraArgs:
+  # Keep reading existing external-dns.alpha.kubernetes.io annotations while
+  # ingress manifests are migrated to the current annotation prefix.
+  enable-legacy-annotation-prefix: true
   cloudflare-dns-records-per-page: '5000'
   cloudflare-proxied: true
   cloudflare-record-comment: Managed by ExternalDNS (falcon homelab)
