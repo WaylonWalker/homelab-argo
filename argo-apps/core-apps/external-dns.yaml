@@ -16,7 +16,7 @@ spec:
           - $values/k8s/external-dns/values.yaml
           - $values/k8s/external-dns/zone-ids.yaml
       repoURL: https://kubernetes-sigs.github.io/external-dns/
-      targetRevision: 1.22.0
+      targetRevision: 1.23.0
     - ref: values
       repoURL: 'https://github.com/waylonwalker/homelab-argo'
       targetRevision: HEAD
