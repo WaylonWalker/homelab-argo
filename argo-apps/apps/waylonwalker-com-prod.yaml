@@ -163,6 +163,9 @@ spec:
                   value: https://waylonwalker.com/api/search
                 - name: MARKATA_GO_SEARCH_BLEVE_ENDPOINT
                   value: https://waylonwalker.com/api/search
+              resources:
+                requests:
+                  cpu: 50m
               ingress:
                 host: edit.waylonwalker.com
                 ingressClassName: traefik
