@@ -154,7 +154,7 @@ spec:
               gitAuth:
                 existingSecretName: markata-editor-git-publish
                 privateKeyKey: ssh-privatekey
-                repository: https://github.com/waylonwalker/waylonwalker.com.git
+                repository: https://github.com/WaylonWalker/waylonwalker.com.git
                 branch: main
                 knownHosts: |
                   github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
