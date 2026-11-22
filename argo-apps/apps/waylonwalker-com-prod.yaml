@@ -164,6 +164,11 @@ spec:
                 knownHosts: |
                   github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
               extraEnv:
+                - name: MARKATA_GO_ENCRYPTION_KEY_DEFAULT
+                  valueFrom:
+                    secretKeyRef:
+                      name: markata-go-encryption
+                      key: MARKATA_GO_ENCRYPTION_KEY_DEFAULT
                 - name: GIT_AUTHOR_NAME
                   value: "Waylon S. Walker"
                 - name: GIT_AUTHOR_EMAIL
