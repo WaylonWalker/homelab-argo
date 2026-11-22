@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: builder
-          image: ghcr.io/waylonwalker/markata-go-builder:sha-5232048
+          image: ghcr.io/waylonwalker/markata-go-builder:sha-aae31b7
           imagePullPolicy: IfNotPresent
           command:
             - markata-go
@@ -116,7 +116,7 @@ spec:
         kubernetes.io/hostname: falcon3
       initContainers:
         - name: clone-source
-          image: ghcr.io/waylonwalker/markata-go-builder:sha-5232048
+          image: ghcr.io/waylonwalker/markata-go-builder:sha-aae31b7
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
