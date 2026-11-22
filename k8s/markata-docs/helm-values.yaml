@@ -45,7 +45,7 @@ storage:
 build:
   enabled: false
   builderImage:
-    tag: sha-5232048
+    tag: sha-aae31b7
   fast: false
 
 builderAdmin:

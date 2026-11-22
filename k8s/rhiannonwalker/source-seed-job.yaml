@@ -37,7 +37,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: source-seed
-          image: ghcr.io/waylonwalker/markata-go-builder:sha-5232048
+          image: ghcr.io/waylonwalker/markata-go-builder:sha-aae31b7
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false

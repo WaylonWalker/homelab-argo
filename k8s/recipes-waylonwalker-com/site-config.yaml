@@ -12,6 +12,6 @@ data:
   webrootPath: /mnt/main/walkershare/waylon/sites/recipes.waylonwalker.com
   sourceRepository: https://git.waylonwalker.com/waylon/recipes.waylonwalker.com
   sourceBranch: main
-  builderImage: ghcr.io/waylonwalker/markata-go-builder:sha-5232048
+  builderImage: ghcr.io/waylonwalker/markata-go-builder:sha-aae31b7
   webhookPath: /webhook
   keepReleases: "5"
