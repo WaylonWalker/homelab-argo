@@ -145,6 +145,11 @@ spec:
           prometheusSpec:
             retention: 15d
             enableRemoteWriteReceiver: true
+            containers:
+              - name: prometheus
+                startupProbe:
+                  # Longhorn TSDB replay can exceed the default 15-minute startup window.
+                  failureThreshold: 180
             serviceMonitorSelectorNilUsesHelmValues: false
             podMonitorSelectorNilUsesHelmValues: false
             ruleSelectorNilUsesHelmValues: false
