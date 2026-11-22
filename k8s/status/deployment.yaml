@@ -69,7 +69,7 @@ spec:
         - env:
             - name: TZ
               value: UTC
-          image: louislam/uptime-kuma:1.23.17-debian
+          image: docker.io/louislam/uptime-kuma:2.5.12@sha256:bc81e600a1b18824e7eaecbb0167c2a1c732475fc499c1e3253752b965946036
           name: status
           ports:
             - containerPort: 3001
