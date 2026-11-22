@@ -2,8 +2,7 @@
 namespace: k8s-pages
 # Number of replicas for the deployment.
 replicaCount: 1
-# Keep the production image on the current digest while validating updates in dev.
-image: nginx:1.30.7@sha256:af61f605a001c7794200cae30093d8ee0da5183318df15fdfff3597ef37a7486
+image: docker.io/library/nginx:1.30.7-alpine@sha256:4d1d4ce08432dc7dfe4af762cb224ce6b5273ae878f41e020ea2425d02ea91a4
 # List of sites to configure.
 bucket: "k8s-pages"
 sites:

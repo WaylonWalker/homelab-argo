@@ -18,7 +18,6 @@ spec:
         namespace: k8s-pages-dev
         # Number of replicas for the deployment.
         replicaCount: 1
-        image: docker.io/library/nginx:1.30.7-alpine@sha256:4d1d4ce08432dc7dfe4af762cb224ce6b5273ae878f41e020ea2425d02ea91a4
         # List of sites to configure.
         bucket: "k8s-pages"
         maxAge: '120960'
