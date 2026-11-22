@@ -71,7 +71,7 @@ spec:
           env:
             - name: TZ
               value: UTC
-          image: binwiederhier/ntfy:v2.11.0
+          image: docker.io/binwiederhier/ntfy:v2.37.2@sha256:e5d978c57b5a6a1095c8a74fd1cfe846dabef14369f2ff7a0d16456e727d40ec
           livenessProbe:
             exec:
               command:
