@@ -56,3 +56,37 @@ jobs:
             echo 'The docs builder must not require an encryption Secret' >&2
             exit 1
           fi
+
+  public-installer:
+    name: Verify live branded installer matches reviewed main
+    # Production publication is managed by Builder Admin, not this CI.
+    # Run manually *after* the Markata webhook publishes a new release.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch public and reviewed installers without executing them
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent --location \
+            --retry 3 --max-time 30 \
+            https://markata.dev/install.sh -o /tmp/markata-public-install.sh
+          curl --fail --show-error --silent --location \
+            --retry 3 --max-time 30 \
+            https://raw.githubusercontent.com/WaylonWalker/markata/main/install.sh \
+            -o /tmp/markata-reviewed-install.sh
+          test -s /tmp/markata-public-install.sh
+          head -n 1 /tmp/markata-public-install.sh | grep -Fx '#!/bin/bash'
+          bash -n /tmp/markata-public-install.sh
+          cmp /tmp/markata-reviewed-install.sh /tmp/markata-public-install.sh
+          grep -Fq 'verify_archive' /tmp/markata-public-install.sh
+          {
+            echo '## Production installer verification'
+            echo ''
+            echo 'Verified: public markata.dev/install.sh equals current reviewed Markata main.'
+            echo 'Validated shell syntax without executing the downloaded installer.'
+            echo ''
+            echo 'Public SHA-256:'
+            sha256sum /tmp/markata-public-install.sh
+          } >> "$GITHUB_STEP_SUMMARY"
