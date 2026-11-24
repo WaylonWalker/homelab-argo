@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: go-waylonwalker-com
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   labels:
     environment: dev
     app.kubernetes.io/environment: dev
