@@ -23,11 +23,10 @@ These Deployments were observed at zero, but they were not present in the matchi
 - `go-waylonwalker-com-dev/search`
 - `performpeoria-dev/theater-studio` and `performpeoria-prod/theater-studio`
 - `solid-stack-dev/web` (distinct from `solidstack-dev/web`, which is in the static-site inventory above)
-- `waylonwalker-com/web`
 
 The local PerformPeoria source checkout at `/home/waylon/git/performpeoria` is not initialized with Git history, and its dev and prod overlays declare one application replica. The live zero count is therefore not represented by that source. Confirm the authoritative repo and desired state before relying on these pauses or syncing those overlays.
 
-The pause sources for `go-waylonwalker-com-dev/search`, `solid-stack-dev/web`, and `waylonwalker-com/web` also need confirmation before these can be described as durable GitOps pauses.
+The pause sources for `go-waylonwalker-com-dev/search` and `solid-stack-dev/web` also need confirmation before these can be described as durable GitOps pauses.
 
 ## Resuming a hibernated CNPG database
 

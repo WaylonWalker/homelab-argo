@@ -43,8 +43,9 @@ The hostPath content stays outside this repository. The manifests only mount
 the existing hostPath into nginx, so the site content remains managed by the
 host and its existing publishing workflow.
 
-The canary intentionally excludes `go.waylonwalker.com`, `waylonwalker.com`,
-and `recipes.waylonwalker.com`; those sites are already or specially managed.
+The canary intentionally excludes `waylonwalker.com` and
+`recipes.waylonwalker.com`; those sites are already or specially managed.
+The separate `go.waylonwalker.com` site has been retired.
 
 `recipes.waylonwalker.com` is adopted separately at `k8s/recipes-waylonwalker-com`
 because it has a builder sidecar. It is not under `sites/`, so the ApplicationSet

@@ -205,7 +205,7 @@ spec:
             # Cache remains on node-local NVMe.
             workspace:
               enabled: false
-            # Dev remains the authoring/watch environment for now.
+            # Production publishes are managed through builder-admin; no dev watch site is configured.
             watch:
               enabled: false
               debounce: 2s

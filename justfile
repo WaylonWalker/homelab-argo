@@ -361,7 +361,6 @@ markata-encryption-from-clipboard deployment="":
     deployments=(
       "rhiannonwalker|k8s/rhiannonwalker/markata-go-encryption-sealed-secret.yaml|rhiannonwalker-com-prod-notes"
       "waylonwalker|k8s/waylonwalker-com/waylonwalker-com-prod/markata-go-encryption-sealed-secret.yaml|waylonwalker-com-prod-notes"
-      "go-waylonwalker|k8s/waylonwalker-com/go-waylonwalker-com/markata-go-encryption-sealed-secret.yaml|go-waylonwalker-com-notes"
       "wyattbubbylee|k8s/wyattbubbylee-com/wyattbubbylee-com-prod/markata-go-encryption-sealed-secret.yaml|wyattbubbylee-com-prod-notes"
     )
 
@@ -751,7 +750,6 @@ update-markata-image-pin image_tag="" scope="all":
     scope="{{scope}}"
     image="ghcr.io/waylonwalker/markata-go-builder"
     all_files=(
-      argo-apps/apps/go-waylonwalker-com.yaml
       argo-apps/apps/waylonwalker-com-prod.yaml
       argo-apps/apps/wyattbubbylee-com-prod.yaml
       argo-apps/apps/rhiannonwalker-com-prod.yaml
@@ -861,7 +859,7 @@ update-markata-image-pin image_tag="" scope="all":
       application/1-apps -n argocd --timeout=600s
 
     kubectl annotate application 1-apps -n argocd argocd.argoproj.io/refresh=hard --overwrite
-    apps=(go-waylonwalker-com waylonwalker-com-prod wyattbubbylee-com-prod rhiannonwalker homelab-docs)
+    apps=(waylonwalker-com-prod wyattbubbylee-com-prod rhiannonwalker homelab-docs)
     for app in "${apps[@]}"; do
       kubectl annotate application "$app" -n argocd argocd.argoproj.io/refresh=hard --overwrite
       kubectl wait \
