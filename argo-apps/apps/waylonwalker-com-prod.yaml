@@ -86,7 +86,7 @@ spec:
             fetchImage:
               tag: sha-05000c9
             builderImage:
-              tag: sha-8421090
+              tag: sha-9ec442a
             fast: false
             successfulJobsHistoryLimit: 3
             failedJobsHistoryLimit: 3
